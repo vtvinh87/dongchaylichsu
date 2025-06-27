@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dòng Chảy Lịch Sử</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Ensure Tailwind's 'class' strategy for dark mode is active.
+    // For Tailwind CSS v3 via CDN, 'class' strategy is often the default or easily enabled.
+    // If issues arise, ensure your Tailwind setup (or CDN script options if available) supports this.
+    // tailwind.config = { darkMode: 'class', /* other settings */ }
+  </script>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <style>
+    body {
+      font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; /* Ensure no default margin */
+      /* background-image is now handled by App.tsx */
+    }
+    /* Keyframes for modal animation (can be component-scoped too) */
+    @keyframes fadeInScaleUp {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .animate-fadeInScaleUp {
+      -webkit-animation: fadeInScaleUp 0.3s forwards;
+      animation: fadeInScaleUp 0.3s forwards;
+    }
+
+    /* --- CSS cho Hiệu ứng chuyển cảnh --- */
+    .screen-fade-in {
+        -webkit-animation: fadeInScreen 0.5s forwards;
+        animation: fadeInScreen 0.5s forwards;
+    }
+
+    .screen-fade-out {
+        -webkit-animation: fadeOutScreen 0.5s forwards;
+        animation: fadeOutScreen 0.5s forwards;
+    }
+
+    @keyframes fadeInScreen {
+        from { opacity: 0; transform: scale(0.98); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fadeOutScreen {
+        from { opacity: 1; transform: scale(1); }
+        to { opacity: 0; transform: scale(0.98); }
+    }
+
+    /* --- Cải tiến UI chung --- */
+    button, .mission-card {
+      transition: all 0.2s ease-in-out;
+    }
+    .mission-card:not(.locked):hover, button:not([disabled]):hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+    }
+    .mission-card:not(.locked):active, button:not([disabled]):active {
+      transform: translateY(-1px) scale(0.98);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+
+    /* --- CSS cho AR Back Button --- */
+    #ar-back-button {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10002; /* Ensure it's above the AR scene and modals */
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: #f59e0b; /* Amber 500 */
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    #ar-back-button:hover {
+      background-color: #d97706; /* Amber 600 */
+    }
+
+    .dark #ar-back-button { /* Applied when <html> has 'dark' class */
+      background-color: #78350f; /* Amber 800 */
+      color: #fef3c7; /* Amber 100 */
+      box-shadow: 0 4px 6px rgba(255,255,255,0.1);
+    }
+    .dark #ar-back-button:hover {
+      background-color: #92400e; /* Amber 700 */
+    }
+
+    /* --- CSS for Premium Locked Mission --- */
+    .premium-locked-visuals {
+      border-color: #fbbf24; /* amber-400 */
+      box-shadow: 0 0 15px rgba(251, 191, 36, 0.6), 0 0 25px rgba(251, 191, 36, 0.4);
+      -webkit-animation: premium-glow 2.5s infinite alternate;
+      animation: premium-glow 2.5s infinite alternate;
+    }
+    .dark .premium-locked-visuals {
+      box-shadow: 0 0 15px rgba(251, 191, 36, 0.7), 0 0 25px rgba(251, 191, 36, 0.5);
+    }
+
+    @keyframes premium-glow {
+      from { box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+      to { box-shadow: 0 0 20px rgba(251, 191, 36, 0.8); }
+    }
+
+    .premium-locked-visuals .premium-crown {
+      content: '👑';
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      font-size: 28px;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+      transform: rotate(15deg);
+    }
+    
+    /* --- CSS cho Cấu trúc Hồi/Chương --- */
+    .hoi-container {
+      background-color: rgba(255, 250, 235, 0.6); /* amber-50 with alpha */
+      border: 1px solid #fde68a; /* amber-200 */
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      transition: all 0.3s ease-in-out;
+      backdrop-filter: blur(3px);
+    }
+    .dark .hoi-container {
+      background-color: rgba(30, 27, 27, 0.6); /* a dark stone with alpha */
+      border-color: #a16207; /* amber-700 */
+    }
+
+    .hoi-container.locked {
+      filter: grayscale(90%);
+      opacity: 0.6;
+      pointer-events: none;
+      user-select: none;
+      position: relative;
+    }
+    
+    .hoi-container.locked::after {
+        content: '🔒';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 6rem;
+        color: white;
+        text-shadow: 0 0 15px black;
+        z-index: 10;
+        opacity: 0.7;
+    }
+
+    .mission-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1.5rem;
+    }
+
+    /* --- CSS cho Hướng dẫn Tương tác --- */
+    #tutorial-overlay-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 9998; /* Dưới hộp thoại, trên tất cả mọi thứ khác */
+    }
+
+    .tutorial-highlight {
+        position: absolute;
+        border-radius: 0.5rem; /* Match target element's rounding */
+        /* This box-shadow creates the "cutout" effect */
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+        z-index: 9999;
+        pointer-events: none;
+        transition: all 0.3s ease-in-out;
+    }
+
+    #tutorial-box {
+        position: absolute;
+        z-index: 10000;
+        min-width: 280px;
+        max-width: 350px;
+        background-color: white;
+        color: #333;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        border: 2px solid #f59e0b; /* amber-500 */
+        transition: all 0.3s ease-in-out;
+    }
+
+    .dark #tutorial-box {
+        background-color: #292524; /* stone-800 */
+        color: #f5f5f4; /* stone-100 */
+        border-color: #d97706; /* amber-600 */
+    }
+
+    /* --- CSS for Customization Screen --- */
+    .customization-item-card {
+      position: relative;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s ease-in-out;
+    }
+    .customization-item-card.item-locked {
+      filter: grayscale(1);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    .customization-item-card.item-locked::after {
+      content: '🔒';
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 1.5rem;
+      color: white;
+      text-shadow: 0 0 5px black;
+    }
+    .customization-item-card.item-selected {
+      border-color: #3b82f6; /* blue-500 */
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+    .dark .customization-item-card.item-selected {
+       border-color: #60a5fa; /* blue-400 */
+       box-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+    }
+
+    /* --- START OF DIPLOMACY SCREEN STYLES --- */
+    #goodwill-bar-container {
+        width: 100%;
+        height: 24px;
+        background-color: #e5e7eb; /* gray-200 */
+        border-radius: 0.5rem;
+        padding: 4px;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #d1d5db; /* gray-300 */
+    }
+    .dark #goodwill-bar-container {
+        background-color: #374151; /* gray-700 */
+        border-color: #4b5563; /* gray-600 */
+    }
+    #goodwill-bar {
+        height: 100%;
+        border-radius: 0.25rem;
+        transition: width 0.5s ease-in-out, background-color 0.5s ease-in-out;
+        box-shadow: 0 1px 2px rgba(255,255,255,0.2) inset;
+        position: relative;
+        overflow: hidden;
+    }
+    #goodwill-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background-image: linear-gradient(
+          -45deg,
+          rgba(255, 255, 255, 0.2) 25%,
+          transparent 25%,
+          transparent 50%,
+          rgba(255, 255, 255, 0.2) 50%,
+          rgba(255, 255, 255, 0.2) 75%,
+          transparent 75%,
+          transparent
+        );
+        z-index: 1;
+        background-size: 30px 30px;
+    }
+
+    #npc-dialogue-box {
+      background-color: #fffbeb; /* amber-50 */
+      border: 2px solid #fcd34d; /* amber-300 */
+      padding: 1rem;
+      border-radius: 0.75rem;
+      border-top-left-radius: 0; /* Creates speech bubble effect */
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      position: relative;
+    }
+    .dark #npc-dialogue-box {
+      background-color: #451a03; /* amber-950 */
+      border-color: #d97706; /* amber-600 */
+    }
+    #npc-dialogue-box::before {
+        content: '';
+        position: absolute;
+        width: 0px;
+        height: 0px;
+        border-bottom: 20px solid transparent;
+        border-right: 20px solid #fcd34d; /* Match border color */
+        left: -20px;
+        top: 0px;
+    }
+    .dark #npc-dialogue-box::before {
+       border-right-color: #d97706;
+    }
+    
+    .diplomacy-choice-button {
+      background-color: #e0f2fe; /* sky-100 */
+      border: 2px solid transparent;
+      transition: all 0.2s ease-in-out;
+    }
+    .dark .diplomacy-choice-button {
+      background-color: #0c4a6e; /* sky-900 */
+    }
+
+    .diplomacy-choice-button:not(:disabled):hover {
+      border-color: #38bdf8; /* sky-400 */
+      transform: scale(1.02);
+    }
+    .diplomacy-choice-button.selected-correct {
+        background-color: #dcfce7; /* green-100 */
+        border-color: #22c55e; /* green-500 */
+    }
+    .dark .diplomacy-choice-button.selected-correct {
+        background-color: #14532d; /* green-900 */
+        border-color: #4ade80; /* green-400 */
+    }
+     .diplomacy-choice-button.selected-wrong {
+        background-color: #fee2e2; /* red-100 */
+        border-color: #ef4444; /* red-500 */
+    }
+    .dark .diplomacy-choice-button.selected-wrong {
+        background-color: #7f1d1d; /* red-900 */
+        border-color: #f87171; /* red-400 */
+    }
+    /* --- END OF DIPLOMACY SCREEN STYLES --- */
+    
+    /* --- START OF CRAFTING SCREEN STYLES --- */
+    .crafting-item-card {
+      /* Base styles handled by Tailwind, this is for custom interactions */
+      transition: box-shadow 0.3s, transform 0.3s;
+    }
+    .crafting-item-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .dark .crafting-item-card:hover {
+       box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+    .crafting-button:disabled {
+      filter: grayscale(80%);
+      background-color: #9ca3af; /* gray-400 */
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+    .dark .crafting-button:disabled {
+      background-color: #4b5563; /* gray-600 */
+    }
+    /* --- END OF CRAFTING SCREEN STYLES --- */
+
+    /* --- START OF TRADING SCREEN STYLES --- */
+    #player-stats .stat-item {
+        @apply bg-amber-200 dark:bg-stone-600 p-2 px-4 rounded-md text-stone-700 dark:text-amber-200 text-sm sm:text-base;
+    }
+    .trading-card {
+        @apply bg-amber-50 dark:bg-stone-700 p-3 rounded-lg shadow-md text-center border border-amber-200 dark:border-stone-600;
+    }
+    .trading-card.small {
+        @apply flex items-center text-left p-2;
+    }
+    .trade-button {
+        @apply w-full mt-2 py-1 px-4 text-sm font-semibold rounded-md shadow-sm transition-transform transform hover:scale-105;
+    }
+    .trade-button.buy-button {
+        @apply bg-blue-500 hover:bg-blue-600 text-white;
+    }
+    .trade-button.sell-button {
+        @apply bg-red-500 hover:bg-red-600 text-white;
+    }
+    /* --- END OF TRADING SCREEN STYLES --- */
+
+
+    /* --- Responsive Design --- */
+    @media (max-width: 768px) { /* Tablets and large phones */
+      body > #root > div:first-child {
+        padding: 1rem;
+      }
+      .hoi-container {
+        padding: 1rem;
+      }
+      .mission-list {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+      }
+      .modal-content {
+        max-width: 90vw;
+      }
+      .chatbot-container {
+        width: 95vw;
+        max-width: 420px;
+        max-height: 85vh;
+      }
+      #main-header {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+      }
+    }
+    
+    @media (max-width: 600px) { /* Mobile phones */
+      body > #root, body > #root > div:first-child {
+        padding: 0;
+      }
+      
+      .main-screen-container, .screen-container {
+        min-height: 100vh;
+        border-radius: 0;
+        padding: 1rem;
+        padding-top: 1.5rem; /* More space at top */
+      }
+
+      /* Header */
+      #main-header h1 {
+        font-size: 1.5rem; /* 24px */
+      }
+      #main-header-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+      #main-header-controls button {
+        padding: 8px 12px;
+        font-size: 0.875rem; /* 14px */
+      }
+      
+      .mission-list {
+        grid-template-columns: 1fr; /* Stack missions vertically on smallest screens */
+      }
+
+      #collection-grid, #hero-card-grid, #premium-decorations-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+      }
+      .modal-content {
+        width: 95vw;
+        max-width: 95vw;
+        padding: 1.25rem;
+      }
+      .modal-content h2 { font-size: 1.75rem; }
+
+      .chatbot-container {
+        width: 100vw;
+        height: 100vh;
+        max-height: 100vh;
+        bottom: 0;
+        right: 0;
+        border-radius: 0;
+        border: none;
+      }
+      
+      .sandbox-container {
+        flex-direction: column;
+        height: 98vh;
+      }
+      #item-palette {
+        flex-shrink: 0;
+        height: auto;
+        width: 100%;
+        overflow-x: auto;
+      }
+      #item-palette .overflow-y-auto {
+        display: flex;
+        flex-direction: row;
+        overflow-y: hidden;
+        gap: 1rem;
+        padding-bottom: 0.5rem;
+      }
+      #item-palette .overflow-y-auto > div {
+        flex-shrink: 0;
+      }
+      .sandbox-container .flex-col.sm\\:flex-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+
+    /* --- START OF CLARITY & READABILITY ENHANCEMENTS --- */
+
+    /* 1. Backdrop Blur for Modal Overlays */
+    /* This targets the div that acts as the dark background for modals */
+    .fixed.inset-0.bg-black {
+      -webkit-backdrop-filter: blur(5px);
+      backdrop-filter: blur(5px);
+    }
+
+    /* 2. Content Container Styling (Background & Shadow) */
+    /* Apply a more opaque, solid background to main content blocks to lift them from the background image and improve readability */
+    .screen-container,
+    .hoi-container,
+    .modal-content,
+    #tutorial-box {
+      background-color: rgba(253, 250, 245, 0.97) !important; /* A nearly opaque warm, off-white like aged paper */
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(220, 190, 150, 0.6); /* More visible warm border */
+    }
+
+    /* Dark mode adjustments for the same containers */
+    .dark .screen-container,
+    .dark .hoi-container,
+    .dark .modal-content,
+    .dark #tutorial-box {
+      background-color: rgba(41, 37, 36, 0.94) !important; /* A dark, warm stone color */
+      box-shadow: 0 5px 30px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(120, 80, 50, 0.5);
+    }
+
+    /* Ensure mission cards also get a lift, but keep their original intended colors */
+    .mission-card {
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    .dark .mission-card {
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    }
+
+    /* 3. Text Shadow for Readability */
+    /* Apply a very subtle shadow to headers and buttons in light mode for depth. Body text has no shadow for maximum crispness. */
+    h1, h2, h3, h4, button {
+      text-shadow: 0 1px 2px rgba(30, 27, 27, 0.15);
+    }
+
+    /* A stronger shadow for ALL text in dark mode where light text can get lost on complex backgrounds */
+    .dark h1, .dark h2, .dark h3, .dark h4, .dark p, .dark button, .dark label, .dark li {
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Exclude icons from getting a text shadow as it often looks incorrect */
+    button span[role="img"], .premium-crown, .control-button {
+      text-shadow: none !important;
+    }
+
+    /* --- END OF CLARITY & READABILITY ENHANCEMENTS --- */
+
+    /* --- START OF LANDING PAGE STYLES --- */
+    @keyframes text-fade-in-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .landing-screen {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Overlay for text readability */
+    .landing-screen::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+
+    .landing-content {
+      position: relative;
+      z-index: 2;
+      padding: 1rem;
+    }
+
+    .landing-content h1 {
+      font-size: 3rem; /* Tailwind: text-5xl */
+      font-weight: 800; /* extra-bold */
+      animation: text-fade-in-up 1s forwards;
+      opacity: 0;
+    }
+
+    .landing-content h2 {
+      font-size: 1.5rem; /* text-2xl */
+      font-weight: 600; /* semi-bold */
+      margin-top: 1rem;
+      animation: text-fade-in-up 1s forwards 0.3s;
+      opacity: 0;
+    }
+    
+    #start-adventure-button {
+      margin-top: 2.5rem; /* mt-10 */
+      padding: 0.75rem 2rem; /* py-3 px-8 */
+      font-size: 1.125rem; /* text-lg */
+      font-weight: 700; /* bold */
+      background-color: #f59e0b; /* amber-500 */
+      color: white;
+      border-radius: 0.5rem; /* rounded-lg */
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 0 20px rgba(245, 158, 11, 0.4);
+      transition: all 0.3s ease;
+      animation: text-fade-in-up 1s forwards 0.6s;
+      opacity: 0;
+    }
+
+    #start-adventure-button:hover {
+      background-color: #d97706; /* amber-600 */
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2), 0 0 30px rgba(245, 158, 11, 0.6);
+    }
+    /* --- END OF LANDING PAGE STYLES --- */
+
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.7.0",
+    "html2canvas": "https://esm.sh/html2canvas@1.4.1"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body> <!-- Removed Tailwind classes and background, will be handled by App.tsx -->
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+
+  <audio id="sfx-click" src="https://pixabay.com/sound-effects/download/sounds-1323-click-button-140881.mp3" preload="auto"></audio>
+  <audio id="sfx-success" src="https://pixabay.com/sound-effects/download/sounds-1323-success-1-6297.mp3" preload="auto"></audio>
+  <audio id="sfx-unlock" src="https://pixabay.com/sound-effects/download/sounds-1323-magic-wand-2-164832.mp3" preload="auto"></audio>
+</body>
+</html>
