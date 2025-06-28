@@ -95,7 +95,7 @@ export const TRADING_CERAMICS_ICON_URL = "https://i.ibb.co/YhX3fQG/gom-su-icon.p
 export const TRADING_SPICES_ICON_URL = "https://i.ibb.co/yQJzV5B/spices-icon.png";
 
 // --- AI Character Avatars ---
-export const QUANG_TRUNG_AVATAR_URL = "https://i.ibb.co/5hXZBzjP/quang-trung.png";
+export const QUANG_TRUNG_AVATAR_URL = "https://i.ibb.co/5g2fxwbm/Avt-Quang-Trung.png";
 // Using the hero card image for Hai Ba Trung avatar for consistency
 export const HAI_BA_TRUNG_AVATAR_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Tranh_Hai_B%C3%A0_Tr%C6%B0ng_kh%E1%BB%9Fi_ngh%C4%A9a.jpg/640px-Tranh_Hai_B%C3%A0_Tr%C6%B0ng_kh%E1%BB%9Fi_ngh%C4%A9a.jpg";
 export const LY_THAI_TO_AVATAR_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/T%C6%B0%E1%BB%A3ng_vua_L%C3%BD_Th%C3%A1i_T%E1%BB%95_t%E1%BA%A1i_%C4%90%E1%BB%81n_%C4%90%C3%B4.jpg/800px-T%C6%B0%E1%BB%A3ng_vua_L%C3%BD_Th%C3%A1i_T%E1%BB%95_t%E1%BA%A1i_%C4%90%E1%BB%81n_%C4%90%C3%B4.jpg";

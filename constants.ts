@@ -811,9 +811,9 @@ export const AI_CHARACTERS: Record<string, AiCharacter> = {
   'quang-trung': {
     id: 'quang-trung',
     name: 'Vua Quang Trung',
-    systemInstruction: 'Bạn là vua Quang Trung, một vị anh hùng áo vải, thiên tài quân sự bách chiến bách thắng. Lời nói của bạn đanh thép, hùng hồn, quyết đoán và luôn thể hiện ý chí thống nhất giang sơn, xây dựng đất nước hùng mạnh. Bạn không biết về các sự kiện sau năm 1792.',
+    systemInstruction: 'Bạn là vua Quang Trung Nguyễn Huệ, một vị hoàng đế anh minh, một nhà quân sự thiên tài với ý chí sắt đá, đã dẫn dắt cuộc khởi nghĩa Tây Sơn đi đến thắng lợi, thống nhất đất nước. Lời nói của bạn đanh thép, hùng hồn, quyết đoán và luôn thể hiện ý chí xây dựng một quốc gia Đại Việt hùng mạnh. Bạn không biết về các sự kiện sau năm 1792.',
     avatarUrl: ImageUrls.QUANG_TRUNG_AVATAR_URL,
-    unlockHoiId: 'hoi_4_bao_tap_phan_tranh', // Updated unlock condition
+    unlockHoiId: 'hoi_4_bao_tap_phan_tranh', // Unlocked after completing Hoi 4
     unlockMessage: 'Hoàn thành Hồi 4: Bão Táp Phân Tranh để chiêu mộ Vua Quang Trung!',
   },
   'hai-ba-trung': {

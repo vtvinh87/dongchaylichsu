@@ -1,10 +1,12 @@
+/// <reference types="react" />
+
 // aframe.d.ts
 // This file provides TypeScript definitions for A-Frame's custom HTML elements
 // to be used within JSX, preventing "Property 'a-scene' does not exist on type 'JSX.IntrinsicElements'" errors.
 
 declare global {
   namespace JSX {
-      type AFrameReactAttributes = import('react').DetailedHTMLProps<import('react').HTMLAttributes<HTMLElement>, HTMLElement>;
+      type AFrameReactAttributes = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 
       interface IntrinsicElements {
         'a-scene': AFrameReactAttributes & {
@@ -14,7 +16,7 @@ declare global {
           'vr-mode-ui'?: string;
           'gesture-detector'?: string | boolean;
           id?: string;
-          style?: import('react').CSSProperties;
+          style?: React.CSSProperties;
         };
         'a-entity': AFrameReactAttributes & {
           camera?: boolean | string;
@@ -41,6 +43,3 @@ declare global {
       }
   }
 }
-
-// Add an empty export to make this file a module, which is required for global augmentations.
-export {};

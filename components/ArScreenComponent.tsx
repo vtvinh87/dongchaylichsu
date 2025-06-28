@@ -1,7 +1,5 @@
-
-
 import React, { useEffect } from 'react';
-import '../aframe.d.ts';
+
 import { ARMissionData, Reward } from '../types';
 import { playSound } from '../utils/audio';
 
@@ -20,34 +18,34 @@ const ArScreenComponent: React.FC<ArScreenComponentProps> = ({
 }) => {
 
   useEffect(() => {
-    // This effect ensures that A-Frame components are re-evaluated if missionData changes,
-    // though typically for AR, the scene is static once loaded for a mission.
-  }, [missionData]);
+    const sceneEl = document.querySelector('a-scene');
+    if (!sceneEl) return;
 
-  useEffect(() => {
-    const marker = document.querySelector('a-marker');
-    let markerFoundOnce = false; // To ensure we only trigger once per AR session for this marker instance
-
+    let markerFoundOnce = false;
     const markerFoundHandler = () => {
       if (!markerFoundOnce) {
         onMarkerActuallyFound(missionData.reward);
-        markerFoundOnce = true; // Set flag to prevent multiple triggers for this specific marker rendering
+        markerFoundOnce = true;
       }
     };
-
-    if (marker) {
-      marker.addEventListener('markerfound', markerFoundHandler);
-      // console.log("Marker event listener attached for", missionData.markerPatternUrl);
-    } else {
-      // console.warn("a-marker element not found for event listener.");
-    }
     
-    // Cleanup: remove event listener when component unmounts or missionData changes
+    const attachMarkerListener = () => {
+        const markerEl = sceneEl.querySelector('a-marker');
+        if (markerEl) {
+            markerEl.addEventListener('markerfound', markerFoundHandler);
+        }
+    };
+
+    if ((sceneEl as any).hasLoaded) {
+      attachMarkerListener();
+    } else {
+      sceneEl.addEventListener('loaded', attachMarkerListener, { once: true });
+    }
+
     return () => {
-      if (marker) {
-        marker.removeEventListener('markerfound', markerFoundHandler);
-        // console.log("Marker event listener removed for", missionData.markerPatternUrl);
-      }
+      const markerEl = sceneEl.querySelector('a-marker');
+      markerEl?.removeEventListener('markerfound', markerFoundHandler);
+      sceneEl.removeEventListener('loaded', attachMarkerListener);
     };
   }, [missionData.reward, missionData.markerPatternUrl, onMarkerActuallyFound]);
 
