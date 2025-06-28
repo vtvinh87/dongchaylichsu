@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useMemo } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import html2canvas from 'html2canvas';
@@ -6,7 +7,7 @@ import { playSound } from '../utils/audio';
 import { TRANSPARENT_GIF_URL } from '../imageUrls';
 import { ALL_SANDBOX_BACKGROUNDS_MAP } from '../constants';
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = process.env.GEMINI_API;
 
 type DraggedInfo =
   | { type: 'item'; item: PlacedItem; offsetX: number; offsetY: number }

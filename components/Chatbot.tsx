@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GoogleGenAI, Chat } from "@google/genai";
 import { ChatMessage, AiCharacter } from '../types';
@@ -15,7 +16,7 @@ interface ChatbotProps {
   onUpgradePrompt: () => void;
 }
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = process.env.GEMINI_API;
 
 const Chatbot: React.FC<ChatbotProps> = ({ 
   isOpen, 

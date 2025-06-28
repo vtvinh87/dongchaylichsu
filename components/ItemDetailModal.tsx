@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import { Artifact, HeroCard, Decoration } from '../types';
@@ -13,7 +14,7 @@ interface ItemDetailModalProps {
   onClose: () => void;
 }
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = process.env.GEMINI_API;
 
 const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, isOpen, onClose }) => {
   const [isLoading, setIsLoading] = useState(true);
