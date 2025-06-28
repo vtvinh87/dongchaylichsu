@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import '../aframe.d.ts';
 
 import { ARMissionData, Reward } from '../types';
 import { playSound } from '../utils/audio';

@@ -1,13 +1,10 @@
 
 import React, { useState, useRef, useMemo } from 'react';
-import { GoogleGenAI } from "@google/genai";
 import html2canvas from 'html2canvas';
 import { Artifact, Decoration, SandboxState, PlacedItem, SandboxItem, SpeechBubble } from '../types';
 import { playSound } from '../utils/audio';
 import { TRANSPARENT_GIF_URL } from '../imageUrls';
 import { ALL_SANDBOX_BACKGROUNDS_MAP } from '../constants';
-
-const API_KEY = process.env.GEMINI_API;
 
 type DraggedInfo =
   | { type: 'item'; item: PlacedItem; offsetX: number; offsetY: number }
@@ -132,26 +129,29 @@ const SandboxScreen: React.FC<SandboxScreenProps> = ({
       setIsAddingDialogue(false);
     }
   };
-
+  
   const generateAndSetBubbleText = async (bubbleId: string, itemName: string) => {
-    if (!API_KEY) {
-      onUpdateSandboxState(s => {
-          const newBubbles = s.speechBubbles.map(b => b.id === bubbleId ? {...b, text: "Lỗi: API chưa được cấu hình."} : b);
-          return {...s, speechBubbles: newBubbles};
-      });
-      return;
-    }
-
     try {
-      const ai = new GoogleGenAI({ apiKey: API_KEY });
-      const prompt = `Bạn là một trợ lý sáng tạo cho game lịch sử. Hãy tạo một câu thoại ngắn gọn (1-2 câu), thú vị, dưới dạng suy nghĩ hoặc một sự thật vui về vật phẩm sau. Viết bằng tiếng Việt, văn phong phù hợp cho trẻ em. Vật phẩm: "${itemName}"`;
-      const response = await ai.models.generateContent({ model: "gemini-2.5-flash-preview-04-17", contents: prompt });
+      const promptText = `Bạn là một trợ lý sáng tạo cho game lịch sử. Hãy tạo một câu thoại ngắn gọn (1-2 câu), thú vị, dưới dạng suy nghĩ hoặc một sự thật vui về vật phẩm sau. Viết bằng tiếng Việt, văn phong phù hợp cho trẻ em. Vật phẩm: "${itemName}"`;
+      
+      const response = await fetch('/api/gemini', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: promptText }),
+      });
+
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+
+      const data = await response.json();
+
       onUpdateSandboxState(s => {
-          const newBubbles = s.speechBubbles.map(b => b.id === bubbleId ? { ...b, text: response.text.trim() } : b);
+          const newBubbles = s.speechBubbles.map(b => b.id === bubbleId ? { ...b, text: data.text.trim() } : b);
           return {...s, speechBubbles: newBubbles};
       });
     } catch (e) {
-      console.error("Error generating bubble text:", e);
+      console.error("Error generating bubble text via proxy:", e);
       onUpdateSandboxState(s => {
           const newBubbles = s.speechBubbles.map(b => b.id === bubbleId ? { ...b, text: "Oops, có lỗi xảy ra!" } : b);
           return {...s, speechBubbles: newBubbles};
@@ -301,8 +301,3 @@ const SandboxScreen: React.FC<SandboxScreenProps> = ({
 };
 
 export default SandboxScreen;
-
-if (typeof process === 'undefined') {
-  // @ts-ignore
-  globalThis.process = { env: {} };
-}
