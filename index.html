@@ -377,6 +377,668 @@
     }
     /* --- END OF TRADING SCREEN STYLES --- */
 
+    /* --- START OF CHATBOT CHARACTER SELECTION --- */
+    #character-selection {
+      background-color: #fef3c7; /* amber-100 */
+      padding: 0.5rem;
+      border-bottom: 1px solid #fcd34d; /* amber-300 */
+      text-align: center;
+      position: relative;
+    }
+    .dark #character-selection {
+      background-color: #451a03; /* amber-950 */
+      border-bottom-color: #b45309; /* amber-700 */
+    }
+
+    #character-selection-scroll {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.75rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem; /* For scrollbar */
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    #character-selection-scroll::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+    }
+
+
+    .character-avatar-button {
+      position: relative;
+      border: none;
+      background: none;
+      padding: 0;
+      cursor: pointer;
+      border-radius: 9999px;
+      transition: all 0.2s ease-in-out;
+      flex-shrink: 0;
+    }
+
+    .character-avatar-button img {
+      width: 2.75rem; /* 44px */
+      height: 2.75rem; /* 44px */
+      border-radius: 9999px;
+      object-fit: cover;
+      border: 3px solid transparent;
+      transition: all 0.2s ease-in-out;
+      background-color: #e5e7eb; /* gray-200 */
+    }
+    .dark .character-avatar-button img {
+      background-color: #4b5563; /* gray-600 */
+    }
+
+
+    .character-avatar-button.avatar-selected img {
+      border-color: #3b82f6; /* blue-500 */
+      transform: scale(1.1);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
+    }
+    .dark .character-avatar-button.avatar-selected img {
+      border-color: #60a5fa; /* blue-400 */
+      box-shadow: 0 0 10px rgba(96, 165, 250, 0.7);
+    }
+
+
+    .character-avatar-button.avatar-locked {
+      cursor: not-allowed;
+    }
+    .character-avatar-button.avatar-locked img {
+      filter: grayscale(100%);
+      opacity: 0.6;
+    }
+
+    .character-avatar-button.avatar-locked::after {
+      content: '🔒';
+      position: absolute;
+      bottom: -4px;
+      right: -4px;
+      font-size: 1rem;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      border-radius: 9999px;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+    /* --- END OF CHATBOT CHARACTER SELECTION --- */
+
+    /* --- START OF COLORING GAME STYLES --- */
+    #coloring-canvas {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      border-radius: 8px;
+      background-color: #fffaf0; /* floralwhite */
+      border: 4px solid #fcd34d; /* amber-300 */
+    }
+    #coloring-canvas svg path,
+    #coloring-canvas svg circle,
+    #coloring-canvas svg polygon {
+      cursor: pointer;
+      transition: fill 0.15s ease-in-out;
+    }
+    #coloring-canvas svg path:hover,
+    #coloring-canvas svg circle:hover,
+    #coloring-canvas svg polygon:hover {
+      stroke-width: 3px;
+      stroke: #3b82f6; /* blue-500 */
+    }
+    .dark #coloring-canvas {
+       background-color: #4b5563; /* gray-600 */
+       border-color: #b45309; /* amber-700 */
+    }
+    .dark #coloring-canvas svg {
+      stroke: #f5f5f4; /* stone-100 */
+    }
+    .dark #coloring-canvas svg circle {
+      fill: #f5f5f4; /* stone-100 */
+    }
+
+    #color-palette {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background-color: rgba(255,255,255,0.5);
+      border-radius: 0.5rem;
+    }
+    .dark #color-palette {
+      background-color: rgba(0,0,0,0.3);
+    }
+    .color-swatch {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid #d1d5db; /* gray-300 */
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .dark .color-swatch {
+       border-color: #4b5563; /* gray-600 */
+    }
+    .color-swatch.selected {
+      border-color: #3b82f6; /* blue-500 */
+      transform: scale(1.15);
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.5);
+    }
+    .dark .color-swatch.selected {
+      border-color: #60a5fa; /* blue-400 */
+      box-shadow: 0 4px 10px rgba(96, 165, 250, 0.5);
+    }
+    /* --- END OF COLORING GAME STYLES --- */
+    
+    /* --- START OF RHYTHM GAME STYLES --- */
+    .rhythm-play-area {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      height: 600px;
+      background-color: #1f2937; /* gray-800 */
+      background-image: linear-gradient(to bottom, #374151, #111827);
+      margin: 1rem auto;
+      border-radius: 0.5rem;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+      overflow: hidden;
+      display: flex;
+      justify-content: space-around;
+      border: 2px solid #4b5563; /* gray-600 */
+    }
+    .rhythm-lane {
+      position: relative;
+      width: 30%;
+      height: 100%;
+      border-left: 1px dashed rgba(255, 255, 255, 0.1);
+      border-right: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+    .hit-line {
+      position: absolute;
+      bottom: 15%;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background-color: #f59e0b; /* amber-500 */
+      box-shadow: 0 0 15px #f59e0b, 0 0 25px #f59e0b;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+    }
+    .hit-key {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #fffbeb;
+      text-shadow: 0 0 5px black;
+    }
+    .rhythm-note {
+      position: absolute;
+      top: -50px; /* Start above the screen */
+      width: 80%;
+      left: 10%;
+      height: 25px;
+      background: linear-gradient(145deg, #06b6d4, #67e8f9); /* cyan-500, cyan-300 */
+      border-radius: 1rem;
+      box-shadow: 0 0 10px #06b6d4;
+      animation-name: note-fall;
+      animation-timing-function: linear;
+      will-change: transform;
+    }
+    @keyframes note-fall {
+      from { transform: translateY(0); }
+      to { transform: translateY(650px); } /* height + 50px offset */
+    }
+
+    .hit-feedback {
+      position: absolute;
+      bottom: 16%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      font-weight: bold;
+      text-shadow: 0 0 10px white;
+      pointer-events: none;
+      opacity: 0;
+      animation: fade-up-out 0.5s ease-out;
+    }
+    @keyframes fade-up-out {
+      0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-50px); }
+    }
+    /* --- END OF RHYTHM GAME STYLES --- */
+
+    /* --- START OF FORGING GAME STYLES --- */
+    @keyframes move-marker {
+      0% { left: 0%; }
+      50% { left: calc(100% - 10px); } /* 10px is the width of the marker */
+      100% { left: 0%; }
+    }
+    .force-bar-container {
+      position: relative;
+      width: 100%;
+      height: 30px;
+      background-color: #4b5563; /* gray-600 */
+      border-radius: 8px;
+      border: 2px solid #1f2937; /* gray-800 */
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+    }
+    .force-bar-zone {
+      position: absolute;
+      top: 0;
+      height: 100%;
+    }
+    .force-bar-good-zone {
+      left: 25%;
+      width: 50%;
+      background-color: rgba(251, 191, 36, 0.4); /* amber-400 with alpha */
+    }
+    .force-bar-perfect-zone {
+      left: 45%;
+      width: 10%;
+      background-color: rgba(52, 211, 153, 0.6); /* emerald-400 with alpha */
+      border-left: 2px solid white;
+      border-right: 2px solid white;
+    }
+    .hit-marker {
+      position: absolute;
+      top: -5px;
+      bottom: -5px;
+      width: 10px;
+      background-color: #ef4444; /* red-500 */
+      border: 2px solid white;
+      border-radius: 4px;
+      box-shadow: 0 0 8px #ef4444;
+      animation: move-marker 1.5s linear infinite;
+      animation-play-state: running; /* Initially running */
+    }
+    .hit-marker.paused {
+      animation-play-state: paused;
+    }
+    .sparks-effect {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -60%);
+        width: 200px;
+        height: 200px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+    .sparks-effect.show {
+      opacity: 1;
+    }
+    /* --- END OF FORGING GAME STYLES --- */
+
+    /* --- START OF RALLY CALL SCREEN STYLES --- */
+    #hich-content {
+        background-color: #fdf6e3; /* A parchment color */
+        border: 20px solid transparent;
+        border-image: url('https://i.ibb.co/hK4mJ5S/scroll-border.png') 30 stretch;
+        padding: 2rem;
+        font-family: 'serif';
+        font-size: 1.25rem;
+        line-height: 1.8;
+        color: #5d4037; /* A dark brown color */
+        white-space: pre-wrap; /* To respect newlines */
+        min-height: 200px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .dark #hich-content {
+        background-color: #3e2723;
+        color: #d7ccc8;
+        border-image-source: url('https://i.ibb.co/JqjTz3V/scroll-border-dark.png');
+    }
+
+    .phrase-choice-button {
+        background-color: #c8a46e;
+        border: 2px solid #a1887f;
+        color: #4e342e;
+        font-family: 'serif';
+        transition: all 0.2s ease-in-out;
+    }
+    .dark .phrase-choice-button {
+      background-color: #8d6e63;
+      border-color: #a1887f;
+      color: #efebe9;
+    }
+    .phrase-choice-button:hover {
+      background-color: #bfa068;
+      border-color: #795548;
+      transform: scale(1.03);
+    }
+    /* --- END OF RALLY CALL SCREEN STYLES --- */
+
+
+    /* --- START OF SANDBOX 2.0 STYLES --- */
+    #background-palette .item-locked {
+      filter: grayscale(1);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    #background-palette .item-locked::after {
+      content: '🔒';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      color: white; text-shadow: 0 0 5px black;
+    }
+    #background-palette .item-selected {
+      border-color: #3b82f6; /* blue-500 */
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+    
+    #sandbox-canvas.dialogue-mode .placed-item {
+        cursor: copy;
+    }
+
+    .speech-bubble {
+        position: absolute;
+        background-color: white;
+        color: #333;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        max-width: 150px;
+        font-size: 13px;
+        cursor: move;
+        line-height: 1.3;
+        transition: all 0.2s;
+    }
+
+    .dark .speech-bubble {
+        background-color: #374151; /* gray-700 */
+        color: #f3f4f6; /* gray-100 */
+        border-color: #4b5563; /* gray-600 */
+    }
+
+    .speech-bubble::after {
+        content: '';
+        position: absolute;
+        border-style: solid;
+        border-width: 10px;
+        bottom: -19px;
+        left: 20px;
+        border-color: white transparent transparent transparent;
+    }
+    
+    .dark .speech-bubble::after {
+        border-top-color: #374151; /* Match dark bubble background */
+    }
+    
+    .speech-bubble.loading {
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .speech-bubble.loading::before {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ccc;
+      border-top-color: #333;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    /* --- END OF SANDBOX 2.0 STYLES --- */
+
+    /* --- START OF ACHIEVEMENT STYLES --- */
+    #achievements-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .achievement-card {
+      transition: all 0.2s ease-in-out;
+      border: 2px solid transparent;
+    }
+    .achievement-card:not(.achievement-locked):hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      border-color: #fbbf24; /* amber-400 */
+    }
+
+    .achievement-locked {
+      filter: grayscale(1);
+      opacity: 0.65;
+      background-color: rgba(0,0,0,0.05);
+    }
+    .dark .achievement-locked {
+        background-color: rgba(255,255,255,0.05);
+    }
+
+    #achievement-toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      animation: toast-in-out 4s forwards ease-in-out;
+      pointer-events: none;
+    }
+    
+    @keyframes toast-in-out {
+      0% { opacity: 0; transform: translate(-50%, 50px); }
+      15% { opacity: 1; transform: translate(-50%, 0); }
+      85% { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 0; transform: translate(-50%, 50px); }
+    }
+
+    /* --- END OF ACHIEVEMENT STYLES --- */
+
+    /* --- START OF QUEST CHAIN STYLES --- */
+    .quest-step {
+      position: relative;
+      padding-left: 50px; /* Space for icon and line */
+      min-height: 80px;
+    }
+    /* The vertical connecting line */
+    .quest-step:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 20px;
+      top: 40px; /* Start below the icon */
+      bottom: -40px; /* Extend to the next icon's top */
+      width: 4px;
+      background-color: #d1d5db; /* gray-300 */
+    }
+    .dark .quest-step:not(:last-child)::before {
+      background-color: #4b5563; /* gray-600 */
+    }
+    .quest-step.step-completed:not(:last-child)::before {
+      background-color: #22c55e; /* green-500 */
+    }
+
+    /* The icon circle */
+    .quest-step-icon {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      z-index: 1;
+      transition: all 0.3s ease;
+      border-width: 4px;
+    }
+    .quest-step.step-locked .quest-step-icon {
+      background-color: #e5e7eb; /* gray-200 */
+      color: #9ca3af; /* gray-400 */
+      border-color: #d1d5db; /* gray-300 */
+    }
+    .dark .quest-step.step-locked .quest-step-icon {
+       background-color: #374151; /* gray-700 */
+       color: #6b7280; /* gray-500 */
+       border-color: #4b5563; /* gray-600 */
+    }
+    .quest-step.step-active .quest-step-icon {
+      background-color: #f59e0b; /* amber-500 */
+      color: white;
+      border-color: #fbbf24; /* amber-400 */
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.7);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+    .quest-step.step-completed .quest-step-icon {
+      background-color: #22c55e; /* green-500 */
+      color: white;
+      border-color: #16a34a; /* green-600 */
+    }
+    /* --- END OF QUEST CHAIN STYLES --- */
+
+    /* --- START OF TACTICAL MAP STYLES --- */
+    #tactical-map {
+      position: relative;
+      cursor: url('https://i.ibb.co/L8zBScR/bach-dang-stake.png') 16 32, crosshair;
+    }
+    .placed-stake {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      pointer-events: none;
+      transform: translate(-50%, -100%); /* Center horizontally, tip at cursor */
+      animation: place-stake 0.3s ease-out;
+    }
+    @keyframes place-stake {
+      from { transform: translate(-50%, -150%) scale(1.2); opacity: 0; }
+      to { transform: translate(-50%, -100%) scale(1); opacity: 1; }
+    }
+    /* --- END OF TACTICAL MAP STYLES --- */
+
+    /* --- START OF DEFENSE GAME STYLES --- */
+    #map-grid {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        grid-template-rows: repeat(10, 1fr);
+        gap: 2px;
+        background-color: #a3b18a; /* A light olive green for the grid background */
+        border: 4px solid #344e41; /* Dark green border */
+        position: relative; /* For item positioning */
+    }
+    .map-cell {
+        width: 100%;
+        height: 100%;
+        aspect-ratio: 1 / 1;
+        transition: background-color 0.2s;
+    }
+    .map-cell.village { background-color: #f2e8cf; }
+    .dark .map-cell.village { background-color: #a18a6a; }
+    .map-cell.forest { background-color: #3a5a40; }
+    .dark .map-cell.forest { background-color: #2c4231; }
+    .map-cell.road { background-color: #d2b48c; }
+    .dark .map-cell.road { background-color: #795c34; }
+    .map-cell.empty { background-color: #dad7cd; }
+    .dark .map-cell.empty { background-color: #8c8980; }
+
+    .map-cell.droppable:hover {
+        background-color: rgba(251, 191, 36, 0.4); /* Amber highlight on hover */
+        outline: 2px dashed #f59e0b;
+    }
+
+    .movable-item {
+        position: absolute;
+        width: 10%; /* Corresponds to grid cell width */
+        height: 10%; /* Corresponds to grid cell height */
+        padding: 4%;
+        box-sizing: border-box;
+        cursor: grab;
+        transition: all 0.2s;
+        z-index: 10;
+    }
+    .movable-item:active {
+        cursor: grabbing;
+        transform: scale(1.2);
+        z-index: 100;
+        filter: drop-shadow(0 0 5px white);
+    }
+    .movable-item-icon {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        pointer-events: none; /* Make sure the underlying cell receives drop events */
+    }
+    #timer-display {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    #timer-display.low-time {
+      color: #ef4444; /* red-500 */
+      animation: timer-pulse 1s infinite;
+    }
+    @keyframes timer-pulse {
+      50% { transform: scale(1.05); }
+    }
+    /* --- END OF DEFENSE GAME STYLES --- */
+
+    /* --- START OF STRATEGY MAP STYLES --- */
+    #map-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+    }
+    #map-container img, #map-container canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    /* --- END OF STRATEGY MAP STYLES --- */
+
+    /* --- START OF COIN MINTING STYLES --- */
+    .selection-card {
+        transition: all 0.2s ease-in-out;
+        border: 3px solid transparent;
+    }
+    .selection-card:not(.disabled):hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .dark .selection-card:not(.disabled):hover {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .selection-card.selected {
+        border-color: #3b82f6; /* blue-500 */
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+    }
+    .dark .selection-card.selected {
+        border-color: #60a5fa; /* blue-400 */
+    }
+    #result-display img {
+        animation: coin-appear 0.5s ease-out forwards;
+    }
+    @keyframes coin-appear {
+        from { transform: scale(0.5) rotate(-90deg); opacity: 0; }
+        to { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    /* --- END OF COIN MINTING STYLES --- */
+
 
     /* --- Responsive Design --- */
     @media (max-width: 768px) { /* Tablets and large phones */

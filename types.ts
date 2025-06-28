@@ -1,6 +1,5 @@
 
 
-
 export enum Screen {
   LOGIN,
   MAIN_INTERFACE,
@@ -18,7 +17,17 @@ export enum Screen {
   CUSTOMIZATION,
   LANDING_PAGE,
   CRAFTING_SCREEN,
-  TRADING_SCREEN, // New screen for the trading game
+  TRADING_SCREEN,
+  RHYTHM_MISSION_SCREEN,
+  COLORING_MISSION_SCREEN,
+  ACHIEVEMENTS,
+  RALLY_CALL_MISSION_SCREEN,
+  FORGING_MISSION_SCREEN,
+  QUEST_CHAIN_SCREEN, // New screen for quest chains
+  TACTICAL_MAP_MISSION_SCREEN, // New screen for the stake-placing game
+  DEFENSE_MISSION_SCREEN, // New screen for the defense game
+  STRATEGY_MAP_MISSION_SCREEN, // New screen for the strategy map game
+  COIN_MINTING_MISSION_SCREEN, // New screen for the coin minting game
 }
 
 export interface Artifact {
@@ -59,8 +68,10 @@ export interface MissionInfo {
   imageUrl: string;
   description?: string;
   missionId: string; 
+  questChainId?: string; // ID for quest chains
   isPremium?: boolean;
   isOptionalForProgression?: boolean; 
+  dependsOnMissionId?: string; // New field for sequential unlocking
 }
 
 // Represents a "Chapter" or "Act" that groups multiple missions
@@ -113,7 +124,7 @@ export interface NarrativeMissionData {
   title: string;
   startNodeId: string;
   nodes: Record<string, NarrativeNode>; 
-  reward: Reward;
+  reward?: Reward; // Final step of a quest might not have an inline reward
 }
 
 export interface TimelineEventItem {
@@ -158,7 +169,7 @@ export interface HiddenObjectMissionData {
   title: string;
   backgroundImageUrl: string;
   objectsToFind: HiddenObjectItem[];
-  reward: Reward;
+  reward?: Reward;
 }
 
 export interface QuizQuestion {
@@ -240,8 +251,145 @@ export interface TradingMissionData {
     reward: Reward;
 }
 
+// --- Rhythm Game Types ---
+export interface RhythmNote {
+  time: number; // in milliseconds from song start
+  lane: number; // e.g., 1, 2, 3
+}
 
-export type MissionData = PuzzleMissionData | NarrativeMissionData | TimelineMissionData | ARMissionData | HiddenObjectMissionData | QuizMissionData | ConstructionMissionData | DiplomacyMissionData | TradingMissionData;
+export interface RhythmMissionData {
+  type: 'rhythm';
+  id: string;
+  title: string;
+  songUrl: string;
+  noteMap: RhythmNote[];
+  targetScore: number;
+  reward: Reward;
+}
+
+// --- Coloring Game Types ---
+export interface ColoringMissionData {
+  type: 'coloring';
+  id: string;
+  title: string;
+  lineArtSVG: string;
+  colorPalette: string[];
+  solution: Record<string, string>; // Maps path ID to correct color hex
+  reward: Reward;
+}
+
+// --- Rally Call Game Types ---
+export interface RallyCallRound {
+    prefix: string;
+    options: string[];
+}
+
+export interface RallyCallMissionData {
+    type: 'rallyCall';
+    id: string;
+    title: string;
+    rounds: RallyCallRound[];
+    reward: Reward;
+}
+
+// --- Forging Game Types ---
+export interface ForgingMissionData {
+    type: 'forging';
+    id: string;
+    title: string;
+    targetProgress: number;
+    reward: Reward;
+}
+
+// --- Tactical Map Game Types ---
+export interface TacticalMapMissionData {
+    type: 'tacticalMap';
+    id: string;
+    title: string;
+    backgroundUrl: string;
+    stakeImageUrl: string;
+    targetStakes: number;
+    reward?: Reward;
+}
+
+// --- Defense Game Types ---
+export type MapCellType = 'village' | 'forest' | 'road' | 'empty';
+
+export interface DefenseMissionData {
+    type: 'defense';
+    id:string;
+    title: string;
+    mapLayout: MapCellType[][];
+    initialItems: {
+        type: 'person' | 'food';
+        gridIndex: number; 
+    }[];
+    timeLimit: number; // in seconds
+    reward: Reward;
+}
+
+// --- Strategy Map Game Types ---
+export interface DangerZone {
+    x: number; // percent
+    y: number; // percent
+    radius: number; // percent of canvas width
+}
+
+export interface StrategyMapMissionData {
+    type: 'strategyMap';
+    id: string;
+    title: string;
+    mapImageUrl: string;
+    startPoint: { x: number; y: number }; // percent
+    endPoint: { x: number; y: number }; // percent
+    dangerZones: DangerZone[];
+    reward: Reward;
+}
+
+// --- Coin Minting Game Types ---
+export interface CoinMintingOption {
+    id: string;
+    name: string;
+    imageUrl: string;
+}
+
+export interface CoinMintingTask {
+    id: string;
+    name: string;
+    coinImageUrl: string;
+    requiredMetalId: string;
+    requiredMoldId: string;
+}
+
+export interface CoinMintingMissionData {
+    type: 'coinMinting';
+    id: string;
+    title: string;
+    tasks: CoinMintingTask[];
+    metalOptions: CoinMintingOption[];
+    moldOptions: CoinMintingOption[];
+    reward: Reward;
+}
+
+
+export type MissionData = PuzzleMissionData | NarrativeMissionData | TimelineMissionData | ARMissionData | HiddenObjectMissionData | QuizMissionData | ConstructionMissionData | DiplomacyMissionData | TradingMissionData | RhythmMissionData | ColoringMissionData | RallyCallMissionData | ForgingMissionData | TacticalMapMissionData | DefenseMissionData | StrategyMapMissionData | CoinMintingMissionData;
+
+// --- Quest Chain Types ---
+export interface QuestChainStep {
+  id: string;
+  title: string;
+  description: string;
+  missionId: string;
+  iconUrl: string;
+}
+
+export interface QuestChain {
+  id: string;
+  title: string;
+  description: string;
+  steps: QuestChainStep[];
+}
+
 
 // --- Leaderboard Type ---
 export interface LeaderboardEntry {
@@ -262,7 +410,8 @@ export interface AiCharacter {
   name: string;
   systemInstruction: string;
   avatarUrl: string;
-  unlockCondition?: (collectedArtifacts: Artifact[], collectedHeroCards: HeroCard[]) => boolean;
+  unlockHoiId: string | null; // null means unlocked by default
+  unlockMessage: string;
 }
 
 // --- Tutorial System Types ---
@@ -297,6 +446,52 @@ export interface AvatarCustomization {
   hat: string | null;
 }
 
+// --- Sandbox 2.0 Types ---
+export type SandboxItem = (Artifact | Decoration) & { type: 'artifact' | 'decoration' };
+
+export type PlacedItem = SandboxItem & {
+  instanceId: string;
+  x: number;
+  y: number;
+  rotation: number;
+  scale: number;
+  zIndex: number;
+};
+
+export interface SpeechBubble {
+    id: string;
+    text: string;
+    x: number;
+    y: number;
+    zIndex: number;
+    attachedToInstanceId: string;
+}
+
+export interface SandboxBackground {
+    id: string;
+    name: string;
+    imageUrl: string;
+    unlockCondition: {
+        type: 'complete_hoi';
+        hoi_id: string;
+    } | null;
+}
+
+export interface SandboxState {
+    activeBackgroundId: string;
+    placedItems: PlacedItem[];
+    speechBubbles: SpeechBubble[];
+}
+
+// --- Achievement Types ---
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  iconUrl: string;
+  condition: (gameState: SavedGameState) => boolean;
+}
+
 
 // --- Game State Type ---
 export interface SavedGameState {
@@ -305,6 +500,7 @@ export interface SavedGameState {
   collectedHeroCardIds: string[];
   collectedDecorationIds?: string[];
   inventory: Record<string, number>; // For fragments and trading goods
+  questProgress?: Record<string, number>; // For quest chains, e.g. { 'bach-dang-chien': 1 }
   isPremium?: boolean;
   dailyChatCount?: number;
   lastChatDate?: string;
@@ -312,4 +508,8 @@ export interface SavedGameState {
   seenInstructions?: string[]; 
   avatarCustomization?: AvatarCustomization;
   unlockedCustomizationItemIds?: string[];
+  unlockedCharacterIds?: string[];
+  unlockedBackgroundIds?: string[];
+  sandboxState?: SandboxState;
+  unlockedAchievementIds?: string[]; // New property for achievements
 }

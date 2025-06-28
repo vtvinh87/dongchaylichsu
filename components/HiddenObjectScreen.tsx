@@ -8,7 +8,7 @@ import { playSound } from '../utils/audio';
 interface HiddenObjectScreenProps {
   missionData: HiddenObjectMissionData;
   onReturnToMuseum: () => void;
-  onMissionComplete: (reward: Reward) => void;
+  onMissionComplete: (reward?: Reward) => void;
 }
 
 const HiddenObjectScreen: React.FC<HiddenObjectScreenProps> = ({
@@ -26,9 +26,9 @@ const HiddenObjectScreen: React.FC<HiddenObjectScreenProps> = ({
     setIsComplete(false);
     
     let url = '';
-    if (missionData.reward.type === 'artifact') {
+    if (missionData.reward?.type === 'artifact') {
         url = ALL_ARTIFACTS_MAP[missionData.reward.id]?.imageUrl || '';
-    } else if (missionData.reward.type === 'fragment') {
+    } else if (missionData.reward?.type === 'fragment') {
         url = ALL_FRAGMENTS_MAP[missionData.reward.id]?.imageUrl || '';
     }
     setRewardImageUrl(url);

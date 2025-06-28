@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GoogleGenAI, Chat } from "@google/genai";
 import { ChatMessage, AiCharacter } from '../types';
 import { playSound } from '../utils/audio';
-import { AI_CHARACTER_QUANG_TRUNG_ID, FREE_DAILY_CHAT_LIMIT } from '../constants';
+import { AI_CHARACTERS, FREE_DAILY_CHAT_LIMIT } from '../constants';
 import { AVATAR_PLACEHOLDER_URL } from '../imageUrls';
 
 interface ChatbotProps {
   isOpen: boolean;
   onClose: () => void;
-  availableCharacters: Record<string, AiCharacter>;
+  unlockedCharacterIds: string[];
   isPremium: boolean;
   dailyChatCount: number;
   onIncrementChatCount: () => void;
@@ -20,7 +20,7 @@ const API_KEY = process.env.API_KEY;
 const Chatbot: React.FC<ChatbotProps> = ({ 
   isOpen, 
   onClose, 
-  availableCharacters,
+  unlockedCharacterIds,
   isPremium,
   dailyChatCount,
   onIncrementChatCount,
@@ -41,9 +41,8 @@ const Chatbot: React.FC<ChatbotProps> = ({
 
   useEffect(scrollToBottom, [messages]);
   
-  const currentCharacter = activeCharacterId ? availableCharacters[activeCharacterId] : null;
+  const currentCharacter = activeCharacterId ? AI_CHARACTERS[activeCharacterId] : null;
   const isChatLimitReached = !isPremium && dailyChatCount >= FREE_DAILY_CHAT_LIMIT;
-
 
   const initializeChat = useCallback(async (characterId: string | null) => {
     if (!API_KEY) {
@@ -57,8 +56,8 @@ const Chatbot: React.FC<ChatbotProps> = ({
         }]);
         return;
     }
-    if (!characterId || !availableCharacters[characterId]) {
-        setError("Nhân vật không hợp lệ hoặc chưa được mở khóa.");
+    if (!characterId || !AI_CHARACTERS[characterId]) {
+        setError("Nhân vật không hợp lệ.");
         setMessages([{
             id: 'char-error-system',
             sender: 'system',
@@ -69,7 +68,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
         return;
     }
 
-    const character = availableCharacters[characterId];
+    const character = AI_CHARACTERS[characterId];
     setIsLoading(true);
     setError(null);
     setMessages([]); // Clear previous messages when character changes
@@ -102,40 +101,48 @@ const Chatbot: React.FC<ChatbotProps> = ({
     } finally {
         setIsLoading(false);
     }
-  }, [availableCharacters]);
+  }, []);
 
   // Effect to initialize or update active character and chat
   useEffect(() => {
     if (isOpen) {
-      const charIds = Object.keys(availableCharacters);
-      if (charIds.length > 0) {
-        // If current activeCharacterId is not valid or not set, pick a default
-        if (!activeCharacterId || !availableCharacters[activeCharacterId]) {
-          const defaultCharId = charIds.includes(AI_CHARACTER_QUANG_TRUNG_ID) ? AI_CHARACTER_QUANG_TRUNG_ID : charIds[0];
-          setActiveCharacterId(defaultCharId);
-          initializeChat(defaultCharId); // Initialize chat with the new default
+      const unlockedChars = Object.values(AI_CHARACTERS).filter(c => unlockedCharacterIds.includes(c.id));
+      
+      if (unlockedChars.length > 0) {
+        // If current activeCharacterId is not valid (e.g., no longer unlocked) or not set, pick a default
+        if (!activeCharacterId || !unlockedCharacterIds.includes(activeCharacterId)) {
+          const defaultChar = unlockedChars[0];
+          setActiveCharacterId(defaultChar.id);
+          initializeChat(defaultChar.id);
         } else {
-          // If activeCharacterId is already set and valid, ensure chat is initialized (e.g. on first open)
+           // If activeCharacterId is already set and valid, ensure chat is initialized (e.g. on first open)
            if(!chatSession && !isLoading && !error) {
              initializeChat(activeCharacterId);
            }
         }
       } else {
-        // No characters available
+        // No characters unlocked
         setActiveCharacterId(null);
         setChatSession(null);
-        setError("Chưa có nhân vật nào được mở khóa để trò chuyện.");
-        setMessages([{id: 'no-char', sender: 'system', text: "Hãy hoàn thành nhiệm vụ để mở khóa nhân vật!", timestamp: new Date()}]);
+        setError("Chưa có nhân vật nào được chiêu mộ.");
+        setMessages([{id: 'no-char', sender: 'system', text: "Hãy hoàn thành các Hồi truyện để chiêu mộ nhân vật lịch sử!", timestamp: new Date()}]);
       }
     } else {
       // Reset chat session when closed to ensure fresh start if character changes before re-opening
       setChatSession(null);
-      // setMessages([]); // Optionally clear messages when closed
     }
-  }, [isOpen, availableCharacters, activeCharacterId, initializeChat, chatSession, isLoading, error]);
+  }, [isOpen, unlockedCharacterIds, activeCharacterId, initializeChat, chatSession, isLoading, error]);
 
 
   const handleCharacterSelect = (characterId: string) => {
+    const character = AI_CHARACTERS[characterId];
+    if (!character) return;
+    
+    if (!unlockedCharacterIds.includes(characterId)) {
+        alert(character.unlockMessage);
+        return;
+    }
+    
     if (characterId !== activeCharacterId) {
       playSound('sfx-click');
       setActiveCharacterId(characterId);
@@ -217,7 +224,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
     return null;
   }
 
-  const characterList = Object.values(availableCharacters);
+  const allCharacters = Object.values(AI_CHARACTERS);
 
   return (
     <div 
@@ -231,7 +238,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
             <h2 id="chatbot-title" className="font-semibold text-lg">
             {currentCharacter ? `Trò chuyện với ${currentCharacter.name}` : "Hỏi Đáp Lịch Sử"}
             </h2>
-            {!isPremium && characterList.length > 0 && (
+            {!isPremium && (
                 <p className="text-xs text-amber-200">Lượt miễn phí còn lại: {Math.max(0, FREE_DAILY_CHAT_LIMIT - dailyChatCount)}</p>
             )}
         </div>
@@ -244,33 +251,29 @@ const Chatbot: React.FC<ChatbotProps> = ({
         </button>
       </header>
 
-      {characterList.length > 1 && (
-        <div id="character-selection" className="bg-amber-100 dark:bg-stone-700 p-2 border-b border-amber-200 dark:border-stone-600">
-          <p className="text-xs text-center text-amber-700 dark:text-amber-300 mb-1">Chọn nhân vật:</p>
-          <div className="flex justify-center items-center space-x-2 overflow-x-auto pb-1">
-            {characterList.map(char => (
-              <button
+      <div id="character-selection">
+        <p className="text-xs text-center text-amber-700 dark:text-amber-300 mb-1 font-semibold">CHIÊU MỘ NHÂN VẬT</p>
+        <div id="character-selection-scroll">
+            {allCharacters.map(char => {
+            const isUnlocked = unlockedCharacterIds.includes(char.id);
+            return (
+                <button
                 key={char.id}
                 onClick={() => handleCharacterSelect(char.id)}
-                title={`Trò chuyện với ${char.name}`}
-                className={`p-1 rounded-full transition-all duration-200 focus:outline-none 
-                            ${activeCharacterId === char.id 
-                              ? 'ring-2 ring-offset-1 ring-offset-amber-100 dark:ring-offset-stone-700 ring-amber-500 dark:ring-amber-400 scale-110' 
-                              : 'hover:scale-105'
-                            }`}
+                title={isUnlocked ? `Trò chuyện với ${char.name}` : char.unlockMessage}
+                className={`character-avatar-button ${activeCharacterId === char.id ? 'avatar-selected' : ''} ${!isUnlocked ? 'avatar-locked' : ''}`}
                 aria-pressed={activeCharacterId === char.id}
-              >
+                >
                 <img 
                     src={char.avatarUrl} 
-                    alt={char.name} 
-                    className="w-10 h-10 rounded-full object-cover bg-gray-300 dark:bg-gray-500 border-2 border-white dark:border-stone-800" 
+                    alt={char.name}
                     onError={(e) => (e.currentTarget.src = AVATAR_PLACEHOLDER_URL)}
                 />
-              </button>
-            ))}
-          </div>
+                </button>
+            );
+            })}
         </div>
-      )}
+      </div>
 
       <div className="flex-grow overflow-y-auto p-4 space-y-3 bg-amber-50 dark:bg-stone-900">
         {messages.map((msg) => (
@@ -325,18 +328,18 @@ const Chatbot: React.FC<ChatbotProps> = ({
                 onKeyPress={handleKeyPress}
                 placeholder={
                     !API_KEY ? "Chatbot không khả dụng..." 
-                    : characterList.length === 0 ? "Mở khóa nhân vật để chat..."
+                    : unlockedCharacterIds.length === 0 ? "Chiêu mộ nhân vật để chat..."
                     : !chatSession && !isLoading ? "Đang kết nối..." 
                     : isLoading ? "Đang chờ phản hồi..."
                     : "Nhập tin nhắn..."
                 }
                 className="flex-grow bg-white dark:bg-stone-700 text-stone-800 dark:text-stone-100 border border-amber-300 dark:border-stone-600 rounded-lg p-2 focus:ring-1 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-amber-500 dark:focus:border-amber-400 outline-none transition-shadow"
                 aria-label="Tin nhắn"
-                disabled={isLoading || !chatSession || !currentCharacter || !API_KEY || characterList.length === 0}
+                disabled={isLoading || !chatSession || !currentCharacter || !API_KEY || unlockedCharacterIds.length === 0}
             />
             <button
                 onClick={handleSendMessage}
-                disabled={isLoading || !chatSession || !currentCharacter || inputValue.trim() === '' || !API_KEY || characterList.length === 0}
+                disabled={isLoading || !chatSession || !currentCharacter || inputValue.trim() === '' || !API_KEY || unlockedCharacterIds.length === 0}
                 className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-stone-900 font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 Gửi

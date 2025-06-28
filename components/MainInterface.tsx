@@ -1,11 +1,13 @@
+
+
 import React, { useMemo } from 'react';
-import { Hoi, MissionInfo, Artifact, HeroCard, Decoration, AvatarCustomization } from '../types';
+import { Hoi, MissionInfo, Artifact, HeroCard, Decoration, AvatarCustomization, Reward } from '../types';
 import MissionCard from './SagaCard';
 import ArtifactCard from './ArtifactCard';
 import HeroCardDisplay from './HeroCardDisplay'; 
 import DecorationCard from './DecorationCard';
 import AvatarDisplay from './AvatarDisplay';
-import { ALL_MISSIONS } from '../constants';
+import { ALL_MISSIONS, ALL_QUEST_CHAINS } from '../constants';
 
 interface MainInterfaceProps {
   userName: string;
@@ -14,6 +16,7 @@ interface MainInterfaceProps {
   collectedArtifacts: Artifact[];
   collectedHeroCards: HeroCard[]; 
   collectedDecorations: Decoration[];
+  inventory: Record<string, number>;
   onStartMission: (missionInfo: MissionInfo) => void;
   onShowLeaderboard: () => void;
   onToggleChatbot: () => void;
@@ -25,6 +28,7 @@ interface MainInterfaceProps {
   onShowSandbox: () => void;
   onShowCustomization: () => void;
   onShowCrafting: () => void;
+  onShowAchievements: () => void;
 }
 
 const MainInterface: React.FC<MainInterfaceProps> = ({
@@ -34,6 +38,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
   collectedArtifacts,
   collectedHeroCards, 
   collectedDecorations,
+  inventory,
   onStartMission,
   onShowLeaderboard,
   onToggleChatbot,
@@ -45,14 +50,18 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
   onShowSandbox,
   onShowCustomization,
   onShowCrafting,
+  onShowAchievements,
 }) => {
 
     // Memoize sets of collected IDs for efficient O(1) lookups.
     const collectedArtifactIds = useMemo(() => new Set(collectedArtifacts.map(a => a.id)), [collectedArtifacts]);
     const collectedHeroCardIds = useMemo(() => new Set(collectedHeroCards.map(h => h.id)), [collectedHeroCards]);
-    const collectedDecorationIds = useMemo(() => new Set(collectedDecorations.map(d => d.id)), [collectedDecorations]);
 
     const hoiUnlockStatus = useMemo(() => {
+        if (isPremium) {
+            return hois.map(() => true);
+        }
+        
         const status: boolean[] = [];
         for (let i = 0; i < hois.length; i++) {
             if (i === 0) {
@@ -61,29 +70,59 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
             }
             
             const previousHoi = hois[i - 1];
-            let isPreviousHoiComplete = true;
+            // An unlocked chapter is considered "complete" for unlocking the next one if all its required missions are done.
+            if (!status[i-1]) {
+                status.push(false);
+                continue;
+            }
 
+            let isPreviousHoiComplete = true;
             const requiredMissions = previousHoi.missions.filter(
                 mission => !mission.isOptionalForProgression
             );
-
+            
+            // If a chapter has no required missions, it's complete.
+            if (requiredMissions.length === 0) {
+                status.push(true);
+                continue;
+            }
+    
             for (const missionInfo of requiredMissions) {
-                const missionData = ALL_MISSIONS[missionInfo.missionId];
-                if (!missionData) continue;
+                let reward: Reward | undefined;
                 
-                const reward = missionData.reward;
-                if (!reward) continue;
-
-                let isRewardCollected = false;
-                 // Chapter progression only depends on collecting the final artifact/herocard, not fragments.
-                if (reward.type === 'artifact') {
-                    isRewardCollected = collectedArtifactIds.has(reward.id);
-                } else if (reward.type === 'heroCard') {
-                    isRewardCollected = collectedHeroCardIds.has(reward.id);
+                if (missionInfo.questChainId) {
+                    const chain = ALL_QUEST_CHAINS[missionInfo.questChainId];
+                    if (!chain) { isPreviousHoiComplete = false; break; }
+                    const lastStep = chain.steps[chain.steps.length - 1];
+                    const finalMissionData = ALL_MISSIONS[lastStep.missionId];
+                    reward = finalMissionData?.reward;
                 } else {
-                    isRewardCollected = true; // Fragments and decorations don't block progression
+                    const missionData = ALL_MISSIONS[missionInfo.missionId];
+                    reward = missionData?.reward;
                 }
-
+    
+                if (!reward) { 
+                    // A required mission without reward doesn't block progression.
+                    continue; 
+                }
+    
+                let isRewardCollected = false;
+                switch(reward.type) {
+                    case 'artifact':
+                        isRewardCollected = collectedArtifactIds.has(reward.id);
+                        break;
+                    case 'heroCard':
+                        isRewardCollected = collectedHeroCardIds.has(reward.id);
+                        break;
+                    case 'fragment':
+                        // Fragments MUST block progression if they are the reward of a required mission.
+                        isRewardCollected = (inventory[reward.id] || 0) > 0;
+                        break;
+                    default:
+                        // Decorations, etc., don't block progression
+                        isRewardCollected = true;
+                }
+    
                 if (!isRewardCollected) {
                     isPreviousHoiComplete = false;
                     break;
@@ -92,7 +131,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
             status.push(isPreviousHoiComplete);
         }
         return status;
-    }, [hois, collectedArtifactIds, collectedHeroCardIds]);
+    }, [hois, collectedArtifactIds, collectedHeroCardIds, inventory, isPremium]);
 
 
   return (
@@ -155,6 +194,13 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
               <span role="img" aria-label="trophy icon" className="mr-2 text-xl">🏆</span>
               Xếp Hạng
             </button>
+            <button
+              onClick={onShowAchievements}
+              className="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center"
+            >
+              <span role="img" aria-label="medal icon" className="mr-2 text-xl">🎖️</span>
+              Thành tựu
+            </button>
              <button
               onClick={onShowCustomization}
               className="bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center"
@@ -178,14 +224,34 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
                 <h3 className="text-2xl font-bold text-amber-800 dark:text-amber-300 mb-2">{hoi.title}</h3>
                 <p className="text-stone-600 dark:text-stone-400 mb-6">{hoi.description}</p>
                 <div className="mission-list">
-                  {hoi.missions.map((mission) => (
-                    <MissionCard 
-                      key={mission.id} 
-                      mission={mission} 
-                      onClick={() => onStartMission(mission)}
-                      isLocked={mission.isPremium && !isPremium}
-                    />
-                  ))}
+                  {hoi.missions.map((mission) => {
+                    let isDependencyLocked = false;
+                    if (isHoiUnlocked && mission.dependsOnMissionId && !isPremium) {
+                        const dependencyMission = ALL_MISSIONS[mission.dependsOnMissionId];
+                        if (dependencyMission && dependencyMission.reward) {
+                           let isDepRewardCollected = false;
+                           if(dependencyMission.reward.type === 'artifact') {
+                             isDepRewardCollected = collectedArtifactIds.has(dependencyMission.reward.id);
+                           } else if (dependencyMission.reward.type === 'heroCard') {
+                             isDepRewardCollected = collectedHeroCardIds.has(dependencyMission.reward.id);
+                           } else if (dependencyMission.reward.type === 'fragment') {
+                             isDepRewardCollected = (inventory[dependencyMission.reward.id] || 0) > 0;
+                           }
+                           if(!isDepRewardCollected) isDependencyLocked = true;
+                        }
+                    }
+                    const isLockedByProgression = !isPremium && (!isHoiUnlocked || isDependencyLocked);
+                    const isLockedByPremium = mission.isPremium && !isPremium;
+
+                    return (
+                        <MissionCard 
+                            key={mission.id} 
+                            mission={mission} 
+                            onClick={() => onStartMission(mission)}
+                            isLocked={isLockedByProgression || isLockedByPremium}
+                        />
+                    );
+                  })}
                 </div>
               </div>
             );

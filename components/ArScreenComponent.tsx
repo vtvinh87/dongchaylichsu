@@ -1,6 +1,7 @@
 
 
 import React, { useEffect } from 'react';
+import '../aframe.d.ts';
 import { ARMissionData, Reward } from '../types';
 import { playSound } from '../utils/audio';
 
@@ -79,7 +80,7 @@ const ArScreenComponent: React.FC<ArScreenComponentProps> = ({
         arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
         renderer="logarithmicDepthBuffer: true; antialias: true; colorManagement: true;"
         vr-mode-ui="enabled: false"
-        gesture-detector
+        gesture-detector="true"
         id="arScene"
         style={{ width: '100%', height: '100%', display: 'block' }}
       >
@@ -95,7 +96,7 @@ const ArScreenComponent: React.FC<ArScreenComponentProps> = ({
             position="0 0.05 0"    
             rotation="-90 0 0"   
             animation__rotate="property: rotation; to: -90 360 0; loop: true; dur: 10000; easing: linear; startEvents: model-loaded" 
-            gesture-handler 
+            gesture-handler="true" 
           >
           </a-entity>
         </a-marker>
