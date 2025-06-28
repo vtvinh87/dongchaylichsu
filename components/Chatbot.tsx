@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { GoogleGenAI, Chat } from "@google/genai";
 import { ChatMessage, AiCharacter } from '../types';
 import { playSound } from '../utils/audio';
 import { AI_CHARACTERS, FREE_DAILY_CHAT_LIMIT } from '../constants';
@@ -15,6 +15,8 @@ interface ChatbotProps {
   onUpgradePrompt: () => void;
 }
 
+const API_KEY = process.env.API_KEY;
+
 const Chatbot: React.FC<ChatbotProps> = ({ 
   isOpen, 
   onClose, 
@@ -27,6 +29,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [chatSession, setChatSession] = useState<Chat | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeCharacterId, setActiveCharacterId] = useState<string | null>(null);
 
@@ -42,51 +45,93 @@ const Chatbot: React.FC<ChatbotProps> = ({
   const isChatLimitReached = !isPremium && dailyChatCount >= FREE_DAILY_CHAT_LIMIT;
 
   const initializeChat = useCallback(async (characterId: string | null) => {
+    if (!API_KEY) {
+        console.error("API Key for Gemini is missing. Chatbot cannot be initialized.");
+        setError("Lỗi cấu hình: Không thể kết nối tới dịch vụ AI.");
+        setMessages([{
+            id: 'init-error-system',
+            sender: 'system',
+            text: "Xin lỗi, chức năng trò chuyện hiện không khả dụng do lỗi cấu hình.",
+            timestamp: new Date()
+        }]);
+        return;
+    }
     if (!characterId || !AI_CHARACTERS[characterId]) {
-      setError("Nhân vật không hợp lệ.");
-      setMessages([{
-        id: 'char-error-system',
-        sender: 'system',
-        text: "Vui lòng chọn một nhân vật để bắt đầu trò chuyện.",
-        timestamp: new Date()
-      }]);
-      return;
+        setError("Nhân vật không hợp lệ.");
+        setMessages([{
+            id: 'char-error-system',
+            sender: 'system',
+            text: "Vui lòng chọn một nhân vật để bắt đầu trò chuyện.",
+            timestamp: new Date()
+        }]);
+        setChatSession(null);
+        return;
     }
 
     const character = AI_CHARACTERS[characterId];
-    setIsLoading(false);
+    setIsLoading(true);
     setError(null);
-    setMessages([{
-      id: 'welcome-' + Date.now(),
-      sender: 'bot',
-      text: `Xin chào! Ta là ${character.name}. Ngươi có điều gì muốn hỏi ta không?`,
-      timestamp: new Date()
-    }]);
+    setMessages([]); // Clear previous messages when character changes
+
+    try {
+      const ai = new GoogleGenAI({ apiKey: API_KEY });
+      const newChat = ai.chats.create({
+        model: 'gemini-2.5-flash-preview-04-17',
+        config: {
+          systemInstruction: character.systemInstruction,
+        },
+      });
+      setChatSession(newChat);
+      setMessages([{
+        id: 'welcome-' + Date.now(),
+        sender: 'bot',
+        text: `Xin chào! Ta là ${character.name}. Ngươi có điều gì muốn hỏi ta không?`,
+        timestamp: new Date()
+      }]);
+    } catch (e) {
+      console.error(`Failed to initialize chat session for ${character.name}:`, e);
+      setError(`Không thể khởi tạo cuộc trò chuyện với ${character.name}.`);
+       setMessages(prev => [...prev, {
+            id: `init-catch-error-${character.id}`,
+            sender: 'system',
+            text: `Xin lỗi, đã có lỗi xảy ra khi cố gắng kết nối với ${character.name}.`,
+            timestamp: new Date()
+        }]);
+        setChatSession(null);
+    } finally {
+        setIsLoading(false);
+    }
   }, []);
 
+  // Effect to initialize or update active character and chat
   useEffect(() => {
     if (isOpen) {
       const unlockedChars = Object.values(AI_CHARACTERS).filter(c => unlockedCharacterIds.includes(c.id));
       
       if (unlockedChars.length > 0) {
+        // If current activeCharacterId is not valid (e.g., no longer unlocked) or not set, pick a default
         if (!activeCharacterId || !unlockedCharacterIds.includes(activeCharacterId)) {
           const defaultChar = unlockedChars[0];
           setActiveCharacterId(defaultChar.id);
           initializeChat(defaultChar.id);
         } else {
-           if(messages.length === 0 && !isLoading && !error) {
+           // If activeCharacterId is already set and valid, ensure chat is initialized (e.g. on first open)
+           if(!chatSession && !isLoading && !error) {
              initializeChat(activeCharacterId);
            }
         }
       } else {
+        // No characters unlocked
         setActiveCharacterId(null);
+        setChatSession(null);
         setError("Chưa có nhân vật nào được chiêu mộ.");
         setMessages([{id: 'no-char', sender: 'system', text: "Hãy hoàn thành các Hồi truyện để chiêu mộ nhân vật lịch sử!", timestamp: new Date()}]);
       }
     } else {
-      setMessages([]); // Clear messages when closed
+      // Reset chat session when closed to ensure fresh start if character changes before re-opening
+      setChatSession(null);
     }
-  }, [isOpen, unlockedCharacterIds, activeCharacterId, initializeChat, messages.length, isLoading, error]);
+  }, [isOpen, unlockedCharacterIds, activeCharacterId, initializeChat, chatSession, isLoading, error]);
 
 
   const handleCharacterSelect = (characterId: string) => {
@@ -101,12 +146,12 @@ const Chatbot: React.FC<ChatbotProps> = ({
     if (characterId !== activeCharacterId) {
       playSound('sfx-click');
       setActiveCharacterId(characterId);
-      initializeChat(characterId);
+      initializeChat(characterId); // Re-initialize chat for the new character
     }
   };
 
   const handleSendMessage = async () => {
-    if (inputValue.trim() === '' || isLoading || !currentCharacter) return;
+    if (inputValue.trim() === '' || isLoading || !chatSession || !currentCharacter) return;
 
     if (isChatLimitReached) {
         setMessages(prev => [...prev, {
@@ -125,15 +170,14 @@ const Chatbot: React.FC<ChatbotProps> = ({
         return;
     }
 
+
     const userMessage: ChatMessage = {
       id: 'user-' + Date.now(),
       sender: 'user',
       text: inputValue.trim(),
       timestamp: new Date()
     };
-
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
+    setMessages(prevMessages => [...prevMessages, userMessage]);
     setInputValue('');
     setIsLoading(true);
     setError(null);
@@ -143,33 +187,8 @@ const Chatbot: React.FC<ChatbotProps> = ({
       if (!isPremium) {
           onIncrementChatCount();
       }
-
-      // Prepare history for the API
-      const chatHistory = newMessages.filter(m => m.sender !== 'system').map(m => ({
-          role: m.sender === 'user' ? 'user' : 'model',
-          parts: [{ text: m.text }]
-      }));
-      // Remove the last message (the user's current prompt) from history
-      chatHistory.pop();
-
-      const apiResponse = await fetch('/api/gemini', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: userMessage.text,
-          systemInstruction: currentCharacter.systemInstruction,
-          chatHistory: chatHistory
-        }),
-      });
-
-      if (!apiResponse.ok) {
-        const errorData = await apiResponse.json();
-        throw new Error(errorData.error || 'API request failed');
-      }
-
-      const { text: botMessageText } = await apiResponse.json();
+      const response = await chatSession.sendMessage({ message: userMessage.text });
+      const botMessageText = response.text;
       
       setMessages(prevMessages => [...prevMessages, {
         id: 'bot-' + Date.now(),
@@ -178,9 +197,9 @@ const Chatbot: React.FC<ChatbotProps> = ({
         timestamp: new Date()
       }]);
     } catch (e: any) {
-      console.error(`Error sending message via proxy (character: ${currentCharacter.name}):`, e);
+      console.error(`Error sending message to Gemini (character: ${currentCharacter.name}):`, e);
       let displayError = `Xin lỗi, ${currentCharacter.name} không thể trả lời ngay lúc này. Hãy thử lại sau.`;
-      if (e.message && (e.message.includes('API key') || e.message.includes('configured'))) {
+      if (e.message && e.message.includes('API key not valid')) {
           displayError = "Lỗi xác thực: Không thể kết nối với dịch vụ AI. Vui lòng kiểm tra lại cấu hình.";
       }
       setError(displayError);
@@ -282,7 +301,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
             </div>
           </div>
         ))}
-        {isLoading && (
+        {isLoading && chatSession && ( // Only show "thinking" if a chat session is active and loading
           <div className="flex justify-start">
             <div className="max-w-[80%] p-3 rounded-lg shadow bg-stone-200 dark:bg-stone-700 text-stone-800 dark:text-stone-100 rounded-bl-none">
               <p className="text-sm italic">Đang suy nghĩ...</p>
@@ -308,17 +327,19 @@ const Chatbot: React.FC<ChatbotProps> = ({
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={
-                    unlockedCharacterIds.length === 0 ? "Chiêu mộ nhân vật để chat..."
+                    !API_KEY ? "Chatbot không khả dụng..." 
+                    : unlockedCharacterIds.length === 0 ? "Chiêu mộ nhân vật để chat..."
+                    : !chatSession && !isLoading ? "Đang kết nối..." 
                     : isLoading ? "Đang chờ phản hồi..."
                     : "Nhập tin nhắn..."
                 }
                 className="flex-grow bg-white dark:bg-stone-700 text-stone-800 dark:text-stone-100 border border-amber-300 dark:border-stone-600 rounded-lg p-2 focus:ring-1 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-amber-500 dark:focus:border-amber-400 outline-none transition-shadow"
                 aria-label="Tin nhắn"
-                disabled={isLoading || !currentCharacter || unlockedCharacterIds.length === 0}
+                disabled={isLoading || !chatSession || !currentCharacter || !API_KEY || unlockedCharacterIds.length === 0}
             />
             <button
                 onClick={handleSendMessage}
-                disabled={isLoading || !currentCharacter || inputValue.trim() === '' || unlockedCharacterIds.length === 0}
+                disabled={isLoading || !chatSession || !currentCharacter || inputValue.trim() === '' || !API_KEY || unlockedCharacterIds.length === 0}
                 className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-stone-900 font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 Gửi
@@ -331,3 +352,8 @@ const Chatbot: React.FC<ChatbotProps> = ({
 };
 
 export default Chatbot;
+
+if (typeof process === 'undefined') {
+  // @ts-ignore
+  globalThis.process = { env: {} };
+}
