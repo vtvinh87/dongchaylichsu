@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { GoogleGenAI } from "@google/genai";
 import { Artifact, HeroCard, Decoration } from '../types';
 import { playSound } from '../utils/audio';
 import { BRONZE_DRUM_ARTIFACT_ID } from '../constants';
@@ -12,8 +11,6 @@ interface ItemDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
-const API_KEY = process.env.API_KEY;
 
 const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, isOpen, onClose }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -28,26 +25,30 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, isOpen, onClose
     setAiContent("");
     setError(null);
 
-    if (!API_KEY) {
-      setError("Lỗi cấu hình: Không thể kết nối tới dịch vụ AI.");
-      setIsLoading(false);
-      return;
-    }
-
     const fetchAiInfo = async () => {
       try {
-        const ai = new GoogleGenAI({ apiKey: API_KEY });
         const prompt = `Bạn là một nhà sử học chuyên nghiệp. Cung cấp thông tin chi tiết, ngắn gọn và súc tích về chủ đề sau: '${item.name}'. Viết bằng tiếng Việt. Tập trung vào các khía cạnh quan trọng, ý nghĩa văn hóa hoặc lịch sử của nó. Không cần viết lời chào hay câu kết.`;
 
-        const response = await ai.models.generateContent({
-          model: "gemini-2.5-flash-preview-04-17",
-          contents: prompt,
+        const apiResponse = await fetch('/.netlify/functions/gemini-proxy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: 'generate',
+                prompt: prompt,
+            }),
         });
         
-        setAiContent(response.text);
-      } catch (e) {
+        if (!apiResponse.ok) {
+            const errorData = await apiResponse.json();
+            throw new Error(errorData.error || `Lỗi máy chủ: ${apiResponse.status}`);
+        }
+
+        const data = await apiResponse.json();
+        setAiContent(data.text);
+
+      } catch (e: any) {
         console.error("Error fetching AI details:", e);
-        setError("Rất tiếc, đã có lỗi xảy ra khi tìm kiếm thông tin. Vui lòng thử lại sau.");
+        setError(e.message || "Rất tiếc, đã có lỗi xảy ra khi tìm kiếm thông tin. Vui lòng thử lại sau.");
       } finally {
         setIsLoading(false);
       }
@@ -149,8 +150,3 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, isOpen, onClose
 };
 
 export default ItemDetailModal;
-
-if (typeof process === 'undefined') {
-  // @ts-ignore
-  globalThis.process = { env: {} };
-}

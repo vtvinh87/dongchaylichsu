@@ -1,5 +1,6 @@
 
 
+
 export enum Screen {
   LOGIN,
   MAIN_INTERFACE,
@@ -413,6 +414,17 @@ export interface AiCharacter {
   unlockHoiId: string | null; // null means unlocked by default
   unlockMessage: string;
 }
+
+// --- Gemini Chat History Types ---
+export interface Part {
+  text: string;
+}
+
+export interface Content {
+  role: 'user' | 'model';
+  parts: Part[];
+}
+
 
 // --- Tutorial System Types ---
 export interface TutorialStep {
