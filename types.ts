@@ -1,6 +1,4 @@
 
-
-
 export enum Screen {
   LOGIN,
   MAIN_INTERFACE,
@@ -29,6 +27,8 @@ export enum Screen {
   DEFENSE_MISSION_SCREEN, // New screen for the defense game
   STRATEGY_MAP_MISSION_SCREEN, // New screen for the strategy map game
   COIN_MINTING_MISSION_SCREEN, // New screen for the coin minting game
+  CITY_PLANNING_MISSION_SCREEN, // New screen for the city planning game
+  TYPESETTING_MISSION_SCREEN, // New screen for the typesetting game
 }
 
 export interface Artifact {
@@ -372,8 +372,39 @@ export interface CoinMintingMissionData {
     reward: Reward;
 }
 
+// --- City Planning Game Types ---
+export interface BuildingPlacement {
+    id: string; // e.g., 'ngo-mon'
+    name: string;
+    iconUrl: string;
+    // Position of the top-left corner of the drop zone, in percentage
+    correctPosition: {
+        x: number;
+        y: number;
+    };
+}
 
-export type MissionData = PuzzleMissionData | NarrativeMissionData | TimelineMissionData | ARMissionData | HiddenObjectMissionData | QuizMissionData | ConstructionMissionData | DiplomacyMissionData | TradingMissionData | RhythmMissionData | ColoringMissionData | RallyCallMissionData | ForgingMissionData | TacticalMapMissionData | DefenseMissionData | StrategyMapMissionData | CoinMintingMissionData;
+export interface CityPlanningMissionData {
+    type: 'cityPlanning';
+    id: string;
+    title: string;
+    mapImageUrl: string;
+    buildings: BuildingPlacement[];
+    reward: Reward;
+}
+
+// --- Typesetting Game Types ---
+export interface TypesettingMissionData {
+  type: 'typesetting';
+  id: string;
+  title: string;
+  targetText: string;
+  availableLetters: string[]; // An array of single characters
+  reward: Reward;
+}
+
+
+export type MissionData = PuzzleMissionData | NarrativeMissionData | TimelineMissionData | ARMissionData | HiddenObjectMissionData | QuizMissionData | ConstructionMissionData | DiplomacyMissionData | TradingMissionData | RhythmMissionData | ColoringMissionData | RallyCallMissionData | ForgingMissionData | TacticalMapMissionData | DefenseMissionData | StrategyMapMissionData | CoinMintingMissionData | CityPlanningMissionData | TypesettingMissionData;
 
 // --- Quest Chain Types ---
 export interface QuestChainStep {

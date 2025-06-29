@@ -33,7 +33,9 @@ import TacticalMapScreen from './components/TacticalMapScreen'; // Import Tactic
 import DefenseScreen from './components/DefenseScreen'; // Import Defense Screen
 import StrategyMapScreen from './components/StrategyMapScreen'; // Import Strategy Map Screen
 import CoinMintingScreen from './components/CoinMintingScreen'; // Import Coin Minting Screen
-import { Screen, Artifact, MissionInfo, HeroCard, MissionData, PuzzleMissionData, NarrativeMissionData, TimelineMissionData, ARMissionData, HiddenObjectMissionData, LeaderboardEntry, AiCharacter, Decoration, QuizMissionData, ConstructionMissionData, Tutorial, SavedGameState, AvatarCustomization, CustomizationItem, DiplomacyMissionData, Reward, MemoryFragment, TradingMissionData, ColoringMissionData, RhythmMissionData, SandboxState, Achievement, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingMissionData } from './types';
+import CityPlanningScreen from './components/CityPlanningScreen'; // Import City Planning Screen
+import TypesettingScreen from './components/TypesettingScreen'; // Import Typesetting Screen
+import { Screen, Artifact, MissionInfo, HeroCard, MissionData, PuzzleMissionData, NarrativeMissionData, TimelineMissionData, ARMissionData, HiddenObjectMissionData, LeaderboardEntry, AiCharacter, Decoration, QuizMissionData, ConstructionMissionData, Tutorial, SavedGameState, AvatarCustomization, CustomizationItem, DiplomacyMissionData, Reward, MemoryFragment, TradingMissionData, ColoringMissionData, RhythmMissionData, SandboxState, Achievement, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, TypesettingMissionData } from './types';
 import { 
   HOI_DATA, ALL_MISSIONS, APP_NAME, ALL_HERO_CARDS,
   LEADERBOARD_LOCAL_STORAGE_KEY, POINTS_PER_ARTIFACT, MAX_LEADERBOARD_ENTRIES,
@@ -144,7 +146,7 @@ const App: React.FC = () => {
 
 
   const navigateTo = useCallback((screen: Screen, mission: MissionData | null = null) => {
-    const nonStandardNavScreens = [Screen.AR_MISSION_SCREEN, Screen.PREMIUM_SCREEN, Screen.SANDBOX, Screen.HIDDEN_OBJECT_SCREEN, Screen.QUIZ_MISSION_SCREEN, Screen.CONSTRUCTION_MISSION_SCREEN, Screen.DIPLOMACY_MISSION_SCREEN, Screen.CUSTOMIZATION, Screen.CRAFTING_SCREEN, Screen.TRADING_SCREEN, Screen.COLORING_MISSION_SCREEN, Screen.RHYTHM_MISSION_SCREEN, Screen.ACHIEVEMENTS, Screen.RALLY_CALL_MISSION_SCREEN, Screen.FORGING_MISSION_SCREEN, Screen.QUEST_CHAIN_SCREEN, Screen.TACTICAL_MAP_MISSION_SCREEN, Screen.DEFENSE_MISSION_SCREEN, Screen.STRATEGY_MAP_MISSION_SCREEN, Screen.COIN_MINTING_MISSION_SCREEN];
+    const nonStandardNavScreens = [Screen.AR_MISSION_SCREEN, Screen.PREMIUM_SCREEN, Screen.SANDBOX, Screen.HIDDEN_OBJECT_SCREEN, Screen.QUIZ_MISSION_SCREEN, Screen.CONSTRUCTION_MISSION_SCREEN, Screen.DIPLOMACY_MISSION_SCREEN, Screen.CUSTOMIZATION, Screen.CRAFTING_SCREEN, Screen.TRADING_SCREEN, Screen.COLORING_MISSION_SCREEN, Screen.RHYTHM_MISSION_SCREEN, Screen.ACHIEVEMENTS, Screen.RALLY_CALL_MISSION_SCREEN, Screen.FORGING_MISSION_SCREEN, Screen.QUEST_CHAIN_SCREEN, Screen.TACTICAL_MAP_MISSION_SCREEN, Screen.DEFENSE_MISSION_SCREEN, Screen.STRATEGY_MAP_MISSION_SCREEN, Screen.COIN_MINTING_MISSION_SCREEN, Screen.CITY_PLANNING_MISSION_SCREEN, Screen.TYPESETTING_MISSION_SCREEN];
     if (currentScreen !== screen || activeMission?.id !== mission?.id || nonStandardNavScreens.includes(screen)) {
       setTransitionClass('screen-fade-out');
       setTimeout(() => {
@@ -580,6 +582,8 @@ const App: React.FC = () => {
         defense: Screen.DEFENSE_MISSION_SCREEN,
         strategyMap: Screen.STRATEGY_MAP_MISSION_SCREEN,
         coinMinting: Screen.COIN_MINTING_MISSION_SCREEN,
+        cityPlanning: Screen.CITY_PLANNING_MISSION_SCREEN,
+        typesetting: Screen.TYPESETTING_MISSION_SCREEN,
     };
     const targetScreen = screenMap[missionToStart.type];
     if (targetScreen) {
@@ -982,6 +986,28 @@ const App: React.FC = () => {
             );
         }
         break;
+      case Screen.CITY_PLANNING_MISSION_SCREEN:
+        if (activeMission?.type === 'cityPlanning') {
+            return (
+                <CityPlanningScreen
+                    missionData={activeMission as CityPlanningMissionData}
+                    onReturnToMuseum={handleReturnToMuseum}
+                    onComplete={handleMissionCompletion}
+                />
+            );
+        }
+        break;
+      case Screen.TYPESETTING_MISSION_SCREEN:
+        if (activeMission?.type === 'typesetting') {
+            return (
+                <TypesettingScreen
+                    missionData={activeMission as TypesettingMissionData}
+                    onReturnToMuseum={handleReturnToMuseum}
+                    onComplete={handleMissionCompletion}
+                />
+            );
+        }
+        break;
       case Screen.AR_MISSION_SCREEN:
          if (activeMission?.type === 'ar') {
           return (
@@ -1068,6 +1094,8 @@ const App: React.FC = () => {
         Screen.DEFENSE_MISSION_SCREEN,
         Screen.STRATEGY_MAP_MISSION_SCREEN,
         Screen.COIN_MINTING_MISSION_SCREEN,
+        Screen.CITY_PLANNING_MISSION_SCREEN,
+        Screen.TYPESETTING_MISSION_SCREEN,
     ];
     if (missionScreenTypes.includes(currentScreen)) {
         console.warn(`Invalid mission data for screen: ${Screen[currentScreen]}. Navigating to main interface.`);

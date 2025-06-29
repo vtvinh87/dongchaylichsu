@@ -1,0 +1,152 @@
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { CityPlanningMissionData, Reward, BuildingPlacement } from '../types';
+import { playSound } from '../utils/audio';
+import { ALL_ARTIFACTS_MAP } from '../constants';
+
+interface CityPlanningScreenProps {
+  missionData: CityPlanningMissionData;
+  onReturnToMuseum: () => void;
+  onComplete: (reward: Reward) => void;
+}
+
+const CityPlanningScreen: React.FC<CityPlanningScreenProps> = ({
+  missionData,
+  onReturnToMuseum,
+  onComplete,
+}) => {
+  const [placedBuildings, setPlacedBuildings] = useState<Record<string, boolean>>({});
+  const [draggedBuilding, setDraggedBuilding] = useState<BuildingPlacement | null>(null);
+  const [dragOverZone, setDragOverZone] = useState<string | null>(null);
+  const [isComplete, setIsComplete] = useState(false);
+  const rewardImageUrl = useMemo(() => {
+    if (missionData.reward.type === 'artifact') {
+      const artifact = ALL_ARTIFACTS_MAP[missionData.reward.id];
+      return artifact ? artifact.imageUrl : '';
+    }
+    return '';
+  }, [missionData.reward]);
+
+  useEffect(() => {
+    // Reset state when mission data changes
+    setPlacedBuildings({});
+    setDraggedBuilding(null);
+    setDragOverZone(null);
+    setIsComplete(false);
+  }, [missionData]);
+
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, building: BuildingPlacement) => {
+    setDraggedBuilding(building);
+    // Use a custom drag image to make it look nicer if desired, for now default is fine
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, buildingId: string) => {
+    e.preventDefault();
+    setDragOverZone(buildingId);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetBuildingId: string) => {
+    e.preventDefault();
+    setDragOverZone(null);
+    if (draggedBuilding && draggedBuilding.id === targetBuildingId) {
+      playSound('sfx-success');
+      const newPlacedBuildings = { ...placedBuildings, [targetBuildingId]: true };
+      setPlacedBuildings(newPlacedBuildings);
+
+      // Check for mission completion
+      if (Object.keys(newPlacedBuildings).length === missionData.buildings.length) {
+        setIsComplete(true);
+        playSound('sfx-unlock');
+        setTimeout(() => {
+          onComplete(missionData.reward);
+        }, 2000);
+      }
+    } else {
+      // Optional: Add feedback for wrong drop
+    }
+    setDraggedBuilding(null);
+  };
+
+  return (
+    <div className="screen-container w-full max-w-6xl p-4 bg-amber-100 dark:bg-stone-800 rounded-lg shadow-xl flex flex-col items-center">
+      <button
+        onClick={onReturnToMuseum}
+        className="absolute top-6 left-6 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-stone-900 font-semibold py-2 px-4 rounded-lg shadow-md transition-colors duration-300 z-20"
+      >
+        Quay về Bảo tàng
+      </button>
+
+      <h2 className="text-3xl font-bold text-amber-700 dark:text-amber-400 mb-4 font-serif">{missionData.title}</h2>
+      
+      <div className="w-full flex flex-col md:flex-row gap-6 flex-grow">
+        {/* Map Area */}
+        <div 
+          id="citadel-map-container"
+          className="flex-grow"
+          style={{ backgroundImage: `url(${missionData.mapImageUrl})` }}
+        >
+          {missionData.buildings.map(building => (
+            <div
+              key={building.id}
+              className={`building-drop-zone ${dragOverZone === building.id ? 'drag-over' : ''}`}
+              style={{ top: `${building.correctPosition.y}%`, left: `${building.correctPosition.x}%` }}
+              onDragOver={(e) => handleDragOver(e, building.id)}
+              onDragLeave={() => setDragOverZone(null)}
+              onDrop={(e) => handleDrop(e, building.id)}
+            >
+               {!placedBuildings[building.id] && <span className="text-white text-shadow-lg font-bold text-sm hidden sm:block">{building.name}</span>}
+            </div>
+          ))}
+          {missionData.buildings.map(building => placedBuildings[building.id] && (
+            <img
+                key={`placed-${building.id}`}
+                src={building.iconUrl}
+                alt={building.name}
+                className="placed-building-icon visible"
+                style={{ top: `${building.correctPosition.y}%`, left: `${building.correctPosition.x}%` }}
+            />
+          ))}
+           {isComplete && (
+            <div className="absolute inset-0 bg-black/70 flex flex-col justify-center items-center text-white z-20 animate-fadeInScaleUp rounded-md">
+                <h3 className="text-4xl font-bold text-green-400">Kinh thành hoàn tất!</h3>
+                <p className="text-xl mt-2">Bạn đã tái hiện thành công một công trình vĩ đại.</p>
+                {rewardImageUrl && <img src={rewardImageUrl} alt="Phần thưởng" className="w-32 h-32 object-contain my-4 rounded-lg" />}
+            </div>
+        )}
+        </div>
+
+        {/* Building Palette */}
+        <div id="construction-palette" className="w-full md:w-64 flex-shrink-0 bg-white/70 dark:bg-stone-700/70 p-4 rounded-lg shadow-inner">
+          <h3 className="text-xl font-semibold text-center mb-3 text-amber-800 dark:text-amber-300">Công trình cần đặt</h3>
+          <div className="space-y-4">
+            {missionData.buildings.map(building => {
+              if (placedBuildings[building.id]) {
+                return (
+                  <div key={building.id} className="p-2 rounded-lg bg-green-200 dark:bg-green-800/60 flex items-center gap-3 opacity-50">
+                    <img src={building.iconUrl} alt={building.name} className="w-12 h-12 object-contain flex-shrink-0" />
+                    <div>
+                      <p className="font-bold text-green-800 dark:text-green-200 line-through">{building.name}</p>
+                      <p className="text-xs text-green-600 dark:text-green-300">Đã đặt</p>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <div
+                  key={building.id}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, building)}
+                  className="building-palette-item p-2 rounded-lg bg-amber-50 dark:bg-stone-600 flex items-center gap-3 shadow-sm border-2 border-amber-200 dark:border-stone-500"
+                >
+                  <img src={building.iconUrl} alt={building.name} className="w-12 h-12 object-contain flex-shrink-0" />
+                  <p className="font-bold text-stone-700 dark:text-stone-200">{building.name}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CityPlanningScreen;

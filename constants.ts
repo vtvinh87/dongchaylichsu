@@ -1,6 +1,8 @@
 
 
-import { MissionInfo, Hoi, Artifact, PuzzlePieceItem, HeroCard, PuzzleMissionData, NarrativeMissionData, TimelineEventItem, TimelineMissionData, MissionData, NarrativeNode, ARMissionData, AiCharacter, Decoration, HiddenObjectMissionData, HiddenObjectItem, QuizMissionData, ConstructionMissionData, Tutorial, CustomizationItem, DiplomacyMissionData, DiplomacyRound, MemoryFragment, Reward, TradingMissionData, TradingGood, TradingEvent, RhythmMissionData, RhythmNote, ColoringMissionData, SandboxBackground, Achievement, SavedGameState, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, MapCellType, StrategyMapMissionData, CoinMintingMissionData } from './types';
+
+
+import { MissionInfo, Hoi, Artifact, PuzzlePieceItem, HeroCard, PuzzleMissionData, NarrativeMissionData, TimelineEventItem, TimelineMissionData, MissionData, NarrativeNode, ARMissionData, AiCharacter, Decoration, HiddenObjectMissionData, HiddenObjectItem, QuizMissionData, ConstructionMissionData, Tutorial, CustomizationItem, DiplomacyMissionData, DiplomacyRound, MemoryFragment, Reward, TradingMissionData, TradingGood, TradingEvent, RhythmMissionData, RhythmNote, ColoringMissionData, SandboxBackground, Achievement, SavedGameState, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, MapCellType, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, BuildingPlacement, TypesettingMissionData } from './types';
 import * as ImageUrls from './imageUrls';
 
 export const APP_NAME = "Dòng Chảy Lịch Sử";
@@ -165,6 +167,24 @@ export const DONG_TIEN_QUANG_TRUNG_ARTIFACT: Artifact = {
     detailedDescription: "Đồng 'Quang Trung Thông Bảo' được đúc bằng đồng, là một phần quan trọng trong nỗ lực cải cách kinh tế, tiền tệ của vua Quang Trung. Việc thống nhất hệ thống tiền tệ đã góp phần ổn định xã hội, thúc đẩy giao thương, khẳng định chủ quyền của một quốc gia độc lập, hùng mạnh.",
 };
 
+export const MO_HINH_CUU_DINH_ARTIFACT_ID = "mo_hinh_cuu_dinh";
+export const MO_HINH_CUU_DINH_ARTIFACT: Artifact = {
+    id: MO_HINH_CUU_DINH_ARTIFACT_ID,
+    name: "Mô hình Cửu đỉnh",
+    imageUrl: ImageUrls.MO_HINH_CUU_DINH_URL,
+    description: "Biểu tượng cho sự trường tồn và thống nhất của triều Nguyễn.",
+    detailedDescription: "Cửu Đỉnh (chín cái đỉnh) là chín cái đỉnh đồng lớn được vua Minh Mạng cho đúc vào năm 1835, đặt tại sân Thế Miếu trong Hoàng thành Huế. Mỗi đỉnh được khắc tên riêng và chạm khắc 17 hình ảnh tinh xảo về cảnh vật, sông núi, sản vật của Việt Nam, tượng trưng cho sự giàu đẹp và thống nhất của đất nước. Cửu Đỉnh là một kiệt tác của nghệ thuật đúc đồng và là di sản văn hóa quý giá của dân tộc.",
+};
+
+export const GIA_DINH_BAO_ARTIFACT_ID = "ban-in-bao-gia-dinh";
+export const GIA_DINH_BAO_ARTIFACT: Artifact = {
+  id: GIA_DINH_BAO_ARTIFACT_ID,
+  name: "Bản in báo Gia Định Báo",
+  imageUrl: ImageUrls.ARTIFACT_GIA_DINH_BAO_URL,
+  description: "Một trong những tờ báo chữ Quốc ngữ đầu tiên tại Việt Nam.",
+  detailedDescription: "Gia Định Báo là tờ báo tiếng Việt đầu tiên, ra đời năm 1865 tại Sài Gòn. Việc sử dụng chữ Quốc ngữ trong báo chí đã đánh dấu một bước ngoặt quan trọng, giúp phổ biến chữ viết này và đưa thông tin đến với đông đảo quần chúng, góp phần vào sự phát triển của văn hóa và trí tuệ dân tộc trong giai đoạn đầu của thời kỳ Pháp thuộc."
+};
+
 
 export const ALL_ARTIFACTS_MAP: Record<string, Artifact> = {
   [BRONZE_DRUM_ARTIFACT_ID]: BRONZE_DRUM_ARTIFACT,
@@ -183,6 +203,8 @@ export const ALL_ARTIFACTS_MAP: Record<string, Artifact> = {
   [MU_TRU_NHA_TRAN_ARTIFACT_ID]: MU_TRU_NHA_TRAN_ARTIFACT,
   [AO_BAO_TAY_SON_ARTIFACT_ID]: AO_BAO_TAY_SON_ARTIFACT,
   [DONG_TIEN_QUANG_TRUNG_ARTIFACT_ID]: DONG_TIEN_QUANG_TRUNG_ARTIFACT,
+  [MO_HINH_CUU_DINH_ARTIFACT_ID]: MO_HINH_CUU_DINH_ARTIFACT,
+  [GIA_DINH_BAO_ARTIFACT_ID]: GIA_DINH_BAO_ARTIFACT,
 };
 
 // --- Memory Fragments ---
@@ -687,6 +709,34 @@ const MISSION_COIN_MINTING_TAY_SON: CoinMintingMissionData = {
     ],
 };
 
+// --- City Planning Mission ---
+export const MISSION_CITY_PLANNING_HUE_ID = "mission_city_planning_hue";
+const MISSION_CITY_PLANNING_HUE: CityPlanningMissionData = {
+    type: 'cityPlanning',
+    id: MISSION_CITY_PLANNING_HUE_ID,
+    title: "Xây dựng Kinh thành Huế",
+    mapImageUrl: ImageUrls.MAP_KINH_THANH_HUE_URL,
+    buildings: [
+        { id: 'ngo-mon', name: 'Ngọ Môn', iconUrl: ImageUrls.ICON_NGO_MON_URL, correctPosition: { x: 42.5, y: 80 } },
+        { id: 'thai-hoa', name: 'Điện Thái Hòa', iconUrl: ImageUrls.ICON_THAI_HOA_URL, correctPosition: { x: 42.5, y: 55 } },
+        { id: 'the-mieu', name: 'Thế Miếu', iconUrl: ImageUrls.ICON_THE_MIEU_URL, correctPosition: { x: 20, y: 75 } },
+    ],
+    reward: { type: 'artifact', id: MO_HINH_CUU_DINH_ARTIFACT_ID },
+};
+
+// --- Typesetting Mission ---
+export const MISSION_TYPESETTING_ID = "mission_typesetting_dong_co";
+const typesettingTargetText = "ĐỒNGCỔTHỜIBÁO";
+const typesettingAvailableLetters = (typesettingTargetText + "XYZ").split('');
+const MISSION_TYPESETTING_DONG_CO: TypesettingMissionData = {
+    type: 'typesetting',
+    id: MISSION_TYPESETTING_ID,
+    title: "In báo chữ Quốc ngữ",
+    targetText: typesettingTargetText,
+    availableLetters: typesettingAvailableLetters,
+    reward: { type: 'artifact', id: GIA_DINH_BAO_ARTIFACT_ID },
+};
+
 
 // --- ALL MISSIONS MAP ---
 export const ALL_MISSIONS: Record<string, MissionData> = {
@@ -711,6 +761,8 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
   [MISSION_DEFENSE_ID]: MISSION_DEFENSE_GAME,
   [MISSION_STRATEGY_MAP_NGOC_HOI_ID]: MISSION_STRATEGY_MAP_NGOC_HOI,
   [MISSION_COIN_MINTING_ID]: MISSION_COIN_MINTING_TAY_SON,
+  [MISSION_CITY_PLANNING_HUE_ID]: MISSION_CITY_PLANNING_HUE,
+  [MISSION_TYPESETTING_ID]: MISSION_TYPESETTING_DONG_CO,
 };
 
 // --- Quest Chains ---
@@ -776,21 +828,31 @@ const HOI_4_BAO_TAP_PHAN_TRANH: Hoi = {
 };
 
 // Hồi 5
-const MISSION_INFO_QUIZ: MissionInfo = { id: 'card_5_1', title: 'Thử Tài Sử Học', imageUrl: ImageUrls.SAGA_QUIZ_URL, description: 'Kiểm tra kiến thức của bạn về các triều đại phong kiến Việt Nam.', missionId: MISSION_QUIZ_GENERAL_KNOWLEDGE_ID };
-const MISSION_INFO_TRADING: MissionInfo = { id: 'card_5_2', title: 'Thương Cảng Hội An', imageUrl: ImageUrls.SAGA_HOI_AN_TRADING_URL, description: 'Trở thành một thương nhân, mua bán và làm giàu tại cảng Hội An.', missionId: MISSION_TRADING_HOI_AN_ID, dependsOnMissionId: MISSION_QUIZ_GENERAL_KNOWLEDGE_ID };
-const HOI_5_GIAO_THOI: Hoi = {
-  id: 'hoi_5_giao_thoi',
-  title: "Hồi 5: Giao Thời và Hội Nhập",
+const MISSION_INFO_KINH_THANH_HUE: MissionInfo = { id: 'card_5_1', title: 'Xây dựng Kinh thành Huế', imageUrl: ImageUrls.SAGA_KINH_THANH_HUE_URL, description: 'Quy hoạch và đặt các công trình biểu tượng vào đúng vị trí trong Kinh thành.', missionId: MISSION_CITY_PLANNING_HUE_ID };
+const MISSION_INFO_TYPESETTING: MissionInfo = { id: 'card_5_2', title: 'In báo chữ Quốc ngữ', imageUrl: ImageUrls.SAGA_TYPESETTING_URL, description: 'Sắp xếp các con chữ để in dòng tít báo, phổ biến tri thức mới.', missionId: MISSION_TYPESETTING_ID, dependsOnMissionId: MISSION_CITY_PLANNING_HUE_ID };
+const HOI_5_VAN_NUOC_DOI_THAY: Hoi = {
+  id: 'hoi_5_van_nuoc_doi_thay',
+  title: "Hồi 5: Vận Nước Đổi Thay",
+  description: "Tìm hiểu về triều đại phong kiến cuối cùng của Việt Nam, nhà Nguyễn, và công cuộc xây dựng kinh đô mới tại Huế.",
+  missions: [MISSION_INFO_KINH_THANH_HUE, MISSION_INFO_TYPESETTING],
+};
+
+// Hồi 6
+const MISSION_INFO_QUIZ: MissionInfo = { id: 'card_6_1', title: 'Thử Tài Sử Học', imageUrl: ImageUrls.SAGA_QUIZ_URL, description: 'Kiểm tra kiến thức của bạn về các triều đại phong kiến Việt Nam.', missionId: MISSION_QUIZ_GENERAL_KNOWLEDGE_ID };
+const MISSION_INFO_TRADING: MissionInfo = { id: 'card_6_2', title: 'Thương Cảng Hội An', imageUrl: ImageUrls.SAGA_HOI_AN_TRADING_URL, description: 'Trở thành một thương nhân, mua bán và làm giàu tại cảng Hội An.', missionId: MISSION_TRADING_HOI_AN_ID, dependsOnMissionId: MISSION_QUIZ_GENERAL_KNOWLEDGE_ID };
+const HOI_6_GIAO_THOI: Hoi = {
+  id: 'hoi_6_giao_thoi',
+  title: "Hồi 6: Giao Thời và Hội Nhập",
   description: "Chứng kiến sự hội nhập với thế giới và những bước ngoặt lịch sử ở giai đoạn cuối các triều đại phong kiến.",
   missions: [MISSION_INFO_QUIZ, MISSION_INFO_TRADING],
 };
 
-// Hồi 6
-const MISSION_INFO_COLORING_DONG_HO: MissionInfo = { id: 'card_6_1', title: 'Vẽ Tranh Dân Gian', imageUrl: ImageUrls.SAGA_COLORING_URL, description: 'Tô màu cho bức tranh Gà Trống theo đúng phong cách tranh Đông Hồ.', missionId: MISSION_COLORING_DONG_HO_ID };
-const MISSION_INFO_RHYTHM_GAME: MissionInfo = { id: 'card_6_2', title: 'Giai điệu Cung đình', imageUrl: ImageUrls.SAGA_RHYTHM_GAME_URL, description: 'Cảm nhận Nhã nhạc cung đình Huế qua một thử thách âm nhạc.', missionId: MISSION_RHYTHM_HUE_COURT_ID, dependsOnMissionId: MISSION_COLORING_DONG_HO_ID };
-const HOI_6_BAN_SAC_VAN_HOA: Hoi = {
-  id: 'hoi_6_ban_sac_van_hoa',
-  title: "Hồi 6: Bản Sắc Văn Hóa",
+// Hồi 7
+const MISSION_INFO_COLORING_DONG_HO: MissionInfo = { id: 'card_7_1', title: 'Vẽ Tranh Dân Gian', imageUrl: ImageUrls.SAGA_COLORING_URL, description: 'Tô màu cho bức tranh Gà Trống theo đúng phong cách tranh Đông Hồ.', missionId: MISSION_COLORING_DONG_HO_ID };
+const MISSION_INFO_RHYTHM_GAME: MissionInfo = { id: 'card_7_2', title: 'Giai điệu Cung đình', imageUrl: ImageUrls.SAGA_RHYTHM_GAME_URL, description: 'Cảm nhận Nhã nhạc cung đình Huế qua một thử thách âm nhạc.', missionId: MISSION_RHYTHM_HUE_COURT_ID, dependsOnMissionId: MISSION_COLORING_DONG_HO_ID };
+const HOI_7_BAN_SAC_VAN_HOA: Hoi = {
+  id: 'hoi_7_ban_sac_van_hoa',
+  title: "Hồi 7: Bản Sắc Văn Hóa",
   description: "Tái hiện lại nét đẹp văn hóa dân gian qua các tác phẩm nghệ thuật truyền thống, khẳng định bản sắc dân tộc.",
   missions: [MISSION_INFO_COLORING_DONG_HO, MISSION_INFO_RHYTHM_GAME],
 };
@@ -801,8 +863,9 @@ export const HOI_DATA: Hoi[] = [
   HOI_2_BAT_KHUAT,
   HOI_3_KY_NGUYEN_DAI_VIET,
   HOI_4_BAO_TAP_PHAN_TRANH,
-  HOI_5_GIAO_THOI,
-  HOI_6_BAN_SAC_VAN_HOA,
+  HOI_5_VAN_NUOC_DOI_THAY,
+  HOI_6_GIAO_THOI,
+  HOI_7_BAN_SAC_VAN_HOA,
 ];
 
 
@@ -942,6 +1005,14 @@ export const INSTRUCTION_DATA: Record<string, { title: string, text: string }> =
     'coinMinting': {
         title: 'Hướng dẫn: Đúc tiền',
         text: 'Chọn đúng loại kim loại và khuôn đúc tương ứng với đồng tiền được yêu cầu. Sau đó nhấn "Tiến hành Đúc" để tạo ra cổ vật lịch sử!'
+    },
+    'cityPlanning': {
+        title: 'Hướng dẫn: Quy hoạch Kinh thành',
+        text: 'Kéo các công trình kiến trúc từ bảng bên phải và thả vào đúng vị trí của chúng trên bản đồ Kinh thành. Đặt đúng tất cả các công trình để hoàn thành nhiệm vụ.'
+    },
+    'typesetting': {
+        title: 'Hướng dẫn: Sắp chữ In báo',
+        text: 'Kéo các con chữ từ khay bên dưới và thả vào khung sắp chữ để tạo thành dòng tít báo mẫu. Khi đã sắp xếp xong, nhấn "Tiến hành In" để kiểm tra kết quả.'
     }
 };
 

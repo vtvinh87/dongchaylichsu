@@ -1,15 +1,10 @@
-/// <reference types="react" />
 
-// aframe.d.ts
-// This file provides TypeScript definitions for A-Frame's custom HTML elements
-// to be used within JSX, preventing "Property 'a-scene' does not exist on type 'JSX.IntrinsicElements'" errors.
+/// <reference types="react" />
 
 declare global {
   namespace JSX {
-      type AFrameReactAttributes = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-
       interface IntrinsicElements {
-        'a-scene': AFrameReactAttributes & {
+        'a-scene': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
           embedded?: boolean | string;
           arjs?: string;
           renderer?: string;
@@ -18,7 +13,7 @@ declare global {
           id?: string;
           style?: React.CSSProperties;
         };
-        'a-entity': AFrameReactAttributes & {
+        'a-entity': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
           camera?: boolean | string;
           'gltf-model'?: string;
           scale?: string;
@@ -27,21 +22,19 @@ declare global {
           animation__rotate?: string;
           'gesture-handler'?: string | boolean;
         };
-        'a-marker': AFrameReactAttributes & {
+        'a-marker': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
           type?: string;
           url?: string;
         };
-        'a-assets': AFrameReactAttributes & {
+        'a-assets': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
           timeout?: string;
         };
-        'a-asset-item': AFrameReactAttributes & {
+        'a-asset-item': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
           id?: string;
           src?: string;
           'response-type'?: string;
         };
-        'a-camera': AFrameReactAttributes;
+        'a-camera': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
       }
   }
 }
-
-export {};

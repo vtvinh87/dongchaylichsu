@@ -44,13 +44,13 @@
     }
 
     @keyframes fadeInScreen {
-        from { opacity: 0; transform: scale(0.98); }
-        to { opacity: 1; transform: scale(1); }
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
 
     @keyframes fadeOutScreen {
-        from { opacity: 1; transform: scale(1); }
-        to { opacity: 0; transform: scale(0.98); }
+        from { opacity: 1; }
+        to { opacity: 0; }
     }
 
     /* --- Cải tiến UI chung --- */
@@ -1038,6 +1038,145 @@
         to { transform: scale(1) rotate(0deg); opacity: 1; }
     }
     /* --- END OF COIN MINTING STYLES --- */
+
+    /* --- START OF CITY PLANNING STYLES --- */
+    #citadel-map-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background-size: cover;
+      background-position: center;
+      border-radius: 0.5rem;
+      border: 4px solid #8c6b4f; /* A dark wood color */
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .building-drop-zone {
+      position: absolute;
+      width: 15%;
+      height: 20%;
+      border: 3px dashed rgba(251, 191, 36, 0.7); /* amber-400 with alpha */
+      border-radius: 8px;
+      transition: all 0.2s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .building-drop-zone.drag-over {
+      background-color: rgba(251, 191, 36, 0.3);
+      border-style: solid;
+      transform: scale(1.05);
+    }
+    .building-palette-item {
+      cursor: grab;
+      transition: all 0.2s;
+    }
+    .building-palette-item:active {
+      cursor: grabbing;
+      transform: scale(0.95);
+      opacity: 0.7;
+    }
+    .placed-building-icon {
+      position: absolute;
+      pointer-events: none;
+      width: 15%;
+      height: 20%;
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    .placed-building-icon.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+    /* --- END OF CITY PLANNING STYLES --- */
+    
+    /* --- START OF TYPESETTING GAME STYLES --- */
+    #typesetting-screen {
+        background-color: #d7ccc8; /* A light, parchment-like brown */
+        color: #3e2723; /* A dark brown */
+        font-family: 'serif';
+    }
+    .dark #typesetting-screen {
+        background-color: #3e2723;
+        color: #d7ccc8;
+    }
+
+    #text-template {
+        background: #fdf6e3;
+        border: 1px solid #a1887f;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        font-size: 1.5rem;
+        letter-spacing: 0.2em;
+        font-weight: bold;
+        text-align: center;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .dark #text-template {
+        background: #5d4037;
+        border-color: #8d6e63;
+    }
+    
+    #letter-tray {
+        background-color: #8d6e63; /* A wood color */
+        padding: 1rem;
+        border: 4px solid #5d4037;
+        border-radius: 0.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        min-height: 100px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    
+    .letter-block {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(145deg, #e0e0e0, #bdbdbd); /* metal-like gradient */
+        border: 1px solid #757575;
+        border-bottom-width: 3px;
+        border-right-width: 3px;
+        color: #212121;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        cursor: grab;
+        transition: all 0.2s;
+        box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+        user-select: none;
+        transform: scaleY(-1); /* Inverted for printing */
+    }
+    .letter-block:active {
+        cursor: grabbing;
+        transform: scale(0.95) scaleY(-1);
+        box-shadow: 0 0 1px rgba(0,0,0,0.4);
+    }
+    
+    #composition-area {
+        background-color: #a1887f; /* A darker wood color */
+        padding: 1rem;
+        border: 2px solid #5d4037;
+        border-radius: 0.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        min-height: 64px;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+    }
+    
+    .composition-slot {
+        width: 44px;
+        height: 44px;
+        background-color: rgba(0,0,0,0.2);
+        border: 1px dashed #efebe9;
+        border-radius: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    /* --- END OF TYPESETTING GAME STYLES --- */
 
 
     /* --- Responsive Design --- */
