@@ -1,4 +1,5 @@
 
+
 export enum Screen {
   LOGIN,
   MAIN_INTERFACE,
@@ -29,6 +30,8 @@ export enum Screen {
   COIN_MINTING_MISSION_SCREEN, // New screen for the coin minting game
   CITY_PLANNING_MISSION_SCREEN, // New screen for the city planning game
   TYPESETTING_MISSION_SCREEN, // New screen for the typesetting game
+  ADVENTURE_PUZZLE_SCREEN,
+  STRATEGIC_PATH_MISSION_SCREEN,
 }
 
 export interface Artifact {
@@ -403,8 +406,34 @@ export interface TypesettingMissionData {
   reward: Reward;
 }
 
+// --- Adventure Puzzle Game Types ---
+export interface AdventurePuzzleRiddle {
+  riddleText: string;
+  correctAnswer: string;
+  hint?: string;
+}
 
-export type MissionData = PuzzleMissionData | NarrativeMissionData | TimelineMissionData | ARMissionData | HiddenObjectMissionData | QuizMissionData | ConstructionMissionData | DiplomacyMissionData | TradingMissionData | RhythmMissionData | ColoringMissionData | RallyCallMissionData | ForgingMissionData | TacticalMapMissionData | DefenseMissionData | StrategyMapMissionData | CoinMintingMissionData | CityPlanningMissionData | TypesettingMissionData;
+export interface AdventurePuzzleMissionData {
+  type: 'adventurePuzzle';
+  id: string;
+  title: string;
+  riddles: AdventurePuzzleRiddle[];
+  reward: Reward;
+}
+
+// --- Strategic Path Mission Types ---
+export interface StrategicPathMissionData {
+  type: 'strategicPath';
+  id: string;
+  title: string;
+  mapLayout: number[][]; // 0: jungle, 1: mountain, 2: river
+  start: { x: number; y: number };
+  end: { x: number; y: number };
+  reward: Reward;
+}
+
+
+export type MissionData = PuzzleMissionData | NarrativeMissionData | TimelineMissionData | ARMissionData | HiddenObjectMissionData | QuizMissionData | ConstructionMissionData | DiplomacyMissionData | TradingMissionData | RhythmMissionData | ColoringMissionData | RallyCallMissionData | ForgingMissionData | TacticalMapMissionData | DefenseMissionData | StrategyMapMissionData | CoinMintingMissionData | CityPlanningMissionData | TypesettingMissionData | AdventurePuzzleMissionData | StrategicPathMissionData;
 
 // --- Quest Chain Types ---
 export interface QuestChainStep {

@@ -38,6 +38,8 @@ export const AO_BAO_TAY_SON_URL = "https://i.ibb.co/PvZj96mQ/M-ao-bao-nghia-quan
 export const ARTIFACT_QUANG_TRUNG_COIN_MINTED_URL = "https://i.ibb.co/35z9bGX3/M-Quang-Trung-thong-bao.png";
 export const MO_HINH_CUU_DINH_URL = 'https://i.ibb.co/LXtFtbxP/M-mo-hinh-cuu-dinh.png';
 export const ARTIFACT_GIA_DINH_BAO_URL = 'https://i.ibb.co/WWL4PKmf/M-Gia-Dinh-bao.png';
+export const VALI_DONG_DU_ARTIFACT_URL = 'https://i.ibb.co/LdyGLXc5/M-vali-cua-nha-yeu-nuoc.png';
+export const TRUONG_SON_COMPASS_ARTIFACT_URL = 'https://i.ibb.co/mSgM1fX/M-la-ban-cua-nguoi-linh.png';
 
 
 // --- Memory Fragment Images ---
@@ -73,6 +75,8 @@ export const SAGA_HANH_QUAN_THAN_TOC_URL = "https://i.ibb.co/sp81xCjx/Q-hanh-qua
 export const SAGA_COIN_MINTING_URL = "https://i.ibb.co/V0M17j9W/Q-duc-tien.png";
 export const SAGA_KINH_THANH_HUE_URL = 'https://i.ibb.co/JjcfLCpd/Q-xay-dung-kinh-thanh-Hue.png';
 export const SAGA_TYPESETTING_URL = 'https://i.ibb.co/ytPyNW9/Q-in-bao-chu-quoc-ngu.png';
+export const SAGA_DONG_DU_URL = 'https://i.ibb.co/6cv9fnP6/Q-vuot-bien-dong-du.png';
+export const SAGA_TRUONG_SON_URL = 'https://i.ibb.co/k6H6nVRt/Q-mo-duong-truong-son.png';
 export const BACH_DANG_DO_THAM_ICON_URL = "https://i.ibb.co/B5hFBJtW/Q-do-tham-dia-hinh.png";
 export const BACH_DANG_CAM_COC_ICON_URL = "https://i.ibb.co/BKfFgHX9/Q-cam-coc-go.png";
 export const BACH_DANG_VICTORY_ICON_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/T%C6%B0%E1%BB%A3ng_%C4%90%E1%BB%A9c_vua_Ng%C3%B4_Quy%E1%BB%81n.jpg/800px-T%C6%B0%E1%BB%A3ng_%C4%90%E1%BB%A9c_vua_Ng%C3%B4_Quy%E1%BB%81n.jpg";

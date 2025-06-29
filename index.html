@@ -1,3 +1,15 @@
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "html2canvas": "https://esm.sh/html2canvas@^1.4.1",
+    "@google/genai": "https://esm.sh/@google/genai@^1.7.0",
+    "@netlify/functions": "https://esm.sh/@netlify/functions@^4.1.8"
+  }
+}
+</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +19,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     // Ensure Tailwind's 'class' strategy for dark mode is active.
@@ -22,6 +35,94 @@
       margin: 0; /* Ensure no default margin */
       /* background-image is now handled by App.tsx */
     }
+
+    /* --- CSS cho Landing Screen --- */
+    .landing-screen {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .landing-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.8) 100%);
+    }
+
+    .landing-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem; /* 24px */
+      animation: fadeInDown 1.5s ease-out forwards;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .landing-content h1 {
+      font-family: 'Nunito', sans-serif;
+      font-size: 4rem; /* 64px */
+      font-weight: 800; /* Extra Bold */
+      letter-spacing: 0.05em;
+      text-shadow: 0 4px 15px rgba(0,0,0,0.7);
+      color: #fde68a; /* amber-200 */
+    }
+
+    .landing-content h2 {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.5rem; /* 24px */
+      font-weight: 600; /* Semibold */
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      max-width: 600px;
+    }
+
+    #start-adventure-button {
+      margin-top: 1rem;
+      padding: 1rem 2.5rem;
+      font-size: 1.25rem; /* 20px */
+      font-weight: 700;
+      color: #78350f; /* amber-800 */
+      background: linear-gradient(145deg, #fcd34d, #fbbf24); /* amber-300 to amber-400 */
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 5px 20px rgba(251, 191, 36, 0.4), inset 0 -2px 5px rgba(0,0,0,0.2);
+      transition: all 0.3s ease-out;
+      transform: scale(1);
+    }
+
+    #start-adventure-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(251, 191, 36, 0.6), inset 0 -2px 5px rgba(0,0,0,0.2);
+      background: linear-gradient(145deg, #fde047, #facc15); /* amber-200 to amber-400 */
+    }
+
+    #start-adventure-button:active {
+      transform: scale(1);
+      box-shadow: 0 2px 10px rgba(251, 191, 36, 0.5), inset 0 -1px 3px rgba(0,0,0,0.3);
+    }
+    
     /* Keyframes for modal animation (can be component-scoped too) */
     @keyframes fadeInScaleUp {
       from { opacity: 0; transform: scale(0.95); }
@@ -223,1216 +324,173 @@
       text-shadow: 0 0 5px black;
     }
     .customization-item-card.item-selected {
-      border-color: #3b82f6; /* blue-500 */
-      transform: scale(1.05);
-      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+      border-color: #3b82f6; /* blue-600 */
     }
-    .dark .customization-item-card.item-selected {
-       border-color: #60a5fa; /* blue-400 */
-       box-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
-    }
-
-    /* --- START OF DIPLOMACY SCREEN STYLES --- */
-    #goodwill-bar-container {
-        width: 100%;
-        height: 24px;
-        background-color: #e5e7eb; /* gray-200 */
-        border-radius: 0.5rem;
-        padding: 4px;
-        box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-        border: 1px solid #d1d5db; /* gray-300 */
-    }
-    .dark #goodwill-bar-container {
-        background-color: #374151; /* gray-700 */
-        border-color: #4b5563; /* gray-600 */
-    }
-    #goodwill-bar {
-        height: 100%;
-        border-radius: 0.25rem;
-        transition: width 0.5s ease-in-out, background-color 0.5s ease-in-out;
-        box-shadow: 0 1px 2px rgba(255,255,255,0.2) inset;
-        position: relative;
-        overflow: hidden;
-    }
-    #goodwill-bar::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        background-image: linear-gradient(
-          -45deg,
-          rgba(255, 255, 255, 0.2) 25%,
-          transparent 25%,
-          transparent 50%,
-          rgba(255, 255, 255, 0.2) 50%,
-          rgba(255, 255, 255, 0.2) 75%,
-          transparent 75%,
-          transparent
-        );
-        z-index: 1;
-        background-size: 30px 30px;
-    }
-
-    #npc-dialogue-box {
-      background-color: #fffbeb; /* amber-50 */
-      border: 2px solid #fcd34d; /* amber-300 */
-      padding: 1rem;
+    
+    /* --- CSS cho Adventure Puzzle Screen --- */
+    #adventure-puzzle-screen {
+      background-image: url('https://i.ibb.co/NgsvHmwQ/B-ban-do-vuot-bien.png');
+      background-size: cover;
+      background-position: center;
+      width: 100%;
+      max-width: 900px;
+      height: 90vh;
+      max-height: 700px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
       border-radius: 0.75rem;
-      border-top-left-radius: 0; /* Creates speech bubble effect */
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
       position: relative;
     }
-    .dark #npc-dialogue-box {
-      background-color: #451a03; /* amber-950 */
-      border-color: #d97706; /* amber-600 */
-    }
-    #npc-dialogue-box::before {
-        content: '';
-        position: absolute;
-        width: 0px;
-        height: 0px;
-        border-bottom: 20px solid transparent;
-        border-right: 20px solid #fcd34d; /* Match border color */
-        left: -20px;
-        top: 0px;
-    }
-    .dark #npc-dialogue-box::before {
-       border-right-color: #d97706;
-    }
-    
-    .diplomacy-choice-button {
-      background-color: #e0f2fe; /* sky-100 */
-      border: 2px solid transparent;
-      transition: all 0.2s ease-in-out;
-    }
-    .dark .diplomacy-choice-button {
-      background-color: #0c4a6e; /* sky-900 */
-    }
 
-    .diplomacy-choice-button:not(:disabled):hover {
-      border-color: #38bdf8; /* sky-400 */
-      transform: scale(1.02);
-    }
-    .diplomacy-choice-button.selected-correct {
-        background-color: #dcfce7; /* green-100 */
-        border-color: #22c55e; /* green-500 */
-    }
-    .dark .diplomacy-choice-button.selected-correct {
-        background-color: #14532d; /* green-900 */
-        border-color: #4ade80; /* green-400 */
-    }
-     .diplomacy-choice-button.selected-wrong {
-        background-color: #fee2e2; /* red-100 */
-        border-color: #ef4444; /* red-500 */
-    }
-    .dark .diplomacy-choice-button.selected-wrong {
-        background-color: #7f1d1d; /* red-900 */
-        border-color: #f87171; /* red-400 */
-    }
-    /* --- END OF DIPLOMACY SCREEN STYLES --- */
-    
-    /* --- START OF CRAFTING SCREEN STYLES --- */
-    .crafting-item-card {
-      /* Base styles handled by Tailwind, this is for custom interactions */
-      transition: box-shadow 0.3s, transform 0.3s;
-    }
-    .crafting-item-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    }
-    .dark .crafting-item-card:hover {
-       box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    }
-    .crafting-button:disabled {
-      filter: grayscale(80%);
-      background-color: #9ca3af; /* gray-400 */
-      box-shadow: none;
-      cursor: not-allowed;
-    }
-    .dark .crafting-button:disabled {
-      background-color: #4b5563; /* gray-600 */
-    }
-    /* --- END OF CRAFTING SCREEN STYLES --- */
-
-    /* --- START OF TRADING SCREEN STYLES --- */
-    #player-stats .stat-item {
-        @apply bg-amber-200 dark:bg-stone-600 p-2 px-4 rounded-md text-stone-700 dark:text-amber-200 text-sm sm:text-base;
-    }
-    .trading-card {
-        @apply bg-amber-50 dark:bg-stone-700 p-3 rounded-lg shadow-md text-center border border-amber-200 dark:border-stone-600;
-    }
-    .trading-card.small {
-        @apply flex items-center text-left p-2;
-    }
-    .trade-button {
-        @apply w-full mt-2 py-1 px-4 text-sm font-semibold rounded-md shadow-sm transition-transform transform hover:scale-105;
-    }
-    .trade-button.buy-button {
-        @apply bg-blue-500 hover:bg-blue-600 text-white;
-    }
-    .trade-button.sell-button {
-        @apply bg-red-500 hover:bg-red-600 text-white;
-    }
-    /* --- END OF TRADING SCREEN STYLES --- */
-
-    /* --- START OF CHATBOT CHARACTER SELECTION --- */
-    #character-selection {
-      background-color: #fef3c7; /* amber-100 */
-      padding: 0.5rem;
-      border-bottom: 1px solid #fcd34d; /* amber-300 */
-      text-align: center;
-      position: relative;
-    }
-    .dark #character-selection {
-      background-color: #451a03; /* amber-950 */
-      border-bottom-color: #b45309; /* amber-700 */
-    }
-
-    #character-selection-scroll {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.75rem;
-      overflow-x: auto;
-      padding-bottom: 0.5rem; /* For scrollbar */
-      -ms-overflow-style: none;  /* IE and Edge */
-      scrollbar-width: none;  /* Firefox */
-    }
-    #character-selection-scroll::-webkit-scrollbar {
-      display: none; /* Chrome, Safari, Opera */
-    }
-
-
-    .character-avatar-button {
-      position: relative;
-      border: none;
-      background: none;
-      padding: 0;
-      cursor: pointer;
-      border-radius: 9999px;
-      transition: all 0.2s ease-in-out;
-      flex-shrink: 0;
-    }
-
-    .character-avatar-button img {
-      width: 2.75rem; /* 44px */
-      height: 2.75rem; /* 44px */
-      border-radius: 9999px;
-      object-fit: cover;
-      border: 3px solid transparent;
-      transition: all 0.2s ease-in-out;
-      background-color: #e5e7eb; /* gray-200 */
-    }
-    .dark .character-avatar-button img {
-      background-color: #4b5563; /* gray-600 */
-    }
-
-
-    .character-avatar-button.avatar-selected img {
-      border-color: #3b82f6; /* blue-500 */
-      transform: scale(1.1);
-      box-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
-    }
-    .dark .character-avatar-button.avatar-selected img {
-      border-color: #60a5fa; /* blue-400 */
-      box-shadow: 0 0 10px rgba(96, 165, 250, 0.7);
-    }
-
-
-    .character-avatar-button.avatar-locked {
-      cursor: not-allowed;
-    }
-    .character-avatar-button.avatar-locked img {
-      filter: grayscale(100%);
-      opacity: 0.6;
-    }
-
-    .character-avatar-button.avatar-locked::after {
-      content: '🔒';
+    #adventure-puzzle-screen::before {
+      content: '';
       position: absolute;
-      bottom: -4px;
-      right: -4px;
-      font-size: 1rem;
-      background-color: rgba(0, 0, 0, 0.6);
-      color: white;
-      border-radius: 9999px;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    }
-    /* --- END OF CHATBOT CHARACTER SELECTION --- */
-
-    /* --- START OF COLORING GAME STYLES --- */
-    #coloring-canvas {
-      width: 100%;
-      max-width: 500px;
-      margin: 0 auto;
-      border-radius: 8px;
-      background-color: #fffaf0; /* floralwhite */
-      border: 4px solid #fcd34d; /* amber-300 */
-    }
-    #coloring-canvas svg path,
-    #coloring-canvas svg circle,
-    #coloring-canvas svg polygon {
-      cursor: pointer;
-      transition: fill 0.15s ease-in-out;
-    }
-    #coloring-canvas svg path:hover,
-    #coloring-canvas svg circle:hover,
-    #coloring-canvas svg polygon:hover {
-      stroke-width: 3px;
-      stroke: #3b82f6; /* blue-500 */
-    }
-    .dark #coloring-canvas {
-       background-color: #4b5563; /* gray-600 */
-       border-color: #b45309; /* amber-700 */
-    }
-    .dark #coloring-canvas svg {
-      stroke: #f5f5f4; /* stone-100 */
-    }
-    .dark #coloring-canvas svg circle {
-      fill: #f5f5f4; /* stone-100 */
-    }
-
-    #color-palette {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 1rem;
-      padding: 0.75rem;
-      background-color: rgba(255,255,255,0.5);
-      border-radius: 0.5rem;
-    }
-    .dark #color-palette {
+      inset: 0;
       background-color: rgba(0,0,0,0.3);
+      border-radius: 0.75rem; /* Match parent's rounding */
     }
-    .color-swatch {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 3px solid #d1d5db; /* gray-300 */
-      transition: all 0.2s;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .dark .color-swatch {
-       border-color: #4b5563; /* gray-600 */
-    }
-    .color-swatch.selected {
-      border-color: #3b82f6; /* blue-500 */
-      transform: scale(1.15);
-      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.5);
-    }
-    .dark .color-swatch.selected {
-      border-color: #60a5fa; /* blue-400 */
-      box-shadow: 0 4px 10px rgba(96, 165, 250, 0.5);
-    }
-    /* --- END OF COLORING GAME STYLES --- */
-    
-    /* --- START OF RHYTHM GAME STYLES --- */
-    .rhythm-play-area {
+
+    .adventure-puzzle-content {
       position: relative;
+      z-index: 1;
       width: 100%;
-      max-width: 400px;
-      height: 600px;
-      background-color: #1f2937; /* gray-800 */
-      background-image: linear-gradient(to bottom, #374151, #111827);
-      margin: 1rem auto;
+      max-width: 600px;
+      text-align: center;
+      color: #3a2e20; /* Dark brown text */
+    }
+
+    #riddle-display {
+      background-image: url('https://i.ibb.co/hZ2vPht/parchment-bg.jpg');
+      background-size: cover;
+      background-position: center;
+      padding: 2.5rem 3rem;
       border-radius: 0.5rem;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+      border: 2px solid #a16207; /* amber-700 */
+      font-family: 'Special Elite', cursive;
+      font-size: 1.25rem;
+      line-height: 1.6;
+      color: #3a2e20;
+    }
+
+    #answer-input-area {
       display: flex;
-      justify-content: space-around;
-      border: 2px solid #4b5563; /* gray-600 */
+      gap: 0.5rem;
+      margin-top: 1.5rem;
     }
-    .rhythm-lane {
-      position: relative;
-      width: 30%;
-      height: 100%;
-      border-left: 1px dashed rgba(255, 255, 255, 0.1);
-      border-right: 1px dashed rgba(255, 255, 255, 0.1);
+
+    #answer-input-area input {
+      flex-grow: 1;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      border: 2px solid #a16207; /* amber-700 */
+      background-color: #fef3c7; /* amber-100 */
+      color: #3a2e20;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.2s;
     }
-    .hit-line {
-      position: absolute;
-      bottom: 15%;
-      left: 0;
-      right: 0;
-      height: 5px;
-      background-color: #f59e0b; /* amber-500 */
-      box-shadow: 0 0 15px #f59e0b, 0 0 25px #f59e0b;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
+
+    #answer-input-area input:focus {
+      background-color: #fefce8; /* amber-50 */
+      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.4); /* ring-amber-600 with opacity */
     }
-    .hit-key {
-      font-size: 1.5rem;
+
+    #answer-input-area button {
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      border: none;
+      background-color: #a16207; /* amber-700 */
+      color: white;
       font-weight: bold;
-      color: #fffbeb;
-      text-shadow: 0 0 5px black;
-    }
-    .rhythm-note {
-      position: absolute;
-      top: -50px; /* Start above the screen */
-      width: 80%;
-      left: 10%;
-      height: 25px;
-      background: linear-gradient(145deg, #06b6d4, #67e8f9); /* cyan-500, cyan-300 */
-      border-radius: 1rem;
-      box-shadow: 0 0 10px #06b6d4;
-      animation-name: note-fall;
-      animation-timing-function: linear;
-      will-change: transform;
-    }
-    @keyframes note-fall {
-      from { transform: translateY(0); }
-      to { transform: translateY(650px); } /* height + 50px offset */
+      cursor: pointer;
+      transition: all 0.2s;
     }
 
-    .hit-feedback {
-      position: absolute;
-      bottom: 16%;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 2rem;
-      font-weight: bold;
-      text-shadow: 0 0 10px white;
-      pointer-events: none;
-      opacity: 0;
-      animation: fade-up-out 0.5s ease-out;
-    }
-    @keyframes fade-up-out {
-      0% { opacity: 1; transform: translateX(-50%) translateY(0); }
-      100% { opacity: 0; transform: translateX(-50%) translateY(-50px); }
-    }
-    /* --- END OF RHYTHM GAME STYLES --- */
-
-    /* --- START OF FORGING GAME STYLES --- */
-    @keyframes move-marker {
-      0% { left: 0%; }
-      50% { left: calc(100% - 10px); } /* 10px is the width of the marker */
-      100% { left: 0%; }
-    }
-    .force-bar-container {
-      position: relative;
-      width: 100%;
-      height: 30px;
-      background-color: #4b5563; /* gray-600 */
-      border-radius: 8px;
-      border: 2px solid #1f2937; /* gray-800 */
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
-    }
-    .force-bar-zone {
-      position: absolute;
-      top: 0;
-      height: 100%;
-    }
-    .force-bar-good-zone {
-      left: 25%;
-      width: 50%;
-      background-color: rgba(251, 191, 36, 0.4); /* amber-400 with alpha */
-    }
-    .force-bar-perfect-zone {
-      left: 45%;
-      width: 10%;
-      background-color: rgba(52, 211, 153, 0.6); /* emerald-400 with alpha */
-      border-left: 2px solid white;
-      border-right: 2px solid white;
-    }
-    .hit-marker {
-      position: absolute;
-      top: -5px;
-      bottom: -5px;
-      width: 10px;
-      background-color: #ef4444; /* red-500 */
-      border: 2px solid white;
-      border-radius: 4px;
-      box-shadow: 0 0 8px #ef4444;
-      animation: move-marker 1.5s linear infinite;
-      animation-play-state: running; /* Initially running */
-    }
-    .hit-marker.paused {
-      animation-play-state: paused;
-    }
-    .sparks-effect {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -60%);
-        width: 200px;
-        height: 200px;
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.2s;
-    }
-    .sparks-effect.show {
-      opacity: 1;
-    }
-    /* --- END OF FORGING GAME STYLES --- */
-
-    /* --- START OF RALLY CALL SCREEN STYLES --- */
-    #hich-content {
-        background-color: #fdf6e3; /* A parchment color */
-        border: 20px solid transparent;
-        border-image: url('https://i.ibb.co/hK4mJ5S/scroll-border.png') 30 stretch;
-        padding: 2rem;
-        font-family: 'serif';
-        font-size: 1.25rem;
-        line-height: 1.8;
-        color: #5d4037; /* A dark brown color */
-        white-space: pre-wrap; /* To respect newlines */
-        min-height: 200px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-    .dark #hich-content {
-        background-color: #3e2723;
-        color: #d7ccc8;
-        border-image-source: url('https://i.ibb.co/JqjTz3V/scroll-border-dark.png');
+    #answer-input-area button:hover {
+      background-color: #78350f; /* amber-800 */
     }
 
-    .phrase-choice-button {
-        background-color: #c8a46e;
-        border: 2px solid #a1887f;
-        color: #4e342e;
-        font-family: 'serif';
-        transition: all 0.2s ease-in-out;
-    }
-    .dark .phrase-choice-button {
-      background-color: #8d6e63;
-      border-color: #a1887f;
-      color: #efebe9;
-    }
-    .phrase-choice-button:hover {
-      background-color: #bfa068;
-      border-color: #795548;
-      transform: scale(1.03);
-    }
-    /* --- END OF RALLY CALL SCREEN STYLES --- */
-
-
-    /* --- START OF SANDBOX 2.0 STYLES --- */
-    #background-palette .item-locked {
-      filter: grayscale(1);
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-    #background-palette .item-locked::after {
-      content: '🔒';
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2rem;
-      color: white; text-shadow: 0 0 5px black;
-    }
-    #background-palette .item-selected {
-      border-color: #3b82f6; /* blue-500 */
-      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-    }
-    
-    #sandbox-canvas.dialogue-mode .placed-item {
-        cursor: copy;
-    }
-
-    .speech-bubble {
-        position: absolute;
-        background-color: white;
-        color: #333;
+    .feedback-display {
+        background-color: rgba(255, 237, 213, 0.9); /* orange-100 with alpha */
+        border: 1px solid #fdba74; /* orange-300 */
+        color: #c2410c; /* orange-700 */
         padding: 0.75rem;
         border-radius: 0.5rem;
-        border: 1px solid #ccc;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        max-width: 150px;
-        font-size: 13px;
-        cursor: move;
-        line-height: 1.3;
-        transition: all 0.2s;
+        font-weight: 600;
+        animation: fadeInScaleUp 0.3s forwards;
     }
 
-    .dark .speech-bubble {
-        background-color: #374151; /* gray-700 */
-        color: #f3f4f6; /* gray-100 */
-        border-color: #4b5563; /* gray-600 */
-    }
-
-    .speech-bubble::after {
-        content: '';
-        position: absolute;
-        border-style: solid;
-        border-width: 10px;
-        bottom: -19px;
-        left: 20px;
-        border-color: white transparent transparent transparent;
-    }
-    
-    .dark .speech-bubble::after {
-        border-top-color: #374151; /* Match dark bubble background */
-    }
-    
-    .speech-bubble.loading {
-      min-height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .speech-bubble.loading::before {
-      content: '';
-      width: 16px;
-      height: 16px;
-      border: 2px solid #ccc;
-      border-top-color: #333;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    /* --- END OF SANDBOX 2.0 STYLES --- */
-
-    /* --- START OF ACHIEVEMENT STYLES --- */
-    #achievements-list {
+    /* --- CSS cho Strategic Path Screen --- */
+    #strategic-path-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .achievement-card {
-      transition: all 0.2s ease-in-out;
-      border: 2px solid transparent;
-    }
-    .achievement-card:not(.achievement-locked):hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-      border-color: #fbbf24; /* amber-400 */
-    }
-
-    .achievement-locked {
-      filter: grayscale(1);
-      opacity: 0.65;
-      background-color: rgba(0,0,0,0.05);
-    }
-    .dark .achievement-locked {
-        background-color: rgba(255,255,255,0.05);
-    }
-
-    #achievement-toast {
-      position: fixed;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 9999;
-      animation: toast-in-out 4s forwards ease-in-out;
-      pointer-events: none;
-    }
-    
-    @keyframes toast-in-out {
-      0% { opacity: 0; transform: translate(-50%, 50px); }
-      15% { opacity: 1; transform: translate(-50%, 0); }
-      85% { opacity: 1; transform: translate(-50%, 0); }
-      100% { opacity: 0; transform: translate(-50%, 50px); }
-    }
-
-    /* --- END OF ACHIEVEMENT STYLES --- */
-
-    /* --- START OF QUEST CHAIN STYLES --- */
-    .quest-step {
-      position: relative;
-      padding-left: 50px; /* Space for icon and line */
-      min-height: 80px;
-    }
-    /* The vertical connecting line */
-    .quest-step:not(:last-child)::before {
-      content: '';
-      position: absolute;
-      left: 20px;
-      top: 40px; /* Start below the icon */
-      bottom: -40px; /* Extend to the next icon's top */
-      width: 4px;
-      background-color: #d1d5db; /* gray-300 */
-    }
-    .dark .quest-step:not(:last-child)::before {
-      background-color: #4b5563; /* gray-600 */
-    }
-    .quest-step.step-completed:not(:last-child)::before {
-      background-color: #22c55e; /* green-500 */
-    }
-
-    /* The icon circle */
-    .quest-step-icon {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      font-weight: bold;
-      z-index: 1;
-      transition: all 0.3s ease;
-      border-width: 4px;
-    }
-    .quest-step.step-locked .quest-step-icon {
-      background-color: #e5e7eb; /* gray-200 */
-      color: #9ca3af; /* gray-400 */
-      border-color: #d1d5db; /* gray-300 */
-    }
-    .dark .quest-step.step-locked .quest-step-icon {
-       background-color: #374151; /* gray-700 */
-       color: #6b7280; /* gray-500 */
-       border-color: #4b5563; /* gray-600 */
-    }
-    .quest-step.step-active .quest-step-icon {
-      background-color: #f59e0b; /* amber-500 */
-      color: white;
-      border-color: #fbbf24; /* amber-400 */
-      transform: scale(1.1);
-      box-shadow: 0 0 15px rgba(245, 158, 11, 0.7);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-    }
-    .quest-step.step-completed .quest-step-icon {
-      background-color: #22c55e; /* green-500 */
-      color: white;
-      border-color: #16a34a; /* green-600 */
-    }
-    /* --- END OF QUEST CHAIN STYLES --- */
-
-    /* --- START OF TACTICAL MAP STYLES --- */
-    #tactical-map {
-      position: relative;
-      cursor: url('https://i.ibb.co/L8zBScR/bach-dang-stake.png') 16 32, crosshair;
-    }
-    .placed-stake {
-      position: absolute;
-      width: 32px;
-      height: 32px;
-      pointer-events: none;
-      transform: translate(-50%, -100%); /* Center horizontally, tip at cursor */
-      animation: place-stake 0.3s ease-out;
-    }
-    @keyframes place-stake {
-      from { transform: translate(-50%, -150%) scale(1.2); opacity: 0; }
-      to { transform: translate(-50%, -100%) scale(1); opacity: 1; }
-    }
-    /* --- END OF TACTICAL MAP STYLES --- */
-
-    /* --- START OF DEFENSE GAME STYLES --- */
-    #map-grid {
-        display: grid;
-        grid-template-columns: repeat(10, 1fr);
-        grid-template-rows: repeat(10, 1fr);
-        gap: 2px;
-        background-color: #a3b18a; /* A light olive green for the grid background */
-        border: 4px solid #344e41; /* Dark green border */
-        position: relative; /* For item positioning */
-    }
-    .map-cell {
-        width: 100%;
-        height: 100%;
-        aspect-ratio: 1 / 1;
-        transition: background-color 0.2s;
-    }
-    .map-cell.village { background-color: #f2e8cf; }
-    .dark .map-cell.village { background-color: #a18a6a; }
-    .map-cell.forest { background-color: #3a5a40; }
-    .dark .map-cell.forest { background-color: #2c4231; }
-    .map-cell.road { background-color: #d2b48c; }
-    .dark .map-cell.road { background-color: #795c34; }
-    .map-cell.empty { background-color: #dad7cd; }
-    .dark .map-cell.empty { background-color: #8c8980; }
-
-    .map-cell.droppable:hover {
-        background-color: rgba(251, 191, 36, 0.4); /* Amber highlight on hover */
-        outline: 2px dashed #f59e0b;
-    }
-
-    .movable-item {
-        position: absolute;
-        width: 10%; /* Corresponds to grid cell width */
-        height: 10%; /* Corresponds to grid cell height */
-        padding: 4%;
-        box-sizing: border-box;
-        cursor: grab;
-        transition: all 0.2s;
-        z-index: 10;
-    }
-    .movable-item:active {
-        cursor: grabbing;
-        transform: scale(1.2);
-        z-index: 100;
-        filter: drop-shadow(0 0 5px white);
-    }
-    .movable-item-icon {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        pointer-events: none; /* Make sure the underlying cell receives drop events */
-    }
-    #timer-display {
-        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    }
-    #timer-display.low-time {
-      color: #ef4444; /* red-500 */
-      animation: timer-pulse 1s infinite;
-    }
-    @keyframes timer-pulse {
-      50% { transform: scale(1.05); }
-    }
-    /* --- END OF DEFENSE GAME STYLES --- */
-
-    /* --- START OF STRATEGY MAP STYLES --- */
-    #map-container {
-      position: relative;
+      grid-template-columns: repeat(10, 1fr); /* 10 columns */
+      grid-template-rows: repeat(15, 1fr); /* 15 rows */
+      gap: 2px;
       width: 100%;
       height: 100%;
-      cursor: crosshair;
-    }
-    #map-container img, #map-container canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-    /* --- END OF STRATEGY MAP STYLES --- */
-
-    /* --- START OF COIN MINTING STYLES --- */
-    .selection-card {
-        transition: all 0.2s ease-in-out;
-        border: 3px solid transparent;
-    }
-    .selection-card:not(.disabled):hover {
-        transform: scale(1.05);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-    .dark .selection-card:not(.disabled):hover {
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-    .selection-card.selected {
-        border-color: #3b82f6; /* blue-500 */
-        transform: scale(1.05);
-        box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
-    }
-    .dark .selection-card.selected {
-        border-color: #60a5fa; /* blue-400 */
-    }
-    #result-display img {
-        animation: coin-appear 0.5s ease-out forwards;
-    }
-    @keyframes coin-appear {
-        from { transform: scale(0.5) rotate(-90deg); opacity: 0; }
-        to { transform: scale(1) rotate(0deg); opacity: 1; }
-    }
-    /* --- END OF COIN MINTING STYLES --- */
-
-    /* --- START OF CITY PLANNING STYLES --- */
-    #citadel-map-container {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      background-size: cover;
-      background-position: center;
+      background-color: #1a2e22; /* Dark green base */
+      border: 4px solid #4a2c13; /* Dark brown border */
       border-radius: 0.5rem;
-      border: 4px solid #8c6b4f; /* A dark wood color */
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
-    .building-drop-zone {
-      position: absolute;
-      width: 15%;
-      height: 20%;
-      border: 3px dashed rgba(251, 191, 36, 0.7); /* amber-400 with alpha */
-      border-radius: 8px;
+    
+    .strategic-path-cell {
+      width: 100%;
+      height: 100%;
       transition: all 0.2s ease-in-out;
+      position: relative;
+    }
+    
+    .cell-jungle {
+      background-color: #166534; /* green-800 */
+    }
+    .cell-jungle:hover {
+       background-color: #15803d; /* green-700 */
+    }
+
+    .cell-mountain {
+      background-color: #57534e; /* stone-600 */
+      background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjNTc1MzRlIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiM0NDQwM2YiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=');
+      cursor: not-allowed;
+    }
+    
+    .cell-river {
+      background-color: #0ea5e9; /* sky-500 */
+      cursor: not-allowed;
+    }
+
+    .cell-start, .cell-end {
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    .building-drop-zone.drag-over {
-      background-color: rgba(251, 191, 36, 0.3);
-      border-style: solid;
-      transform: scale(1.05);
-    }
-    .building-palette-item {
-      cursor: grab;
-      transition: all 0.2s;
-    }
-    .building-palette-item:active {
-      cursor: grabbing;
-      transform: scale(0.95);
-      opacity: 0.7;
-    }
-    .placed-building-icon {
-      position: absolute;
-      pointer-events: none;
-      width: 15%;
-      height: 20%;
-      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-      opacity: 0;
-      transform: scale(0.5);
-    }
-    .placed-building-icon.visible {
-      opacity: 1;
-      transform: scale(1);
-    }
-    /* --- END OF CITY PLANNING STYLES --- */
-    
-    /* --- START OF TYPESETTING GAME STYLES --- */
-    #typesetting-screen {
-        background-color: #d7ccc8; /* A light, parchment-like brown */
-        color: #3e2723; /* A dark brown */
-        font-family: 'serif';
-    }
-    .dark #typesetting-screen {
-        background-color: #3e2723;
-        color: #d7ccc8;
-    }
-
-    #text-template {
-        background: #fdf6e3;
-        border: 1px solid #a1887f;
-        padding: 0.5rem 1rem;
-        border-radius: 0.25rem;
-        font-size: 1.5rem;
-        letter-spacing: 0.2em;
-        font-weight: bold;
-        text-align: center;
-        box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
-    }
-    .dark #text-template {
-        background: #5d4037;
-        border-color: #8d6e63;
-    }
-    
-    #letter-tray {
-        background-color: #8d6e63; /* A wood color */
-        padding: 1rem;
-        border: 4px solid #5d4037;
-        border-radius: 0.5rem;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        min-height: 100px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-    
-    .letter-block {
-        width: 44px;
-        height: 44px;
-        background: linear-gradient(145deg, #e0e0e0, #bdbdbd); /* metal-like gradient */
-        border: 1px solid #757575;
-        border-bottom-width: 3px;
-        border-right-width: 3px;
-        color: #212121;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        font-weight: bold;
-        cursor: grab;
-        transition: all 0.2s;
-        box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
-        user-select: none;
-        transform: scaleY(-1); /* Inverted for printing */
-    }
-    .letter-block:active {
-        cursor: grabbing;
-        transform: scale(0.95) scaleY(-1);
-        box-shadow: 0 0 1px rgba(0,0,0,0.4);
-    }
-    
-    #composition-area {
-        background-color: #a1887f; /* A darker wood color */
-        padding: 1rem;
-        border: 2px solid #5d4037;
-        border-radius: 0.5rem;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        min-height: 64px;
-        box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
-    }
-    
-    .composition-slot {
-        width: 44px;
-        height: 44px;
-        background-color: rgba(0,0,0,0.2);
-        border: 1px dashed #efebe9;
-        border-radius: 2px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    /* --- END OF TYPESETTING GAME STYLES --- */
-
-
-    /* --- Responsive Design --- */
-    @media (max-width: 768px) { /* Tablets and large phones */
-      body > #root > div:first-child {
-        padding: 1rem;
-      }
-      .hoi-container {
-        padding: 1rem;
-      }
-      .mission-list {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1rem;
-      }
-      .modal-content {
-        max-width: 90vw;
-      }
-      .chatbot-container {
-        width: 95vw;
-        max-width: 420px;
-        max-height: 85vh;
-      }
-      #main-header {
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-      }
-    }
-    
-    @media (max-width: 600px) { /* Mobile phones */
-      body > #root, body > #root > div:first-child {
-        padding: 0;
-      }
-      
-      .main-screen-container, .screen-container {
-        min-height: 100vh;
-        border-radius: 0;
-        padding: 1rem;
-        padding-top: 1.5rem; /* More space at top */
-      }
-
-      /* Header */
-      #main-header h1 {
-        font-size: 1.5rem; /* 24px */
-      }
-      #main-header-controls {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.5rem;
-      }
-      #main-header-controls button {
-        padding: 8px 12px;
-        font-size: 0.875rem; /* 14px */
-      }
-      
-      .mission-list {
-        grid-template-columns: 1fr; /* Stack missions vertically on smallest screens */
-      }
-
-      #collection-grid, #hero-card-grid, #premium-decorations-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.5rem;
-      }
-      .modal-content {
-        width: 95vw;
-        max-width: 95vw;
-        padding: 1.25rem;
-      }
-      .modal-content h2 { font-size: 1.75rem; }
-
-      .chatbot-container {
-        width: 100vw;
-        height: 100vh;
-        max-height: 100vh;
-        bottom: 0;
-        right: 0;
-        border-radius: 0;
-        border: none;
-      }
-      
-      .sandbox-container {
-        flex-direction: column;
-        height: 98vh;
-      }
-      #item-palette {
-        flex-shrink: 0;
-        height: auto;
-        width: 100%;
-        overflow-x: auto;
-      }
-      #item-palette .overflow-y-auto {
-        display: flex;
-        flex-direction: row;
-        overflow-y: hidden;
-        gap: 1rem;
-        padding-bottom: 0.5rem;
-      }
-      #item-palette .overflow-y-auto > div {
-        flex-shrink: 0;
-      }
-      .sandbox-container .flex-col.sm\\:flex-row {
-        flex-direction: column;
-        align-items: stretch;
-      }
-    }
-
-    /* --- START OF CLARITY & READABILITY ENHANCEMENTS --- */
-
-    /* 1. Backdrop Blur for Modal Overlays */
-    /* This targets the div that acts as the dark background for modals */
-    .fixed.inset-0.bg-black {
-      -webkit-backdrop-filter: blur(5px);
-      backdrop-filter: blur(5px);
-    }
-
-    /* 2. Content Container Styling (Background & Shadow) */
-    /* Apply a more opaque, solid background to main content blocks to lift them from the background image and improve readability */
-    .screen-container,
-    .hoi-container,
-    .modal-content,
-    #tutorial-box {
-      background-color: rgba(253, 250, 245, 0.97) !important; /* A nearly opaque warm, off-white like aged paper */
-      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
-      border: 1px solid rgba(220, 190, 150, 0.6); /* More visible warm border */
-    }
-
-    /* Dark mode adjustments for the same containers */
-    .dark .screen-container,
-    .dark .hoi-container,
-    .dark .modal-content,
-    .dark #tutorial-box {
-      background-color: rgba(41, 37, 36, 0.94) !important; /* A dark, warm stone color */
-      box-shadow: 0 5px 30px rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(120, 80, 50, 0.5);
-    }
-
-    /* Ensure mission cards also get a lift, but keep their original intended colors */
-    .mission-card {
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-    .dark .mission-card {
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
-    }
-
-    /* 3. Text Shadow for Readability */
-    /* Apply a very subtle shadow to headers and buttons in light mode for depth. Body text has no shadow for maximum crispness. */
-    h1, h2, h3, h4, button {
-      text-shadow: 0 1px 2px rgba(30, 27, 27, 0.15);
-    }
-
-    /* A stronger shadow for ALL text in dark mode where light text can get lost on complex backgrounds */
-    .dark h1, .dark h2, .dark h3, .dark h4, .dark p, .dark button, .dark label, .dark li {
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
-    }
-
-    /* Exclude icons from getting a text shadow as it often looks incorrect */
-    button span[role="img"], .premium-crown, .control-button {
-      text-shadow: none !important;
-    }
-
-    /* --- END OF CLARITY & READABILITY ENHANCEMENTS --- */
-
-    /* --- START OF LANDING PAGE STYLES --- */
-    @keyframes text-fade-in-up {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .landing-screen {
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
+      font-weight: bold;
       color: white;
-      position: relative;
-      background-size: cover;
-      background-position: center;
+      text-shadow: 0 0 4px black;
     }
 
-    /* Overlay for text readability */
-    .landing-screen::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 1;
+    .cell-start {
+      background-color: #fbbf24 !important; /* amber-400 */
     }
 
-    .landing-content {
-      position: relative;
-      z-index: 2;
-      padding: 1rem;
-    }
-
-    .landing-content h1 {
-      font-size: 3rem; /* Tailwind: text-5xl */
-      font-weight: 800; /* extra-bold */
-      animation: text-fade-in-up 1s forwards;
-      opacity: 0;
-    }
-
-    .landing-content h2 {
-      font-size: 1.5rem; /* text-2xl */
-      font-weight: 600; /* semi-bold */
-      margin-top: 1rem;
-      animation: text-fade-in-up 1s forwards 0.3s;
-      opacity: 0;
+    .cell-end {
+       background-color: #ef4444 !important; /* red-500 */
     }
     
-    #start-adventure-button {
-      margin-top: 2.5rem; /* mt-10 */
-      padding: 0.75rem 2rem; /* py-3 px-8 */
-      font-size: 1.125rem; /* text-lg */
-      font-weight: 700; /* bold */
-      background-color: #f59e0b; /* amber-500 */
-      color: white;
-      border-radius: 0.5rem; /* rounded-lg */
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 0 20px rgba(245, 158, 11, 0.4);
-      transition: all 0.3s ease;
-      animation: text-fade-in-up 1s forwards 0.6s;
-      opacity: 0;
+    .cell-player-path {
+      background-color: #ca8a04; /* yellow-600 */
+      border: 1px solid #fde047; /* yellow-200 */
+      box-shadow: inset 0 0 5px rgba(255,255,255,0.4);
     }
-
-    #start-adventure-button:hover {
-      background-color: #d97706; /* amber-600 */
-      transform: translateY(-5px) scale(1.05);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.2), 0 0 30px rgba(245, 158, 11, 0.6);
-    }
-    /* --- END OF LANDING PAGE STYLES --- */
-
   </style>
-<script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.1.0/",
-    "react": "https://esm.sh/react@^19.1.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.7.0",
-    "html2canvas": "https://esm.sh/html2canvas@1.4.1",
-    "@netlify/functions": "https://esm.sh/@netlify/functions@^4.1.8"
-  }
-}
-</script>
 <link rel="stylesheet" href="/index.css">
 </head>
-<body> <!-- Removed Tailwind classes and background, will be handled by App.tsx -->
+<body>
   <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-
   <audio id="sfx-click" src="https://pixabay.com/sound-effects/download/sounds-1323-click-button-140881.mp3" preload="auto"></audio>
   <audio id="sfx-success" src="https://pixabay.com/sound-effects/download/sounds-1323-success-1-6297.mp3" preload="auto"></audio>
   <audio id="sfx-unlock" src="https://pixabay.com/sound-effects/download/sounds-1323-magic-wand-2-164832.mp3" preload="auto"></audio>
+  <script type="module" src="/index.tsx"></script>
 </body>
 </html>

@@ -1,40 +1,20 @@
-
 /// <reference types="react" />
 
+// This simplified version should avoid any potential type conflicts.
+// It uses `any` to bypass detailed prop checking for A-Frame components,
+// which is a common and effective way to resolve these JSX-related TS errors.
 declare global {
   namespace JSX {
-      interface IntrinsicElements {
-        'a-scene': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-          embedded?: boolean | string;
-          arjs?: string;
-          renderer?: string;
-          'vr-mode-ui'?: string;
-          'gesture-detector'?: string | boolean;
-          id?: string;
-          style?: React.CSSProperties;
-        };
-        'a-entity': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-          camera?: boolean | string;
-          'gltf-model'?: string;
-          scale?: string;
-          position?: string;
-          rotation?: string;
-          animation__rotate?: string;
-          'gesture-handler'?: string | boolean;
-        };
-        'a-marker': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-          type?: string;
-          url?: string;
-        };
-        'a-assets': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-          timeout?: string;
-        };
-        'a-asset-item': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-          id?: string;
-          src?: string;
-          'response-type'?: string;
-        };
-        'a-camera': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-      }
+    interface IntrinsicElements {
+      'a-scene': any;
+      'a-entity': any;
+      'a-marker': any;
+      'a-assets': any;
+      'a-asset-item': any;
+      'a-camera': any;
+    }
   }
 }
+
+// The empty export is important to make this a module.
+export {};

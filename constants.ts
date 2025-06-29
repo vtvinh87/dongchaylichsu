@@ -2,7 +2,9 @@
 
 
 
-import { MissionInfo, Hoi, Artifact, PuzzlePieceItem, HeroCard, PuzzleMissionData, NarrativeMissionData, TimelineEventItem, TimelineMissionData, MissionData, NarrativeNode, ARMissionData, AiCharacter, Decoration, HiddenObjectMissionData, HiddenObjectItem, QuizMissionData, ConstructionMissionData, Tutorial, CustomizationItem, DiplomacyMissionData, DiplomacyRound, MemoryFragment, Reward, TradingMissionData, TradingGood, TradingEvent, RhythmMissionData, RhythmNote, ColoringMissionData, SandboxBackground, Achievement, SavedGameState, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, MapCellType, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, BuildingPlacement, TypesettingMissionData } from './types';
+
+
+import { MissionInfo, Hoi, Artifact, PuzzlePieceItem, HeroCard, PuzzleMissionData, NarrativeMissionData, TimelineEventItem, TimelineMissionData, MissionData, NarrativeNode, ARMissionData, AiCharacter, Decoration, HiddenObjectMissionData, HiddenObjectItem, QuizMissionData, ConstructionMissionData, Tutorial, CustomizationItem, DiplomacyMissionData, DiplomacyRound, MemoryFragment, Reward, TradingMissionData, TradingGood, TradingEvent, RhythmMissionData, RhythmNote, ColoringMissionData, SandboxBackground, Achievement, SavedGameState, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, MapCellType, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, BuildingPlacement, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData } from './types';
 import * as ImageUrls from './imageUrls';
 
 export const APP_NAME = "Dòng Chảy Lịch Sử";
@@ -185,6 +187,24 @@ export const GIA_DINH_BAO_ARTIFACT: Artifact = {
   detailedDescription: "Gia Định Báo là tờ báo tiếng Việt đầu tiên, ra đời năm 1865 tại Sài Gòn. Việc sử dụng chữ Quốc ngữ trong báo chí đã đánh dấu một bước ngoặt quan trọng, giúp phổ biến chữ viết này và đưa thông tin đến với đông đảo quần chúng, góp phần vào sự phát triển của văn hóa và trí tuệ dân tộc trong giai đoạn đầu của thời kỳ Pháp thuộc."
 };
 
+export const VALI_DONG_DU_ARTIFACT_ID = "vali-dong-du";
+export const VALI_DONG_DU_ARTIFACT: Artifact = {
+    id: VALI_DONG_DU_ARTIFACT_ID,
+    name: "Vali của nhà yêu nước",
+    imageUrl: ImageUrls.VALI_DONG_DU_ARTIFACT_URL,
+    description: "Chiếc vali chứa đựng tài liệu và ý chí của một thanh niên trên đường sang Nhật tìm đường cứu nước.",
+    detailedDescription: "Chiếc vali này là biểu tượng cho hành trình đầy gian khổ nhưng cũng chan chứa hy vọng của các thanh niên Việt Nam trong phong trào Đông Du đầu thế kỷ 20. Bên trong nó không chỉ có quần áo, sách vở, mà còn là cả một tương lai của đất nước, là khát vọng học hỏi văn minh phương Tây qua con đường Nhật Bản để về cứu giúp quốc gia đang trong vòng nô lệ."
+};
+
+export const TRUONG_SON_COMPASS_ARTIFACT_ID = 'truong_son_compass_artifact';
+export const TRUONG_SON_COMPASS_ARTIFACT: Artifact = {
+    id: TRUONG_SON_COMPASS_ARTIFACT_ID,
+    name: "La bàn của người lính",
+    imageUrl: ImageUrls.TRUONG_SON_COMPASS_ARTIFACT_URL,
+    description: "Vật dụng quan trọng giúp các chiến sĩ định hướng trên con đường mòn Trường Sơn huyền thoại.",
+    detailedDescription: "Chiếc la bàn đơn sơ này là người bạn đồng hành không thể thiếu của các chiến sĩ trên đường Trường Sơn. Giữa núi rừng trùng điệp, nó đã giúp họ xác định phương hướng, vượt qua bom đạn và những điều kiện khắc nghiệt nhất để vận chuyển quân lương, vũ khí chi viện cho chiến trường miền Nam, góp phần to lớn vào cuộc kháng chiến giải phóng dân tộc."
+};
+
 
 export const ALL_ARTIFACTS_MAP: Record<string, Artifact> = {
   [BRONZE_DRUM_ARTIFACT_ID]: BRONZE_DRUM_ARTIFACT,
@@ -205,6 +225,8 @@ export const ALL_ARTIFACTS_MAP: Record<string, Artifact> = {
   [DONG_TIEN_QUANG_TRUNG_ARTIFACT_ID]: DONG_TIEN_QUANG_TRUNG_ARTIFACT,
   [MO_HINH_CUU_DINH_ARTIFACT_ID]: MO_HINH_CUU_DINH_ARTIFACT,
   [GIA_DINH_BAO_ARTIFACT_ID]: GIA_DINH_BAO_ARTIFACT,
+  [VALI_DONG_DU_ARTIFACT_ID]: VALI_DONG_DU_ARTIFACT,
+  [TRUONG_SON_COMPASS_ARTIFACT_ID]: TRUONG_SON_COMPASS_ARTIFACT,
 };
 
 // --- Memory Fragments ---
@@ -737,6 +759,60 @@ const MISSION_TYPESETTING_DONG_CO: TypesettingMissionData = {
     reward: { type: 'artifact', id: GIA_DINH_BAO_ARTIFACT_ID },
 };
 
+// --- Adventure Puzzle Mission ---
+export const MISSION_ADVENTURE_PUZZLE_DONG_DU_ID = "mission_adventure_puzzle_dong_du";
+const MISSION_ADVENTURE_PUZZLE_DONG_DU: AdventurePuzzleMissionData = {
+    type: 'adventurePuzzle',
+    id: MISSION_ADVENTURE_PUZZLE_DONG_DU_ID,
+    title: "Vượt biển Đông Du",
+    reward: { type: 'artifact', id: VALI_DONG_DU_ARTIFACT_ID },
+    riddles: [
+        {
+            riddleText: "Bến cảng nơi con tàu bí mật sẽ khởi hành nằm ở một thành phố cảng lớn của miền Bắc. Để tìm ra, hãy giải mật mã sau: 'Chân đất sét, nung lửa hồng, cất nhà xây cửa'. Tên thành phố có 2 từ, 8 chữ cái.",
+            correctAnswer: "hải phòng",
+            hint: "Đây là một vật liệu xây dựng rất phổ biến, được làm từ đất sét."
+        },
+        {
+            riddleText: "Để lên tàu, ngươi cần một mật khẩu. Nó là tên hiệu của nhà lãnh đạo phong trào Đông Du, người về sau tự xưng là 'Già thuyền'. Tên hiệu gồm 2 chữ.",
+            correctAnswer: "sào nam",
+            hint: "Tên hiệu của ông có nghĩa là 'chàng trai đất Nam Đàn'."
+        },
+        {
+            riddleText: "Thuyền trưởng chỉ nhổ neo khi nhận được đúng tín hiệu. Tín hiệu chính là tên một cuốn sách nổi tiếng của nhà lãnh đạo phong trào, kêu gọi tinh thần dân tộc. Tên sách có 5 chữ.",
+            correctAnswer: "việt nam vong quốc sử",
+            hint: "Cuốn sách kể về lịch sử mất nước của Việt Nam."
+        },
+    ]
+};
+
+// --- Strategic Path Mission ---
+export const MISSION_TRUONG_SON_PATH_ID = 'mission_truong_son_path';
+const MISSION_TRUONG_SON_PATH: StrategicPathMissionData = {
+    type: 'strategicPath',
+    id: MISSION_TRUONG_SON_PATH_ID,
+    title: 'Mở đường Trường Sơn',
+    reward: { type: 'artifact', id: TRUONG_SON_COMPASS_ARTIFACT_ID },
+    start: { x: 0, y: 14 }, // bottom-left
+    end: { x: 9, y: 0 },   // top-right
+    mapLayout: [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+        [1, 0, 1, 1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 1, 2, 2, 2, 0, 1, 0, 1],
+        [0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+        [0, 1, 1, 0, 1, 1, 1, 1, 1, 0],
+        [0, 1, 0, 0, 0, 0, 0, 2, 2, 0],
+        [0, 1, 0, 1, 1, 1, 0, 1, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0, 1, 0, 1],
+        [1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+        [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+        [1, 0, 1, 1, 0, 1, 0, 1, 2, 2],
+        [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1, 1, 1, 1, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    ],
+};
+
 
 // --- ALL MISSIONS MAP ---
 export const ALL_MISSIONS: Record<string, MissionData> = {
@@ -763,6 +839,8 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
   [MISSION_COIN_MINTING_ID]: MISSION_COIN_MINTING_TAY_SON,
   [MISSION_CITY_PLANNING_HUE_ID]: MISSION_CITY_PLANNING_HUE,
   [MISSION_TYPESETTING_ID]: MISSION_TYPESETTING_DONG_CO,
+  [MISSION_ADVENTURE_PUZZLE_DONG_DU_ID]: MISSION_ADVENTURE_PUZZLE_DONG_DU,
+  [MISSION_TRUONG_SON_PATH_ID]: MISSION_TRUONG_SON_PATH,
 };
 
 // --- Quest Chains ---
@@ -830,29 +908,40 @@ const HOI_4_BAO_TAP_PHAN_TRANH: Hoi = {
 // Hồi 5
 const MISSION_INFO_KINH_THANH_HUE: MissionInfo = { id: 'card_5_1', title: 'Xây dựng Kinh thành Huế', imageUrl: ImageUrls.SAGA_KINH_THANH_HUE_URL, description: 'Quy hoạch và đặt các công trình biểu tượng vào đúng vị trí trong Kinh thành.', missionId: MISSION_CITY_PLANNING_HUE_ID };
 const MISSION_INFO_TYPESETTING: MissionInfo = { id: 'card_5_2', title: 'In báo chữ Quốc ngữ', imageUrl: ImageUrls.SAGA_TYPESETTING_URL, description: 'Sắp xếp các con chữ để in dòng tít báo, phổ biến tri thức mới.', missionId: MISSION_TYPESETTING_ID, dependsOnMissionId: MISSION_CITY_PLANNING_HUE_ID };
+const MISSION_INFO_DONG_DU: MissionInfo = { id: 'card_5_3', title: 'Vượt biển Đông Du', imageUrl: ImageUrls.SAGA_DONG_DU_URL, description: 'Giải các mật mã để tìm con đường an toàn sang Nhật Bản.', missionId: MISSION_ADVENTURE_PUZZLE_DONG_DU_ID, dependsOnMissionId: MISSION_TYPESETTING_ID };
 const HOI_5_VAN_NUOC_DOI_THAY: Hoi = {
   id: 'hoi_5_van_nuoc_doi_thay',
   title: "Hồi 5: Vận Nước Đổi Thay",
-  description: "Tìm hiểu về triều đại phong kiến cuối cùng của Việt Nam, nhà Nguyễn, và công cuộc xây dựng kinh đô mới tại Huế.",
-  missions: [MISSION_INFO_KINH_THANH_HUE, MISSION_INFO_TYPESETTING],
+  description: "Tìm hiểu về triều đại phong kiến cuối cùng của Việt Nam, nhà Nguyễn, và những bước chuyển mình đầu tiên của xã hội trước ảnh hưởng phương Tây.",
+  missions: [MISSION_INFO_KINH_THANH_HUE, MISSION_INFO_TYPESETTING, MISSION_INFO_DONG_DU],
 };
 
 // Hồi 6
-const MISSION_INFO_QUIZ: MissionInfo = { id: 'card_6_1', title: 'Thử Tài Sử Học', imageUrl: ImageUrls.SAGA_QUIZ_URL, description: 'Kiểm tra kiến thức của bạn về các triều đại phong kiến Việt Nam.', missionId: MISSION_QUIZ_GENERAL_KNOWLEDGE_ID };
-const MISSION_INFO_TRADING: MissionInfo = { id: 'card_6_2', title: 'Thương Cảng Hội An', imageUrl: ImageUrls.SAGA_HOI_AN_TRADING_URL, description: 'Trở thành một thương nhân, mua bán và làm giàu tại cảng Hội An.', missionId: MISSION_TRADING_HOI_AN_ID, dependsOnMissionId: MISSION_QUIZ_GENERAL_KNOWLEDGE_ID };
-const HOI_6_GIAO_THOI: Hoi = {
-  id: 'hoi_6_giao_thoi',
-  title: "Hồi 6: Giao Thời và Hội Nhập",
+const MISSION_INFO_TRUONG_SON: MissionInfo = { id: 'card_6_1', title: 'Mở đường Trường Sơn', imageUrl: ImageUrls.SAGA_TRUONG_SON_URL, description: 'Lựa chọn con đường an toàn qua núi rừng hiểm trở để vận chuyển quân lương.', missionId: MISSION_TRUONG_SON_PATH_ID };
+const HOI_6_CON_DUONG_GIAI_PHONG: Hoi = {
+  id: 'hoi_6_con_duong_giai_phong',
+  title: "Hồi 6: Con Đường Giải Phóng",
+  description: "Trải qua những năm tháng kháng chiến gian khổ nhưng hào hùng, mà đỉnh cao là con đường mòn Hồ Chí Minh huyền thoại.",
+  missions: [MISSION_INFO_TRUONG_SON],
+};
+
+
+// Hồi 7
+const MISSION_INFO_QUIZ: MissionInfo = { id: 'card_7_1', title: 'Thử Tài Sử Học', imageUrl: ImageUrls.SAGA_QUIZ_URL, description: 'Kiểm tra kiến thức của bạn về các triều đại phong kiến Việt Nam.', missionId: MISSION_QUIZ_GENERAL_KNOWLEDGE_ID };
+const MISSION_INFO_TRADING: MissionInfo = { id: 'card_7_2', title: 'Thương Cảng Hội An', imageUrl: ImageUrls.SAGA_HOI_AN_TRADING_URL, description: 'Trở thành một thương nhân, mua bán và làm giàu tại cảng Hội An.', missionId: MISSION_TRADING_HOI_AN_ID, dependsOnMissionId: MISSION_QUIZ_GENERAL_KNOWLEDGE_ID };
+const HOI_7_GIAO_THOI: Hoi = {
+  id: 'hoi_7_giao_thoi',
+  title: "Hồi 7: Giao Thời và Hội Nhập",
   description: "Chứng kiến sự hội nhập với thế giới và những bước ngoặt lịch sử ở giai đoạn cuối các triều đại phong kiến.",
   missions: [MISSION_INFO_QUIZ, MISSION_INFO_TRADING],
 };
 
-// Hồi 7
-const MISSION_INFO_COLORING_DONG_HO: MissionInfo = { id: 'card_7_1', title: 'Vẽ Tranh Dân Gian', imageUrl: ImageUrls.SAGA_COLORING_URL, description: 'Tô màu cho bức tranh Gà Trống theo đúng phong cách tranh Đông Hồ.', missionId: MISSION_COLORING_DONG_HO_ID };
-const MISSION_INFO_RHYTHM_GAME: MissionInfo = { id: 'card_7_2', title: 'Giai điệu Cung đình', imageUrl: ImageUrls.SAGA_RHYTHM_GAME_URL, description: 'Cảm nhận Nhã nhạc cung đình Huế qua một thử thách âm nhạc.', missionId: MISSION_RHYTHM_HUE_COURT_ID, dependsOnMissionId: MISSION_COLORING_DONG_HO_ID };
-const HOI_7_BAN_SAC_VAN_HOA: Hoi = {
-  id: 'hoi_7_ban_sac_van_hoa',
-  title: "Hồi 7: Bản Sắc Văn Hóa",
+// Hồi 8
+const MISSION_INFO_COLORING_DONG_HO: MissionInfo = { id: 'card_8_1', title: 'Vẽ Tranh Dân Gian', imageUrl: ImageUrls.SAGA_COLORING_URL, description: 'Tô màu cho bức tranh Gà Trống theo đúng phong cách tranh Đông Hồ.', missionId: MISSION_COLORING_DONG_HO_ID };
+const MISSION_INFO_RHYTHM_GAME: MissionInfo = { id: 'card_8_2', title: 'Giai điệu Cung đình', imageUrl: ImageUrls.SAGA_RHYTHM_GAME_URL, description: 'Cảm nhận Nhã nhạc cung đình Huế qua một thử thách âm nhạc.', missionId: MISSION_RHYTHM_HUE_COURT_ID, dependsOnMissionId: MISSION_COLORING_DONG_HO_ID };
+const HOI_8_BAN_SAC_VAN_HOA: Hoi = {
+  id: 'hoi_8_ban_sac_van_hoa',
+  title: "Hồi 8: Bản Sắc Văn Hóa",
   description: "Tái hiện lại nét đẹp văn hóa dân gian qua các tác phẩm nghệ thuật truyền thống, khẳng định bản sắc dân tộc.",
   missions: [MISSION_INFO_COLORING_DONG_HO, MISSION_INFO_RHYTHM_GAME],
 };
@@ -864,8 +953,9 @@ export const HOI_DATA: Hoi[] = [
   HOI_3_KY_NGUYEN_DAI_VIET,
   HOI_4_BAO_TAP_PHAN_TRANH,
   HOI_5_VAN_NUOC_DOI_THAY,
-  HOI_6_GIAO_THOI,
-  HOI_7_BAN_SAC_VAN_HOA,
+  HOI_6_CON_DUONG_GIAI_PHONG,
+  HOI_7_GIAO_THOI,
+  HOI_8_BAN_SAC_VAN_HOA,
 ];
 
 
@@ -1013,6 +1103,14 @@ export const INSTRUCTION_DATA: Record<string, { title: string, text: string }> =
     'typesetting': {
         title: 'Hướng dẫn: Sắp chữ In báo',
         text: 'Kéo các con chữ từ khay bên dưới và thả vào khung sắp chữ để tạo thành dòng tít báo mẫu. Khi đã sắp xếp xong, nhấn "Tiến hành In" để kiểm tra kết quả.'
+    },
+    'adventurePuzzle': {
+        title: 'Hướng dẫn: Phiêu lưu Giải đố',
+        text: 'Đọc kỹ câu đố hoặc mật thư được đưa ra. Nhập câu trả lời của bạn vào ô văn bản và nhấn "Trả lời". Giải đúng tất cả các câu đố để hoàn thành hành trình!'
+    },
+    'strategicPath': {
+        title: 'Hướng dẫn: Mở đường',
+        text: 'Nhấn vào các ô trên bản đồ để tạo một con đường mòn. Con đường phải bắt đầu từ ô xuất phát (màu vàng) và các ô phải liền kề nhau. Tránh các địa hình hiểm trở như núi và sông. Hãy mở đường đến điểm kết thúc (màu đỏ)!'
     }
 };
 
