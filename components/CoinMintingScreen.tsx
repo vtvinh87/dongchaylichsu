@@ -36,7 +36,7 @@ const CoinMintingScreen: React.FC<CoinMintingScreenProps> = ({
       selectedMetalId === currentTask.requiredMetalId &&
       selectedMoldId === currentTask.requiredMoldId
     ) {
-      playSound('sfx-success');
+      playSound('sfx_success');
       setFeedback({ message: 'Đúc thành công!', success: true });
       setShowResult(true);
       setTimeout(() => {
@@ -49,12 +49,12 @@ const CoinMintingScreen: React.FC<CoinMintingScreenProps> = ({
             setSelectedMetalId(null);
             setSelectedMoldId(null);
         } else {
-            playSound('sfx-unlock');
+            playSound('sfx_unlock');
             onComplete(missionData.reward);
         }
       }, 2000);
     } else {
-      playSound('sfx-click'); // Or a dedicated error sound
+      playSound('sfx_fail');
       setFeedback({ message: 'Sai rồi! Hãy thử lại với nguyên liệu và khuôn khác.', success: false });
       setTimeout(() => setFeedback(null), 2000);
     }

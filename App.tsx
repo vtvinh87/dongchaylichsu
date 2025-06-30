@@ -1,5 +1,6 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
+
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import LoginScreen from './components/LoginScreen';
 import MainInterface from './components/MainInterface';
 import MissionScreen from './components/MissionScreen';
@@ -32,30 +33,33 @@ import ForgingScreen from './components/ForgingScreen'; // Import Forging Screen
 import QuestChainScreen from './components/QuestChainScreen'; // Import Quest Chain Screen
 import TacticalMapScreen from './components/TacticalMapScreen'; // Import Tactical Map Screen
 import DefenseScreen from './components/DefenseScreen'; // Import Defense Screen
-import StrategyMapScreen from './components/StrategyMapScreen'; // Import Strategy Map Screen
-import CoinMintingScreen from './components/CoinMintingScreen'; // Import Coin Minting Screen
-import CityPlanningScreen from './components/CityPlanningScreen'; // Import City Planning Screen
+import StrategyMapScreen from './components/StrategyMapScreen'; // Import StrategyMap Screen
+import CoinMintingScreen from './components/CoinMintingScreen'; // Import CoinMinting Screen
+import CityPlanningScreen from './components/CityPlanningScreen'; // Import CityPlanning Screen
 import TypesettingScreen from './components/TypesettingScreen'; // Import Typesetting Screen
 import AdventurePuzzleScreen from './components/AdventurePuzzleScreen';
 import StrategicPathScreen from './components/StrategicPathScreen';
-import { Screen, Artifact, MissionInfo, HeroCard, MissionData, PuzzleMissionData, NarrativeMissionData, TimelineMissionData, ARMissionData, HiddenObjectMissionData, LeaderboardEntry, AiCharacter, Decoration, QuizMissionData, ConstructionMissionData, Tutorial, SavedGameState, AvatarCustomization, CustomizationItem, DiplomacyMissionData, Reward, MemoryFragment, TradingMissionData, ColoringMissionData, RhythmMissionData, SandboxState, Achievement, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData } from './types';
+import DialogueModal from './components/DialogueModal';
+import { Screen, Artifact, MissionInfo, HeroCard, MissionData, PuzzleMissionData, NarrativeMissionData, TimelineMissionData, ARMissionData, HiddenObjectMissionData, LeaderboardEntry, AiCharacter, Decoration, QuizMissionData, ConstructionMissionData, Tutorial, SavedGameState, AvatarCustomization, CustomizationItem, DiplomacyMissionData, Reward, MemoryFragment, TradingMissionData, ColoringMissionData, RhythmMissionData, SandboxState, Achievement, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData, DialogueEntry, ActiveSideQuestState, DialogueOption, NotebookUnlockEvent } from './types';
 import { 
   HOI_DATA, ALL_MISSIONS, APP_NAME, ALL_HERO_CARDS,
   LEADERBOARD_LOCAL_STORAGE_KEY, POINTS_PER_ARTIFACT, MAX_LEADERBOARD_ENTRIES,
-  AI_CHARACTERS, ALL_DECORATIONS_MAP, TUTORIAL_DATA, ALL_CUSTOMIZATION_ITEMS_MAP, ALL_ARTIFACTS_MAP, ALL_FRAGMENTS_MAP, ALL_SANDBOX_BACKGROUNDS_MAP, ALL_ACHIEVEMENTS_MAP, ALL_QUEST_CHAINS
+  AI_CHARACTERS, ALL_DECORATIONS_MAP, TUTORIAL_DATA, ALL_CUSTOMIZATION_ITEMS_MAP, ALL_ARTIFACTS_MAP, ALL_FRAGMENTS_MAP, ALL_SANDBOX_BACKGROUNDS_MAP, ALL_ACHIEVEMENTS_MAP, ALL_QUEST_CHAINS, HOI_6_SCRIPT, SPEAKER_DATA, SIDE_QUESTS
 } from './constants';
 import { BACKGROUND_IMAGE_URL } from './imageUrls';
-import { playSound } from './utils/audio';
+import { initializeAudio, playSound, playMusic, stopMusic, toggleAudio, getIsSoundEnabled } from './utils/audio';
 
 const LOCAL_STORAGE_KEY = 'dongChayLichSu_gameState_v1';
 const THEME_STORAGE_KEY = 'dongChayLichSu_theme_v1';
 const ANIMATION_DURATION = 500; // ms, should match CSS animation
 
 type Theme = 'light' | 'dark';
+type Gender = 'male' | 'female';
 
-const App: React.FC = () => {
+export const App: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>(Screen.LANDING_PAGE); 
   const [userName, setUserName] = useState<string>('');
+  const [gender, setGender] = useState<Gender>('male');
   const [collectedArtifacts, setCollectedArtifacts] = useState<Artifact[]>([]);
   const [collectedHeroCards, setCollectedHeroCards] = useState<HeroCard[]>([]);
   const [collectedDecorations, setCollectedDecorations] = useState<Decoration[]>([]);
@@ -101,6 +105,10 @@ const App: React.FC = () => {
 
   // Notebook State
   const [unlockedNotebookPages, setUnlockedNotebookPages] = useState<number[]>([0, 1]);
+  const [pageUnlockNotification, setPageUnlockNotification] = useState<string | null>(null);
+  
+  // Sound state
+  const [isSoundEnabled, setIsSoundEnabled] = useState(getIsSoundEnabled());
 
   // Instruction Modal State
   const [instructionModalState, setInstructionModalState] = useState<{
@@ -108,6 +116,13 @@ const App: React.FC = () => {
     gameType: string | null;
     onConfirm: (() => void) | null;
   }>({ isOpen: false, gameType: null, onConfirm: null });
+
+  // Dialogue & Quest State
+  const [activeScriptKey, setActiveScriptKey] = useState<string | null>(null);
+  const [pendingMissionInfo, setPendingMissionInfo] = useState<MissionInfo | null>(null);
+  const [pendingReward, setPendingReward] = useState<Reward | undefined>(undefined);
+  const [isDialogueOpen, setIsDialogueOpen] = useState(false);
+  const [activeSideQuest, setActiveSideQuest] = useState<ActiveSideQuestState | null>(null);
 
 
   const [theme, setTheme] = useState<Theme>(() => {
@@ -144,10 +159,43 @@ const App: React.FC = () => {
         document.body.style.backgroundPosition = '';
     };
   }, [currentScreen]);
+  
+  // Initialize Audio System
+  useEffect(() => {
+    initializeAudio();
+  }, []); // Runs only once on component mount
+
+  // BGM Management
+  useEffect(() => {
+    if (!isSoundEnabled) {
+        stopMusic();
+        return;
+    }
+    
+    switch (currentScreen) {
+        case Screen.MAIN_INTERFACE:
+        case Screen.LEADERBOARD:
+        case Screen.CUSTOMIZATION:
+        case Screen.ACHIEVEMENTS:
+        case Screen.CRAFTING_SCREEN:
+        case Screen.SANDBOX:
+            playMusic('bgm_museum');
+            break;
+        case Screen.STRATEGIC_PATH_MISSION_SCREEN:
+            playMusic('bgm_truong_son');
+            break;
+        default:
+            stopMusic(); // Stop music for most other mission screens
+    }
+  }, [currentScreen, isSoundEnabled]);
 
   const toggleTheme = useCallback(() => {
     setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
-    playSound('sfx-click'); 
+    playSound('sfx_click'); 
+  }, []);
+  
+  const handleToggleSound = useCallback(() => {
+    setIsSoundEnabled(toggleAudio());
   }, []);
 
 
@@ -163,1049 +211,579 @@ const App: React.FC = () => {
     }
   }, [currentScreen, activeMission]);
 
+  const collectedArtifactIds = useMemo(() => new Set(collectedArtifacts.map(a => a.id)), [collectedArtifacts]);
+  const collectedHeroCardIds = useMemo(() => new Set(collectedHeroCards.map(h => h.id)), [collectedHeroCards]);
   
-  const handleStartAdventure = useCallback(() => {
-    playSound('sfx-click');
-
-    const savedStateJSON = localStorage.getItem(LOCAL_STORAGE_KEY);
-    let nextScreen = Screen.LOGIN;
-    let loadedTutorialsSeen: string[] = [];
-
-    if (savedStateJSON) {
-        try {
-            const loadedState = JSON.parse(savedStateJSON) as SavedGameState;
-            
-            if (loadedState.userName) {
-                setUserName(loadedState.userName);
-                nextScreen = Screen.MAIN_INTERFACE;
-            }
-
-            if (loadedState.collectedArtifactIds && Array.isArray(loadedState.collectedArtifactIds)) {
-              const artifacts: Artifact[] = loadedState.collectedArtifactIds
-                .map((id: string) => ALL_ARTIFACTS_MAP[id])
-                .filter((artifact): artifact is Artifact => artifact !== undefined);
-              setCollectedArtifacts(artifacts);
-            }
-
-            if (loadedState.collectedHeroCardIds && Array.isArray(loadedState.collectedHeroCardIds)) {
-              const heroCards: HeroCard[] = loadedState.collectedHeroCardIds
-                .map((id: string) => ALL_HERO_CARDS[id])
-                .filter((card): card is HeroCard => card !== undefined);
-              setCollectedHeroCards(heroCards);
-            }
-            
-            if (loadedState.collectedDecorationIds && Array.isArray(loadedState.collectedDecorationIds)) {
-              const decorations: Decoration[] = loadedState.collectedDecorationIds
-                .map((id: string) => ALL_DECORATIONS_MAP[id])
-                .filter((decoration): decoration is Decoration => decoration !== undefined);
-              setCollectedDecorations(decorations);
-            }
-            
-            setInventory(loadedState.inventory ?? {});
-            setQuestProgress(loadedState.questProgress ?? {});
-
-            setIsPremium(loadedState.isPremium ?? false);
-            const today = new Date().toISOString().split('T')[0];
-            if (loadedState.lastChatDate === today) {
-                setDailyChatCount(loadedState.dailyChatCount ?? 0);
-                setLastChatDate(today);
-            } else {
-                setDailyChatCount(0);
-                setLastChatDate(today);
-            }
-
-            loadedTutorialsSeen = loadedState.tutorialsSeen ?? [];
-            setTutorialsSeen(loadedTutorialsSeen);
-            setSeenInstructions(loadedState.seenInstructions ?? []);
-
-            setAvatarCustomization(loadedState.avatarCustomization ?? { outfit: 'default_outfit', hat: null });
-            setUnlockedCustomizationItemIds(loadedState.unlockedCustomizationItemIds ?? ['default_outfit']);
-            
-            const defaultUnlockedChars = Object.values(AI_CHARACTERS).filter(c => c.unlockHoiId === null).map(c => c.id);
-            setUnlockedCharacterIds(loadedState.unlockedCharacterIds ?? defaultUnlockedChars);
-
-            setSandboxState(loadedState.sandboxState ?? { activeBackgroundId: 'lang-que', placedItems: [], speechBubbles: [] });
-            setUnlockedBackgroundIds(loadedState.unlockedBackgroundIds ?? ['lang-que']);
-
-            setUnlockedAchievementIds(loadedState.unlockedAchievementIds ?? []);
-            setUnlockedNotebookPages(loadedState.unlockedNotebookPages ?? [0, 1]);
-
-        } catch (error) {
-            console.error("Failed to parse game state from localStorage:", error);
-            localStorage.removeItem(LOCAL_STORAGE_KEY);
-            nextScreen = Screen.LOGIN;
+  const checkAchievements = useCallback(() => {
+    const newlyUnlocked: Achievement[] = [];
+    for (const achievement of Object.values(ALL_ACHIEVEMENTS_MAP)) {
+      if (!unlockedAchievementIds.includes(achievement.id)) {
+        const fullGameState = {
+            userName, gender, collectedArtifactIds: Array.from(collectedArtifactIds), collectedHeroCardIds: Array.from(collectedHeroCardIds),
+            collectedDecorationIds: collectedDecorations.map(d => d.id), inventory, questProgress, isPremium,
+            dailyChatCount, lastChatDate, tutorialsSeen, seenInstructions, avatarCustomization,
+            unlockedCustomizationItemIds, unlockedCharacterIds, unlockedBackgroundIds, sandboxState,
+            unlockedAchievementIds, unlockedNotebookPages, activeSideQuest
+        };
+        if (achievement.condition(fullGameState as SavedGameState)) {
+          newlyUnlocked.push(achievement);
         }
-    } else {
-         // First time playing, grant default unlocks
-         const defaultUnlockedChars = Object.values(AI_CHARACTERS).filter(c => c.unlockHoiId === null).map(c => c.id);
-         setUnlockedCharacterIds(defaultUnlockedChars);
-         setUnlockedBackgroundIds(['lang-que']);
-         setSandboxState({ activeBackgroundId: 'lang-que', placedItems: [], speechBubbles: [] });
-         setUnlockedAchievementIds([]);
-         setQuestProgress({});
-         setUnlockedNotebookPages([0, 1]);
+      }
     }
-    
-    navigateTo(nextScreen);
-
-    if (nextScreen === Screen.MAIN_INTERFACE && !loadedTutorialsSeen.includes('main-interface-intro')) {
-        setTimeout(() => {
-            setActiveTutorial({ id: 'main-interface-intro', stepIndex: 0 });
-        }, ANIMATION_DURATION + 500);
+    if (newlyUnlocked.length > 0) {
+      setUnlockedAchievementIds(prev => [...prev, ...newlyUnlocked.map(a => a.id)]);
+      // Show toast for the first new achievement
+      setAchievementNotification(newlyUnlocked[0]);
     }
+  }, [unlockedAchievementIds, userName, gender, collectedArtifactIds, collectedHeroCardIds, collectedDecorations, inventory, questProgress, isPremium, dailyChatCount, lastChatDate, tutorialsSeen, seenInstructions, avatarCustomization, unlockedCustomizationItemIds, unlockedCharacterIds, unlockedBackgroundIds, sandboxState, unlockedNotebookPages, activeSideQuest]);
+  
+  useEffect(() => {
+    // Check achievements whenever relevant state changes
+    checkAchievements();
+  }, [collectedArtifacts, unlockedCharacterIds, checkAchievements]);
 
+
+  const loadGameState = useCallback(() => {
+    const savedStateJSON = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (savedStateJSON) {
+      const savedState: SavedGameState = JSON.parse(savedStateJSON);
+      setUserName(savedState.userName || '');
+      setGender(savedState.gender || 'male');
+      setCollectedArtifacts(savedState.collectedArtifactIds.map(id => ALL_ARTIFACTS_MAP[id]).filter(Boolean));
+      setCollectedHeroCards(savedState.collectedHeroCardIds.map(id => ALL_HERO_CARDS[id]).filter(Boolean));
+      setCollectedDecorations((savedState.collectedDecorationIds || []).map(id => ALL_DECORATIONS_MAP[id]).filter(Boolean));
+      setInventory(savedState.inventory || {});
+      setQuestProgress(savedState.questProgress || {});
+      setTutorialsSeen(savedState.tutorialsSeen || []);
+      setSeenInstructions(savedState.seenInstructions || []);
+      setAvatarCustomization(savedState.avatarCustomization || { outfit: 'default_outfit', hat: null });
+      setUnlockedCustomizationItemIds(savedState.unlockedCustomizationItemIds || ['default_outfit']);
+      setUnlockedCharacterIds(savedState.unlockedCharacterIds || []);
+      setUnlockedBackgroundIds(savedState.unlockedBackgroundIds || ['lang-que']);
+      setSandboxState(savedState.sandboxState || { activeBackgroundId: 'lang-que', placedItems: [], speechBubbles: [] });
+      setUnlockedAchievementIds(savedState.unlockedAchievementIds || []);
+      setUnlockedNotebookPages(savedState.unlockedNotebookPages || [0, 1]);
+      setActiveSideQuest(savedState.activeSideQuest || null);
+
+      const isPremiumUser = savedState.isPremium || false;
+      setIsPremium(isPremiumUser);
+      const today = new Date().toISOString().split('T')[0];
+      if (savedState.lastChatDate === today) {
+        setDailyChatCount(savedState.dailyChatCount || 0);
+        setLastChatDate(savedState.lastChatDate);
+      } else {
+        setDailyChatCount(0);
+        setLastChatDate(today);
+      }
+    }
+  }, []);
+
+  const saveGameState = useCallback(() => {
+    const gameState: SavedGameState = {
+      userName, gender, isPremium, dailyChatCount, lastChatDate,
+      collectedArtifactIds: collectedArtifacts.map(a => a.id),
+      collectedHeroCardIds: collectedHeroCards.map(h => h.id),
+      collectedDecorationIds: collectedDecorations.map(d => d.id),
+      inventory, questProgress, tutorialsSeen, seenInstructions,
+      avatarCustomization, unlockedCustomizationItemIds,
+      unlockedCharacterIds, unlockedBackgroundIds, sandboxState,
+      unlockedAchievementIds, unlockedNotebookPages, activeSideQuest
+    };
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(gameState));
+  }, [userName, gender, isPremium, dailyChatCount, lastChatDate, collectedArtifacts, collectedHeroCards,
+      collectedDecorations, inventory, questProgress, tutorialsSeen, seenInstructions, avatarCustomization,
+      unlockedCustomizationItemIds, unlockedCharacterIds, unlockedBackgroundIds, sandboxState,
+      unlockedAchievementIds, unlockedNotebookPages, activeSideQuest]);
+
+  useEffect(() => { loadGameState(); }, [loadGameState]);
+  useEffect(() => { if (currentScreen !== Screen.LANDING_PAGE) saveGameState(); }, [saveGameState, currentScreen]);
+
+  const handleReturnToMuseum = useCallback(() => {
+    playSound('sfx_click');
+    navigateTo(Screen.MAIN_INTERFACE);
+    setActiveQuestChainId(null);
   }, [navigateTo]);
 
-  const checkAndAwardAchievements = useCallback((gameState: SavedGameState) => {
-    Object.values(ALL_ACHIEVEMENTS_MAP).forEach(achievement => {
-        if (!gameState.unlockedAchievementIds?.includes(achievement.id)) {
-            if (achievement.condition(gameState)) {
-                setUnlockedAchievementIds(prev => [...prev, achievement.id]);
-                setAchievementNotification(achievement);
-                playSound('sfx-unlock');
-            }
-        }
-    });
-  }, []);
+  const handleGrantBonusSupplies = (amount: number) => {
+    setInventory(prev => ({
+        ...prev,
+        'vat-tu': (prev['vat-tu'] || 0) + amount
+    }));
+    alert(`Thử thách hoàn thành! Bạn nhận được thêm ${amount} Vật tư!`);
+  };
 
-  useEffect(() => {
-    if (userName) { 
-      const gameState: SavedGameState = {
-        userName,
-        collectedArtifactIds: collectedArtifacts.map(a => a.id),
-        collectedHeroCardIds: collectedHeroCards.map(hc => hc.id),
-        collectedDecorationIds: collectedDecorations.map(d => d.id),
-        inventory,
-        isPremium,
-        questProgress,
-        dailyChatCount,
-        lastChatDate,
-        tutorialsSeen,
-        seenInstructions,
-        avatarCustomization,
-        unlockedCustomizationItemIds,
-        unlockedCharacterIds,
-        unlockedBackgroundIds,
-        sandboxState,
-        unlockedAchievementIds,
-        unlockedNotebookPages,
-      };
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(gameState));
-      checkAndAwardAchievements(gameState);
-    }
-  }, [userName, collectedArtifacts, collectedHeroCards, collectedDecorations, inventory, isPremium, dailyChatCount, lastChatDate, tutorialsSeen, seenInstructions, avatarCustomization, unlockedCustomizationItemIds, unlockedCharacterIds, unlockedBackgroundIds, sandboxState, unlockedAchievementIds, unlockedNotebookPages, questProgress, checkAndAwardAchievements]);
+  const completeMissionLogic = useCallback((reward?: Reward) => {
+    playSound('sfx_unlock');
+    let newItemToShow: Artifact | MemoryFragment | Decoration | null = null;
+    let newCharacterUnlocked = false;
+    let newBackgroundUnlocked = false;
 
-  // Effect to unlock customization items & characters based on completed chapters
-  useEffect(() => {
-    const completedHoiIds = new Set<string>();
-    for (let i = 0; i < HOI_DATA.length; i++) {
-        const hoi = HOI_DATA[i];
-        let isHoiComplete = true;
-        const requiredMissions = hoi.missions.filter(m => !m.isOptionalForProgression);
-        if (requiredMissions.length === 0 && i < HOI_DATA.length -1) {
-             // If a chapter has no required missions, consider it complete if the previous one is
-             const previousHoi = HOI_DATA[i-1];
-             if (previousHoi && completedHoiIds.has(previousHoi.id)) {
-                completedHoiIds.add(hoi.id);
-             }
-             continue;
-        };
-
-        for (const missionInfo of requiredMissions) {
-            const missionData = ALL_MISSIONS[missionInfo.missionId];
-            if (!missionData) continue;
-            
-            const reward = missionData.reward;
-            if (!reward) continue;
-
-            let isRewardCollected = false;
-            // For progression, we only check for artifacts and hero cards, not fragments.
-            if (reward.type === 'artifact') {
-                isRewardCollected = collectedArtifacts.some(a => a.id === reward.id);
-            } else if (reward.type === 'heroCard') {
-                isRewardCollected = collectedHeroCards.some(hc => hc.id === reward.id);
-            } else {
-                // Fragments and decorations don't block progression by default
-                isRewardCollected = true;
-            }
-
-            if (!isRewardCollected) {
-                isHoiComplete = false;
+    if (reward) {
+        switch (reward.type) {
+            case 'artifact':
+                if (!collectedArtifacts.some(a => a.id === reward.id)) {
+                    const newArtifact = ALL_ARTIFACTS_MAP[reward.id];
+                    if (newArtifact) {
+                        setCollectedArtifacts(prev => [...prev, newArtifact]);
+                        newItemToShow = newArtifact;
+                    }
+                }
                 break;
-            }
-        }
-        if (isHoiComplete) {
-            completedHoiIds.add(hoi.id);
-        }
-    }
-    
-    // Unlock Characters
-    const newlyUnlockedChars: string[] = [];
-    Object.values(AI_CHARACTERS).forEach(char => {
-        if (char.unlockHoiId && completedHoiIds.has(char.unlockHoiId) && !unlockedCharacterIds.includes(char.id)) {
-            newlyUnlockedChars.push(char.id);
-        }
-    });
-
-    if (newlyUnlockedChars.length > 0) {
-        setUnlockedCharacterIds(prev => [...new Set([...prev, ...newlyUnlockedChars])]);
-        playSound('sfx-unlock');
-    }
-
-    // Unlock Customization Items
-    const newlyUnlockedItems: string[] = [];
-    Object.values(ALL_CUSTOMIZATION_ITEMS_MAP).forEach(item => {
-        if (item.unlockCondition && item.unlockCondition.type === 'complete_hoi') {
-            if (completedHoiIds.has(item.unlockCondition.hoi_id) && !unlockedCustomizationItemIds.includes(item.id)) {
-                newlyUnlockedItems.push(item.id);
-            }
-        }
-    });
-    
-    // Unlock Sandbox Backgrounds
-    const newlyUnlockedBgs: string[] = [];
-    Object.values(ALL_SANDBOX_BACKGROUNDS_MAP).forEach(bg => {
-        if(bg.unlockCondition && bg.unlockCondition.type === 'complete_hoi') {
-            if (completedHoiIds.has(bg.unlockCondition.hoi_id) && !unlockedBackgroundIds.includes(bg.id)) {
-                newlyUnlockedBgs.push(bg.id);
-            }
-        }
-    });
-
-
-    if (newlyUnlockedItems.length > 0 || newlyUnlockedBgs.length > 0) {
-        setUnlockedCustomizationItemIds(prev => [...new Set([...prev, ...newlyUnlockedItems])]);
-        setUnlockedBackgroundIds(prev => [...new Set([...prev, ...newlyUnlockedBgs])]);
-        playSound('sfx-unlock');
-    }
-
-  }, [collectedArtifacts, collectedHeroCards, unlockedCharacterIds, unlockedCustomizationItemIds, unlockedBackgroundIds]);
-
-  const updateAndSaveLeaderboard = useCallback((currentPlayerName: string, newPlayerScore: number) => {
-    if (!currentPlayerName) return;
-
-    let leaderboard: LeaderboardEntry[] = [];
-    const savedLeaderboard = localStorage.getItem(LEADERBOARD_LOCAL_STORAGE_KEY);
-    if (savedLeaderboard) {
-      try {
-        leaderboard = JSON.parse(savedLeaderboard);
-        if (!Array.isArray(leaderboard)) leaderboard = [];
-      } catch {
-        leaderboard = [];
-      }
-    }
-
-    const playerIndex = leaderboard.findIndex(entry => entry.userName === currentPlayerName);
-
-    if (playerIndex > -1) {
-      if (newPlayerScore > leaderboard[playerIndex].score) {
-        leaderboard[playerIndex].score = newPlayerScore;
-      }
-    } else {
-      leaderboard.push({ userName: currentPlayerName, score: newPlayerScore });
-    }
-
-    leaderboard.sort((a, b) => b.score - a.score);
-    const trimmedLeaderboard = leaderboard.slice(0, MAX_LEADERBOARD_ENTRIES);
-    
-    localStorage.setItem(LEADERBOARD_LOCAL_STORAGE_KEY, JSON.stringify(trimmedLeaderboard));
-  }, []);
-
-  const handleReward = useCallback((reward: Reward) => {
-    let wasNewlyCollected = false;
-    let itemForModal: Artifact | MemoryFragment | null = null;
-    
-    switch (reward.type) {
-        case 'artifact': {
-            const artifact = ALL_ARTIFACTS_MAP[reward.id];
-            if (artifact && !collectedArtifacts.some(a => a.id === artifact.id)) {
-                wasNewlyCollected = true;
-                itemForModal = artifact;
-                const newCollected = [...collectedArtifacts, artifact];
-                setCollectedArtifacts(newCollected);
-                updateAndSaveLeaderboard(userName, newCollected.length * POINTS_PER_ARTIFACT);
-            }
-            break;
-        }
-        case 'heroCard': {
-            const heroCard = ALL_HERO_CARDS[reward.id];
-            if (heroCard && !collectedHeroCards.some(hc => hc.id === heroCard.id)) {
-                wasNewlyCollected = true;
-                setCollectedHeroCards(prev => [...prev, heroCard]);
-            }
-            break;
-        }
-        case 'decoration': {
-            const decoration = ALL_DECORATIONS_MAP[reward.id];
-            if (decoration && !collectedDecorations.some(d => d.id === decoration.id)) {
-                wasNewlyCollected = true;
-                setCollectedDecorations(prev => [...prev, decoration]);
-            }
-            break;
-        }
-        case 'fragment': {
-            const fragment = ALL_FRAGMENTS_MAP[reward.id];
-            if (fragment) {
-                wasNewlyCollected = true;
-                itemForModal = fragment;
-                setInventory(prev => ({ ...prev, [fragment.id]: (prev[fragment.id] || 0) + 1 }));
-            }
-            break;
+            case 'heroCard':
+                if (!collectedHeroCards.some(h => h.id === reward.id)) {
+                    const newHeroCard = ALL_HERO_CARDS[reward.id];
+                    if (newHeroCard) setCollectedHeroCards(prev => [...prev, newHeroCard]);
+                }
+                break;
+            case 'fragment':
+                const fragment = ALL_FRAGMENTS_MAP[reward.id];
+                if(fragment) {
+                  setInventory(prev => ({ ...prev, [reward.id]: (prev[reward.id] || 0) + 1 }));
+                  newItemToShow = fragment;
+                }
+                break;
+            case 'decoration':
+                 if(!collectedDecorations.some(d => d.id === reward.id)) {
+                    const newDecoration = ALL_DECORATIONS_MAP[reward.id];
+                    if (newDecoration) {
+                        setCollectedDecorations(prev => [...prev, newDecoration]);
+                        newItemToShow = newDecoration;
+                    }
+                }
+                break;
         }
     }
 
-    if (wasNewlyCollected) {
-        playSound('sfx-success');
-        if (reward.type === 'heroCard' || reward.type === 'decoration' || reward.type === 'artifact') {
-            playSound('sfx-unlock');
+    const completedHoi = HOI_DATA.find(hoi => hoi.missions.some(m => m.missionId === activeMission?.id));
+    if (completedHoi) {
+        const newlyUnlockedChars = Object.values(AI_CHARACTERS).filter(c => c.unlockHoiId === completedHoi.id && !unlockedCharacterIds.includes(c.id));
+        if (newlyUnlockedChars.length > 0) {
+            setUnlockedCharacterIds(prev => [...prev, ...newlyUnlockedChars.map(c => c.id)]);
+            newCharacterUnlocked = true;
         }
+        const newlyUnlockedBgs = Object.values(ALL_SANDBOX_BACKGROUNDS_MAP).filter(bg => bg.unlockCondition?.type === 'complete_hoi' && bg.unlockCondition.hoi_id === completedHoi.id && !unlockedBackgroundIds.includes(bg.id));
+        if (newlyUnlockedBgs.length > 0) {
+            setUnlockedBackgroundIds(prev => [...prev, ...newlyUnlockedBgs.map(bg => bg.id)]);
+            newBackgroundUnlocked = true;
+        }
+        const newlyUnlockedItems = Object.values(ALL_CUSTOMIZATION_ITEMS_MAP).filter(item => item.unlockCondition?.type === 'complete_hoi' && item.unlockCondition.hoi_id === completedHoi.id && !unlockedCustomizationItemIds.includes(item.id));
+        if (newlyUnlockedItems.length > 0) {
+            setUnlockedCustomizationItemIds(prev => [...prev, ...newlyUnlockedItems.map(i => i.id)]);
+        }
+    }
 
-        if (itemForModal) {
-            setRewardItemForModal(itemForModal);
-            setShowSharedArtifactInfoModal(true);
+    if (activeQuestChainId) {
+        setQuestProgress(prev => ({ ...prev, [activeQuestChainId]: (prev[activeQuestChainId] || 0) + 1 }));
+        const chain = ALL_QUEST_CHAINS[activeQuestChainId];
+        const currentStepIndex = questProgress[activeQuestChainId] || 0;
+        if (currentStepIndex + 1 >= chain.steps.length) {
+            setActiveQuestChainId(null); navigateTo(Screen.MAIN_INTERFACE);
         } else {
-            navigateTo(Screen.MAIN_INTERFACE);
+            navigateTo(Screen.QUEST_CHAIN_SCREEN);
         }
     } else {
         navigateTo(Screen.MAIN_INTERFACE);
     }
-  }, [collectedArtifacts, collectedHeroCards, collectedDecorations, userName, inventory, updateAndSaveLeaderboard, navigateTo]);
-  
-  const handleCraftItem = useCallback((artifactId: string) => {
-    const artifact = ALL_ARTIFACTS_MAP[artifactId];
-    if (!artifact || !artifact.craftingRequirements) return;
-
-    // Verify requirements
-    const canCraft = artifact.craftingRequirements.every(fragId => (inventory[fragId] || 0) >= 1);
     
-    if (canCraft) {
-      playSound('sfx-unlock');
-
-      // Deduct fragments from inventory
-      const newInventory = { ...inventory };
-      artifact.craftingRequirements.forEach(fragId => {
-        newInventory[fragId] -= 1;
-        if (newInventory[fragId] === 0) {
-          delete newInventory[fragId];
-        }
-      });
-      setInventory(newInventory);
-
-      // Add artifact to collection
-      const newCollected = [...collectedArtifacts, artifact];
-      setCollectedArtifacts(newCollected);
-      updateAndSaveLeaderboard(userName, newCollected.length * POINTS_PER_ARTIFACT);
-
-      // Show success modal
-      setRewardItemForModal(artifact);
-      setShowSharedArtifactInfoModal(true);
+    if (newItemToShow) {
+        setRewardItemForModal(newItemToShow as (Artifact | MemoryFragment));
+        setShowSharedArtifactInfoModal(true);
     }
-  }, [inventory, collectedArtifacts, userName, updateAndSaveLeaderboard]);
-
-
-  const handleLogin = useCallback((name: string) => {
-    playSound('sfx-click');
-    setUserName(name);
-    navigateTo(Screen.MAIN_INTERFACE);
-  }, [navigateTo]);
-
-  const handleReturnToMuseum = useCallback(() => {
-    playSound('sfx-click');
-    setActiveQuestChainId(null);
-    navigateTo(Screen.MAIN_INTERFACE);
-  }, [navigateTo]);
+  }, [collectedArtifacts, collectedHeroCards, collectedDecorations, unlockedCharacterIds, unlockedBackgroundIds, unlockedCustomizationItemIds, activeMission, activeQuestChainId, questProgress, navigateTo]);
   
-  const handleShowLeaderboard = useCallback(() => {
-    playSound('sfx-click');
-    navigateTo(Screen.LEADERBOARD);
-  }, [navigateTo]);
-
-  const handleShowAchievements = useCallback(() => {
-    playSound('sfx-click');
-    navigateTo(Screen.ACHIEVEMENTS);
-  }, [navigateTo]);
-  
-  const handleShowPremium = useCallback(() => {
-    playSound('sfx-click');
-    navigateTo(Screen.PREMIUM_SCREEN);
-  }, [navigateTo]);
-
-  const handleShowSandbox = useCallback(() => {
-    playSound('sfx-click');
-    navigateTo(Screen.SANDBOX);
-  }, [navigateTo]);
-  
-  const handleShowCustomization = useCallback(() => {
-    playSound('sfx-click');
-    navigateTo(Screen.CUSTOMIZATION);
-  }, [navigateTo]);
-
-  const handleShowCrafting = useCallback(() => {
-    playSound('sfx-click');
-    navigateTo(Screen.CRAFTING_SCREEN);
-  }, [navigateTo]);
-  
-  const handleAvatarChange = useCallback((item: CustomizationItem) => {
-    playSound('sfx-click');
-    setAvatarCustomization(prev => {
-        const newAvatar = {...prev};
-        if (item.type === 'outfit') {
-            newAvatar.outfit = item.id;
-        } else if (item.type === 'hat') {
-            // Toggle hat on/off if the same one is clicked
-            newAvatar.hat = prev.hat === item.id ? null : item.id;
-        }
-        return newAvatar;
-    });
-  }, []);
-
-  const handleShowItemDetails = useCallback((item: Artifact | HeroCard | Decoration) => {
-    playSound('sfx-click');
-    setItemForDetailModal(item);
-  }, []);
-
-  const handleCloseItemDetails = useCallback(() => {
-    setItemForDetailModal(null);
-  }, []);
-
-  const handleUpdateSandboxState = useCallback((newStateOrFn: React.SetStateAction<SandboxState>) => {
-    setSandboxState(newStateOrFn);
-  }, []);
-
-  const startGame = useCallback((missionToStart: MissionData) => {
-    const screenMap: Partial<Record<MissionData['type'], Screen>> = {
-        puzzle: Screen.MISSION_SCREEN,
-        narrative: Screen.NARRATIVE_MISSION_SCREEN,
-        timeline: Screen.TIMELINE_MISSION_SCREEN,
-        ar: Screen.AR_MISSION_SCREEN,
-        hiddenObject: Screen.HIDDEN_OBJECT_SCREEN,
-        quiz: Screen.QUIZ_MISSION_SCREEN,
-        construction: Screen.CONSTRUCTION_MISSION_SCREEN,
-        diplomacy: Screen.DIPLOMACY_MISSION_SCREEN,
-        trading: Screen.TRADING_SCREEN,
-        coloring: Screen.COLORING_MISSION_SCREEN,
-        rhythm: Screen.RHYTHM_MISSION_SCREEN,
-        rallyCall: Screen.RALLY_CALL_MISSION_SCREEN,
-        forging: Screen.FORGING_MISSION_SCREEN,
-        tacticalMap: Screen.TACTICAL_MAP_MISSION_SCREEN,
-        defense: Screen.DEFENSE_MISSION_SCREEN,
-        strategyMap: Screen.STRATEGY_MAP_MISSION_SCREEN,
-        coinMinting: Screen.COIN_MINTING_MISSION_SCREEN,
-        cityPlanning: Screen.CITY_PLANNING_MISSION_SCREEN,
-        typesetting: Screen.TYPESETTING_MISSION_SCREEN,
-        adventurePuzzle: Screen.ADVENTURE_PUZZLE_SCREEN,
-        strategicPath: Screen.STRATEGIC_PATH_MISSION_SCREEN,
-    };
-    const targetScreen = screenMap[missionToStart.type];
-    if (targetScreen) {
-        if (targetScreen === Screen.AR_MISSION_SCREEN) setArRewardMessage(null);
-        navigateTo(targetScreen, missionToStart);
+  const handleStartMission = (missionInfo: MissionInfo) => {
+    playSound('sfx_click');
+    setPendingMissionInfo(missionInfo);
+    
+    // Logic for pre-mission dialogue
+    const scriptKey = `before_mission_${missionInfo.missionId}`;
+    if (HOI_6_SCRIPT[scriptKey]) {
+        setActiveScriptKey(scriptKey);
+        setIsDialogueOpen(true);
+        return; // Wait for dialogue to finish
     }
-  }, [navigateTo]);
 
-  const openInstructionModal = useCallback((missionToStart: MissionData) => {
-    if (seenInstructions.includes(missionToStart.type)) {
-      startGame(missionToStart);
-    } else {
-      setInstructionModalState({
-        isOpen: true,
-        gameType: missionToStart.type,
-        onConfirm: () => startGame(missionToStart),
-      });
-    }
-  }, [seenInstructions, startGame]);
-
-  const handleStartMission = useCallback((missionInfo: MissionInfo) => {
-    if (!missionInfo) return;
-    playSound('sfx-click');
-
+    // If no dialogue, proceed to start
+    actuallyStartMission(missionInfo);
+  };
+  
+  const actuallyStartMission = (missionInfo: MissionInfo) => {
     if (missionInfo.isPremium && !isPremium) {
-      handleShowPremium();
+      navigateTo(Screen.PREMIUM_SCREEN);
       return;
     }
-    
     if (missionInfo.questChainId) {
       setActiveQuestChainId(missionInfo.questChainId);
       navigateTo(Screen.QUEST_CHAIN_SCREEN);
       return;
     }
-
-    const missionToStart = ALL_MISSIONS[missionInfo.missionId];
-    if (missionToStart) {
-      openInstructionModal(missionToStart);
-    }
-
-  }, [navigateTo, isPremium, handleShowPremium, openInstructionModal]);
-  
-  const handleStartQuestStep = useCallback((missionId: string) => {
-    const missionData = ALL_MISSIONS[missionId];
+    const missionData = ALL_MISSIONS[missionInfo.missionId];
     if (missionData) {
-        openInstructionModal(missionData);
-    }
-  }, [openInstructionModal]);
+      const startMission = () => {
+        const screenMap: Record<string, Screen> = {
+          'puzzle': Screen.MISSION_SCREEN,
+          'narrative': Screen.NARRATIVE_MISSION_SCREEN,
+          'timeline': Screen.TIMELINE_MISSION_SCREEN,
+          'ar': Screen.AR_MISSION_SCREEN,
+          'hiddenObject': Screen.HIDDEN_OBJECT_SCREEN,
+          'quiz': Screen.QUIZ_MISSION_SCREEN,
+          'construction': Screen.CONSTRUCTION_MISSION_SCREEN,
+          'diplomacy': Screen.DIPLOMACY_MISSION_SCREEN,
+          'trading': Screen.TRADING_SCREEN,
+          'rhythm': Screen.RHYTHM_MISSION_SCREEN,
+          'coloring': Screen.COLORING_MISSION_SCREEN,
+          'rallyCall': Screen.RALLY_CALL_MISSION_SCREEN,
+          'forging': Screen.FORGING_MISSION_SCREEN,
+          'tacticalMap': Screen.TACTICAL_MAP_MISSION_SCREEN,
+          'defense': Screen.DEFENSE_MISSION_SCREEN,
+          'strategyMap': Screen.STRATEGY_MAP_MISSION_SCREEN,
+          'coinMinting': Screen.COIN_MINTING_MISSION_SCREEN,
+          'cityPlanning': Screen.CITY_PLANNING_MISSION_SCREEN,
+          'typesetting': Screen.TYPESETTING_MISSION_SCREEN,
+          'adventurePuzzle': Screen.ADVENTURE_PUZZLE_SCREEN,
+          'strategicPath': Screen.STRATEGIC_PATH_MISSION_SCREEN,
+        };
+        const targetScreen = screenMap[missionData.type] || Screen.MAIN_INTERFACE;
+        navigateTo(targetScreen, missionData);
+      };
 
-  const handleCloseInstructionModal = useCallback((gameType: string, shouldRemember: boolean) => {
-    const callback = instructionModalState.onConfirm;
-    setInstructionModalState({ isOpen: false, gameType: null, onConfirm: null });
-
-    if (shouldRemember && !seenInstructions.includes(gameType)) {
-      setSeenInstructions(prev => [...prev, gameType]);
+      if (!seenInstructions.includes(missionData.type)) {
+        setInstructionModalState({
+          isOpen: true,
+          gameType: missionData.type,
+          onConfirm: startMission
+        });
+      } else {
+        startMission();
+      }
     }
-    
-    if (callback) {
-      callback();
-    }
-  }, [instructionModalState.onConfirm, seenInstructions]);
+  };
 
-  const handleUpgradeToPremium = useCallback(() => {
-    playSound('sfx-unlock');
+  const handleStartAdventure = () => {
+    playSound('sfx_click');
+    const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (savedState) {
+        navigateTo(Screen.MAIN_INTERFACE);
+    } else {
+        navigateTo(Screen.LOGIN);
+    }
+  };
+
+  const handleLogin = (name: string, gender: Gender) => {
+    playSound('sfx_click');
+    setUserName(name);
+    setGender(gender);
+    navigateTo(Screen.MAIN_INTERFACE);
+    setActiveTutorial({ id: 'main-interface-intro', stepIndex: 0 });
+  };
+
+  const handleUpgradeToPremium = () => {
+    playSound('sfx_unlock');
     setIsPremium(true);
     setShowPremiumWelcomeModal(true);
-  }, []);
-
-  const handleClosePremiumWelcomeModal = useCallback(() => {
-    setShowPremiumWelcomeModal(false);
     navigateTo(Screen.MAIN_INTERFACE);
-  }, [navigateTo]);
-
-  const handleIncrementChatCount = useCallback(() => {
-    if (!isPremium) {
-      setDailyChatCount(prev => prev + 1);
-    }
-  }, [isPremium]);
-
-  const handleUnlockNotebookPage = useCallback((pageIndex: number) => {
-    setUnlockedNotebookPages(prev => {
-        if (prev.includes(pageIndex)) {
-            return prev; // Already unlocked
-        }
-        return [...prev, pageIndex].sort((a,b) => a - b);
-    });
-  }, []);
-
-  const handleToggleChatbot = useCallback(() => {
-    playSound('sfx-click');
-    setShowChatbot(prev => !prev);
-  }, []);
-
-  const closeSharedArtifactModalAndNavigate = useCallback(() => {
-    setShowSharedArtifactInfoModal(false);
-    setRewardItemForModal(null);
-    if(currentScreen !== Screen.CRAFTING_SCREEN) {
-      navigateTo(Screen.MAIN_INTERFACE);
-    }
-  }, [navigateTo, currentScreen]);
-
-
-  const handleMissionCompletion = useCallback((reward?: Reward) => {
-    const completedMissionId = activeMission?.id;
-    if (activeQuestChainId && completedMissionId) {
-        const chain = ALL_QUEST_CHAINS[activeQuestChainId];
-        const currentStepIndex = questProgress[activeQuestChainId] || 0;
-        const currentStep = chain.steps[currentStepIndex];
-
-        if (currentStep.missionId === completedMissionId) {
-            const nextStepIndex = currentStepIndex + 1;
-            setQuestProgress(prev => ({ ...prev, [activeQuestChainId]: nextStepIndex }));
-
-            if (nextStepIndex >= chain.steps.length) { // Chain complete
-                if (reward) handleReward(reward);
-                setActiveQuestChainId(null);
-            } else {
-                // More steps remain, navigate back to chain screen
-                navigateTo(Screen.QUEST_CHAIN_SCREEN);
-            }
-        } else {
-            // Should not happen, but as a fallback
-            if (reward) handleReward(reward);
-        }
-    } else {
-        // Not part of a quest chain
-        if (reward) handleReward(reward);
-    }
-  }, [activeMission, activeQuestChainId, questProgress, handleReward, navigateTo]);
-  
-
-  const grantArtifactReward = useCallback((reward: Reward): boolean => {
-      if (reward.type !== 'artifact') return false; // AR missions only grant artifacts directly for now
-      const artifact = ALL_ARTIFACTS_MAP[reward.id];
-      if (artifact && !collectedArtifacts.some(a => a.id === artifact.id)) {
-          const newCollected = [...collectedArtifacts, artifact];
-          setCollectedArtifacts(newCollected);
-          updateAndSaveLeaderboard(userName, newCollected.length * POINTS_PER_ARTIFACT);
-          playSound('sfx-unlock');
-          return true;
-      }
-      return false;
-  }, [collectedArtifacts, userName, updateAndSaveLeaderboard]);
-  
-  const handleMarkerActuallyFound = useCallback((reward: Reward) => {
-    const wasNewlyCollected = grantArtifactReward(reward);
-    if (wasNewlyCollected && reward.type === 'artifact') {
-        const artifactToCollect = ALL_ARTIFACTS_MAP[reward.id];
-        setArRewardMessage(`Đã thu thập: ${artifactToCollect.name}!`);
-        setTimeout(() => setArRewardMessage(null), 3000);
-    }
-  }, [grantArtifactReward]);
-
-  const handleArMissionReturnAndClaim = useCallback(() => {
-    const arMission = activeMission as ARMissionData | undefined;
-    if (!arMission || arMission.type !== 'ar') {
-      navigateTo(Screen.MAIN_INTERFACE);
-      return;
-    }
-    const rewardToClaim = arMission.reward;
-    grantArtifactReward(rewardToClaim);
-
-    if(rewardToClaim.type === 'artifact') {
-      const artifactToCollect = ALL_ARTIFACTS_MAP[rewardToClaim.id];
-      playSound('sfx-success');
-      setRewardItemForModal(artifactToCollect);
-      setShowSharedArtifactInfoModal(true); 
-    } else {
-        navigateTo(Screen.MAIN_INTERFACE);
-    }
-    
-  }, [activeMission, navigateTo, grantArtifactReward]);
-
-  const handleNextTutorialStep = useCallback(() => {
-    if (!activeTutorial) return;
-    playSound('sfx-click');
-    const tutorial = TUTORIAL_DATA[activeTutorial.id];
-    if (activeTutorial.stepIndex < tutorial.steps.length - 1) {
-      setActiveTutorial(prev => prev ? { ...prev, stepIndex: prev.stepIndex + 1 } : null);
-    } else {
-      if (!tutorialsSeen.includes(activeTutorial.id)) {
-        setTutorialsSeen(prev => [...prev, activeTutorial.id]);
-      }
-      setActiveTutorial(null);
-    }
-  }, [activeTutorial, tutorialsSeen]);
-
-  const handleSkipTutorial = useCallback(() => {
-    if (!activeTutorial) return;
-    playSound('sfx-click');
-    if (!tutorialsSeen.includes(activeTutorial.id)) {
-      setTutorialsSeen(prev => [...prev, activeTutorial.id]);
-    }
-    setActiveTutorial(null);
-  }, [activeTutorial, tutorialsSeen]);
-
-
-  const renderScreen = () => {
-    switch (currentScreen) {
-      case Screen.LANDING_PAGE:
-        return <LandingScreen onStartAdventure={handleStartAdventure} />;
-      case Screen.LOGIN:
-        return <LoginScreen onLogin={handleLogin} appName={APP_NAME} />;
-      case Screen.MAIN_INTERFACE:
-        if (!userName) return <LoginScreen onLogin={handleLogin} appName={APP_NAME} />;
-        return (
-          <MainInterface
-            userName={userName}
-            avatarCustomization={avatarCustomization}
-            hois={HOI_DATA}
-            collectedArtifacts={collectedArtifacts}
-            collectedHeroCards={collectedHeroCards}
-            collectedDecorations={collectedDecorations}
-            inventory={inventory}
-            onStartMission={handleStartMission}
-            onShowLeaderboard={handleShowLeaderboard}
-            onToggleChatbot={handleToggleChatbot}
-            theme={theme}
-            onToggleTheme={toggleTheme}
-            isPremium={isPremium}
-            onShowPremium={handleShowPremium}
-            onShowItemDetails={handleShowItemDetails}
-            onShowSandbox={handleShowSandbox}
-            onShowCustomization={handleShowCustomization}
-            onShowCrafting={handleShowCrafting}
-            onShowAchievements={handleShowAchievements}
-          />
-        );
-      case Screen.QUEST_CHAIN_SCREEN:
-        if(activeQuestChainId) {
-            const chain = ALL_QUEST_CHAINS[activeQuestChainId];
-            const progress = questProgress[activeQuestChainId] || 0;
-            return <QuestChainScreen questChain={chain} progress={progress} onStartStep={handleStartQuestStep} onReturnToMuseum={handleReturnToMuseum} />;
-        }
-        break;
-      case Screen.MISSION_SCREEN:
-        if (activeMission?.type === 'puzzle') {
-          return (
-            <MissionScreen
-              mission={activeMission as PuzzleMissionData}
-              onReturnToMuseum={handleReturnToMuseum}
-              onMissionComplete={handleMissionCompletion}
-            />
-          );
-        }
-        break;
-      case Screen.NARRATIVE_MISSION_SCREEN:
-        if (activeMission?.type === 'narrative') {
-          return (
-            <NarrativeMissionScreen
-              missionData={activeMission as NarrativeMissionData}
-              onReturnToMuseum={handleReturnToMuseum}
-              onComplete={handleMissionCompletion}
-            />
-          );
-        }
-        break;
-      case Screen.TIMELINE_MISSION_SCREEN:
-        if (activeMission?.type === 'timeline') {
-          return (
-            <TimelineMissionScreen
-              missionData={activeMission as TimelineMissionData}
-              onReturnToMuseum={handleReturnToMuseum}
-              onComplete={handleMissionCompletion}
-            />
-          );
-        }
-        break;
-      case Screen.HIDDEN_OBJECT_SCREEN:
-        if (activeMission?.type === 'hiddenObject') {
-          return (
-            <HiddenObjectScreen
-              missionData={activeMission as HiddenObjectMissionData}
-              onReturnToMuseum={handleReturnToMuseum}
-              onMissionComplete={handleMissionCompletion}
-            />
-          );
-        }
-        break;
-      case Screen.QUIZ_MISSION_SCREEN:
-        if (activeMission?.type === 'quiz') {
-          return (
-            <QuizScreen
-              missionData={activeMission as QuizMissionData}
-              onReturnToMuseum={handleReturnToMuseum}
-              onComplete={handleMissionCompletion}
-            />
-          );
-        }
-        break;
-      case Screen.CONSTRUCTION_MISSION_SCREEN:
-        if (activeMission?.type === 'construction') {
-            return (
-                <ConstructionScreen
-                    missionData={activeMission as ConstructionMissionData}
-                    onReturnToMuseum={handleReturnToMuseum}
-                    onMissionComplete={handleMissionCompletion}
-                />
-            );
-        }
-        break;
-      case Screen.DIPLOMACY_MISSION_SCREEN:
-        if (activeMission?.type === 'diplomacy') {
-            return (
-                <DiplomacyScreen
-                    missionData={activeMission as DiplomacyMissionData}
-                    onReturnToMuseum={handleReturnToMuseum}
-                    onComplete={handleMissionCompletion}
-                />
-            );
-        }
-        break;
-      case Screen.TRADING_SCREEN:
-        if (activeMission?.type === 'trading') {
-            return (
-                <TradingScreen
-                    missionData={activeMission as TradingMissionData}
-                    onReturnToMuseum={handleReturnToMuseum}
-                    onComplete={handleMissionCompletion}
-                />
-            );
-        }
-        break;
-      case Screen.COLORING_MISSION_SCREEN:
-        if (activeMission?.type === 'coloring') {
-            return (
-                <ColoringScreen
-                    missionData={activeMission as ColoringMissionData}
-                    onReturnToMuseum={handleReturnToMuseum}
-                    onMissionComplete={handleMissionCompletion}
-                />
-            );
-        }
-        break;
-      case Screen.RHYTHM_MISSION_SCREEN:
-        if (activeMission?.type === 'rhythm') {
-            return (
-                <RhythmScreen
-                    missionData={activeMission as RhythmMissionData}
-                    onReturnToMuseum={handleReturnToMuseum}
-                    onComplete={handleMissionCompletion}
-                />
-            );
-        }
-        break;
-      case Screen.RALLY_CALL_MISSION_SCREEN:
-        if (activeMission?.type === 'rallyCall') {
-            return (
-                <RallyCallScreen
-                    missionData={activeMission as RallyCallMissionData}
-                    onReturnToMuseum={handleReturnToMuseum}
-                    onComplete={handleMissionCompletion}
-                />
-            );
-        }
-        break;
-      case Screen.FORGING_MISSION_SCREEN:
-        if (activeMission?.type === 'forging') {
-            return (
-                <ForgingScreen
-                    missionData={activeMission as ForgingMissionData}
-                    onReturnToMuseum={handleReturnToMuseum}
-                    onComplete={handleMissionCompletion}
-                />
-            );
-        }
-        break;
-      case Screen.TACTICAL_MAP_MISSION_SCREEN:
-        if (activeMission?.type === 'tacticalMap') {
-            return (
-                <TacticalMapScreen
-                    missionData={activeMission as TacticalMapMissionData}
-                    onReturnToMuseum={handleReturnToMuseum}
-                    onComplete={handleMissionCompletion}
-                />
-            );
-        }
-        break;
-      case Screen.DEFENSE_MISSION_SCREEN:
-        if (activeMission?.type === 'defense') {
-            return (
-                <DefenseScreen
-                    missionData={activeMission as DefenseMissionData}
-                    onReturnToMuseum={handleReturnToMuseum}
-                    onComplete={handleMissionCompletion}
-                />
-            );
-        }
-        break;
-      case Screen.STRATEGY_MAP_MISSION_SCREEN:
-        if (activeMission?.type === 'strategyMap') {
-            return (
-                <StrategyMapScreen
-                    missionData={activeMission as StrategyMapMissionData}
-                    onReturnToMuseum={handleReturnToMuseum}
-                    onComplete={handleMissionCompletion}
-                />
-            );
-        }
-        break;
-      case Screen.COIN_MINTING_MISSION_SCREEN:
-        if (activeMission?.type === 'coinMinting') {
-            return (
-                <CoinMintingScreen
-                    missionData={activeMission as CoinMintingMissionData}
-                    onReturnToMuseum={handleReturnToMuseum}
-                    onComplete={handleMissionCompletion}
-                />
-            );
-        }
-        break;
-      case Screen.CITY_PLANNING_MISSION_SCREEN:
-        if (activeMission?.type === 'cityPlanning') {
-            return (
-                <CityPlanningScreen
-                    missionData={activeMission as CityPlanningMissionData}
-                    onReturnToMuseum={handleReturnToMuseum}
-                    onComplete={handleMissionCompletion}
-                />
-            );
-        }
-        break;
-      case Screen.TYPESETTING_MISSION_SCREEN:
-        if (activeMission?.type === 'typesetting') {
-            return (
-                <TypesettingScreen
-                    missionData={activeMission as TypesettingMissionData}
-                    onReturnToMuseum={handleReturnToMuseum}
-                    onComplete={handleMissionCompletion}
-                />
-            );
-        }
-        break;
-      case Screen.ADVENTURE_PUZZLE_SCREEN:
-        if (activeMission?.type === 'adventurePuzzle') {
-            return (
-                <AdventurePuzzleScreen
-                    missionData={activeMission as AdventurePuzzleMissionData}
-                    onReturnToMuseum={handleReturnToMuseum}
-                    onComplete={handleMissionCompletion}
-                />
-            );
-        }
-        break;
-      case Screen.STRATEGIC_PATH_MISSION_SCREEN:
-        if (activeMission?.type === 'strategicPath') {
-            return (
-                <StrategicPathScreen
-                    missionData={activeMission as StrategicPathMissionData}
-                    onReturnToMuseum={handleReturnToMuseum}
-                    onComplete={handleMissionCompletion}
-                    unlockedNotebookPages={unlockedNotebookPages}
-                    onUnlockNotebookPage={handleUnlockNotebookPage}
-                />
-            );
-        }
-        break;
-      case Screen.AR_MISSION_SCREEN:
-         if (activeMission?.type === 'ar') {
-          return (
-            <ArScreenComponent
-              missionData={activeMission as ARMissionData}
-              onReturnAndClaimReward={handleArMissionReturnAndClaim}
-              onMarkerActuallyFound={handleMarkerActuallyFound}
-              arRewardMessage={arRewardMessage}
-            />
-          );
-        }
-        break;
-      case Screen.LEADERBOARD:
-        return (
-          <LeaderboardScreen
-            currentUserName={userName}
-            onReturnToMuseum={handleReturnToMuseum}
-          />
-        );
-       case Screen.ACHIEVEMENTS:
-        return (
-          <AchievementsScreen
-            unlockedAchievementIds={unlockedAchievementIds}
-            onReturnToMuseum={handleReturnToMuseum}
-          />
-        );
-      case Screen.PREMIUM_SCREEN:
-        return (
-            <PremiumScreen
-                onClose={handleReturnToMuseum}
-                onUpgrade={handleUpgradeToPremium}
-            />
-        );
-      case Screen.SANDBOX:
-        return (
-            <SandboxScreen
-                collectedArtifacts={collectedArtifacts}
-                collectedDecorations={collectedDecorations}
-                unlockedBackgroundIds={unlockedBackgroundIds}
-                sandboxState={sandboxState}
-                onUpdateSandboxState={handleUpdateSandboxState}
-                onReturnToMuseum={handleReturnToMuseum}
-            />
-        );
-      case Screen.CRAFTING_SCREEN:
-        return (
-          <CraftingScreen
-              inventory={inventory}
-              collectedArtifactIds={new Set(collectedArtifacts.map(a => a.id))}
-              onCraftItem={handleCraftItem}
-              onReturnToMuseum={handleReturnToMuseum}
-          />
-        );
-      case Screen.CUSTOMIZATION:
-        return (
-          <CustomizationScreen
-            onReturnToMuseum={handleReturnToMuseum}
-            currentAvatar={avatarCustomization}
-            unlockedItemIds={unlockedCustomizationItemIds}
-            onAvatarChange={handleAvatarChange}
-          />
-        );
-      default:
-        // Fallback to landing page if something goes wrong
-        return <LandingScreen onStartAdventure={handleStartAdventure} />;
-    }
-
-    const missionScreenTypes: Screen[] = [
-        Screen.MISSION_SCREEN,
-        Screen.NARRATIVE_MISSION_SCREEN,
-        Screen.TIMELINE_MISSION_SCREEN,
-        Screen.AR_MISSION_SCREEN,
-        Screen.HIDDEN_OBJECT_SCREEN,
-        Screen.QUIZ_MISSION_SCREEN,
-        Screen.CONSTRUCTION_MISSION_SCREEN,
-        Screen.DIPLOMACY_MISSION_SCREEN,
-        Screen.TRADING_SCREEN,
-        Screen.COLORING_MISSION_SCREEN,
-        Screen.RHYTHM_MISSION_SCREEN,
-        Screen.RALLY_CALL_MISSION_SCREEN,
-        Screen.FORGING_MISSION_SCREEN,
-        Screen.QUEST_CHAIN_SCREEN,
-        Screen.TACTICAL_MAP_MISSION_SCREEN,
-        Screen.DEFENSE_MISSION_SCREEN,
-        Screen.STRATEGY_MAP_MISSION_SCREEN,
-        Screen.COIN_MINTING_MISSION_SCREEN,
-        Screen.CITY_PLANNING_MISSION_SCREEN,
-        Screen.TYPESETTING_MISSION_SCREEN,
-        Screen.ADVENTURE_PUZZLE_SCREEN,
-        Screen.STRATEGIC_PATH_MISSION_SCREEN,
-    ];
-    if (missionScreenTypes.includes(currentScreen)) {
-        console.warn(`Invalid mission data for screen: ${Screen[currentScreen]}. Navigating to main interface.`);
-        navigateTo(Screen.MAIN_INTERFACE, null); 
-    }
-    return null; 
   };
   
-  const arScreenContentVisible = !(currentScreen === Screen.AR_MISSION_SCREEN && transitionClass === 'screen-fade-out');
-  const tutorialForOverlay = activeTutorial ? TUTORIAL_DATA[activeTutorial.id] : null;
+  const handleMarkerFound = useCallback((reward: Reward) => {
+    const item = reward.type === 'artifact' ? ALL_ARTIFACTS_MAP[reward.id] : null;
+    if (item && !collectedArtifacts.some(a => a.id === item.id)) {
+      setArRewardMessage(`Bạn đã tìm thấy: ${item.name}!`);
+      setTimeout(() => setArRewardMessage(null), 3000);
+    }
+  }, [collectedArtifacts]);
+  
+  const handleAvatarChange = (item: CustomizationItem) => {
+    playSound('sfx_click');
+    setAvatarCustomization(prev => ({
+      ...prev,
+      [item.type]: item.id,
+    }));
+  };
+  
+  const handleCraftItem = (artifactId: string) => {
+    const artifact = ALL_ARTIFACTS_MAP[artifactId];
+    if (!artifact || !artifact.craftingRequirements) return;
+
+    const canCraft = artifact.craftingRequirements.every(fragId => (inventory[fragId] || 0) >= 1);
+    
+    if (canCraft) {
+        playSound('sfx_unlock');
+        const newInventory = {...inventory};
+        artifact.craftingRequirements.forEach(fragId => {
+            newInventory[fragId] -= 1;
+            if(newInventory[fragId] <= 0) delete newInventory[fragId];
+        });
+        setInventory(newInventory);
+        
+        setCollectedArtifacts(prev => [...prev, artifact]);
+        
+        setRewardItemForModal(artifact);
+        setShowSharedArtifactInfoModal(true);
+    } else {
+        alert("Bạn chưa đủ nguyên liệu để chế tác!");
+    }
+  };
+  
+  const handleNextTutorialStep = () => {
+    playSound('sfx_click');
+    if (!activeTutorial) return;
+    const tutorial = TUTORIAL_DATA[activeTutorial.id];
+    if (activeTutorial.stepIndex < tutorial.steps.length - 1) {
+      setActiveTutorial(prev => ({ ...prev!, stepIndex: prev!.stepIndex + 1 }));
+    } else {
+      setTutorialsSeen(prev => [...prev, activeTutorial.id]);
+      setActiveTutorial(null);
+    }
+  };
+
+  const handleSkipTutorial = () => {
+    playSound('sfx_click');
+    if (activeTutorial) {
+        setTutorialsSeen(prev => [...prev, activeTutorial.id]);
+        setActiveTutorial(null);
+    }
+  };
+  
+  const handleCloseInstructionModal = (gameType: string, shouldRemember: boolean) => {
+    if (shouldRemember) {
+      setSeenInstructions(prev => [...prev, gameType]);
+    }
+    const onConfirm = instructionModalState.onConfirm;
+    setInstructionModalState({ isOpen: false, gameType: null, onConfirm: null });
+    if(onConfirm) {
+        onConfirm();
+    }
+  };
+
+  const handleUnlockNotebookPage = (pageIndex: number) => {
+    if (!unlockedNotebookPages.includes(pageIndex)) {
+        playSound('sfx_page_turn');
+        setUnlockedNotebookPages(prev => [...prev, pageIndex].sort((a, b) => a - b));
+    }
+  };
+
+  const handleTriggerDialogue = (scriptKey: string) => {
+    setActiveScriptKey(scriptKey);
+    setIsDialogueOpen(true);
+  };
+
+  const handleDialogueClose = () => {
+    if (pendingMissionInfo) {
+      actuallyStartMission(pendingMissionInfo);
+    }
+    if (pendingReward) {
+      completeMissionLogic(pendingReward);
+    }
+    setPendingMissionInfo(null);
+    setPendingReward(undefined);
+    setActiveScriptKey(null);
+    setIsDialogueOpen(false);
+  };
+
+  const handleDialogueEvent = (event: DialogueEntry) => {
+    if (event.type === 'notebook_unlock') {
+      handleUnlockNotebookPage(event.pageIndex);
+      setPageUnlockNotification(event.message);
+      setTimeout(() => setPageUnlockNotification(null), 3000);
+    }
+  };
+  
+  const handleDialogueOptionClick = (option: DialogueOption) => {
+      if (option.action === 'accept_quest') {
+          setActiveSideQuest({ questId: option.questId, currentStage: 0 });
+      }
+      handleDialogueClose();
+  };
+  
+  const handleCompleteSideQuestStage = (questId: string) => {
+      const quest = SIDE_QUESTS[questId];
+      if (!activeSideQuest || activeSideQuest.questId !== questId) return;
+      
+      const newStage = activeSideQuest.currentStage + 1;
+      if (newStage >= quest.stages.length) {
+          setActiveSideQuest(null);
+          handleTriggerDialogue(quest.endDialogueKey);
+          
+          if (quest.reward.type !== 'notebook_unlock') {
+             completeMissionLogic(quest.reward as Reward);
+          }
+      } else {
+          setActiveSideQuest({ questId, currentStage: newStage });
+      }
+  };
+  
+  const handleIncrementChatCount = () => {
+    setDailyChatCount(c => c + 1);
+  };
+
+  const renderCurrentScreen = () => {
+      switch (currentScreen) {
+          case Screen.LANDING_PAGE:
+              return <LandingScreen onStartAdventure={handleStartAdventure} />;
+          case Screen.LOGIN:
+              return <LoginScreen onLogin={handleLogin} appName={APP_NAME} />;
+          case Screen.MAIN_INTERFACE:
+              return <MainInterface
+                  userName={userName} gender={gender} avatarCustomization={avatarCustomization}
+                  hois={HOI_DATA} collectedArtifacts={collectedArtifacts} collectedHeroCards={collectedHeroCards}
+                  collectedDecorations={collectedDecorations} inventory={inventory} onStartMission={handleStartMission}
+                  onShowLeaderboard={() => navigateTo(Screen.LEADERBOARD)} onToggleChatbot={() => setShowChatbot(!showChatbot)}
+                  theme={theme} onToggleTheme={toggleTheme} isPremium={isPremium} onShowPremium={() => navigateTo(Screen.PREMIUM_SCREEN)}
+                  onShowItemDetails={(item) => setItemForDetailModal(item)} onShowSandbox={() => navigateTo(Screen.SANDBOX)}
+                  onShowCustomization={() => navigateTo(Screen.CUSTOMIZATION)} onShowCrafting={() => navigateTo(Screen.CRAFTING_SCREEN)}
+                  onShowAchievements={() => navigateTo(Screen.ACHIEVEMENTS)} isSoundEnabled={isSoundEnabled} onToggleSound={handleToggleSound}
+              />;
+          case Screen.MISSION_SCREEN:
+              if (activeMission?.type === 'puzzle') return <MissionScreen mission={activeMission as PuzzleMissionData} onReturnToMuseum={handleReturnToMuseum} onMissionComplete={completeMissionLogic} onGrantBonusSupplies={handleGrantBonusSupplies} />;
+              return null;
+          case Screen.NARRATIVE_MISSION_SCREEN:
+              if (activeMission?.type === 'narrative') return <NarrativeMissionScreen missionData={activeMission as NarrativeMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.TIMELINE_MISSION_SCREEN:
+              if (activeMission?.type === 'timeline') return <TimelineMissionScreen missionData={activeMission as TimelineMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.LEADERBOARD:
+              return <LeaderboardScreen currentUserName={userName} onReturnToMuseum={handleReturnToMuseum} />;
+          case Screen.AR_MISSION_SCREEN:
+              if (activeMission?.type === 'ar') return <ArScreenComponent missionData={activeMission as ARMissionData} onReturnAndClaimReward={() => completeMissionLogic(activeMission.reward)} onMarkerActuallyFound={handleMarkerFound} arRewardMessage={arRewardMessage}/>;
+              return null;
+          case Screen.PREMIUM_SCREEN:
+              return <PremiumScreen onClose={handleReturnToMuseum} onUpgrade={handleUpgradeToPremium} />;
+          case Screen.SANDBOX:
+              return <SandboxScreen collectedArtifacts={collectedArtifacts} collectedDecorations={collectedDecorations} unlockedBackgroundIds={unlockedBackgroundIds} sandboxState={sandboxState} onUpdateSandboxState={setSandboxState} onReturnToMuseum={handleReturnToMuseum}/>;
+          case Screen.HIDDEN_OBJECT_SCREEN:
+              if (activeMission?.type === 'hiddenObject') return <HiddenObjectScreen missionData={activeMission as HiddenObjectMissionData} onReturnToMuseum={handleReturnToMuseum} onMissionComplete={completeMissionLogic} />;
+              return null;
+          case Screen.QUIZ_MISSION_SCREEN:
+              if (activeMission?.type === 'quiz') return <QuizScreen missionData={activeMission as QuizMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.CONSTRUCTION_MISSION_SCREEN:
+              if (activeMission?.type === 'construction') return <ConstructionScreen missionData={activeMission as ConstructionMissionData} onReturnToMuseum={handleReturnToMuseum} onMissionComplete={completeMissionLogic} />;
+              return null;
+          case Screen.DIPLOMACY_MISSION_SCREEN:
+              if (activeMission?.type === 'diplomacy') return <DiplomacyScreen missionData={activeMission as DiplomacyMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.CUSTOMIZATION:
+              return <CustomizationScreen onReturnToMuseum={handleReturnToMuseum} currentAvatar={avatarCustomization} unlockedItemIds={unlockedCustomizationItemIds} onAvatarChange={handleAvatarChange} gender={gender} />;
+          case Screen.CRAFTING_SCREEN:
+              return <CraftingScreen inventory={inventory} collectedArtifactIds={new Set(collectedArtifacts.map(a => a.id))} onCraftItem={handleCraftItem} onReturnToMuseum={handleReturnToMuseum} />;
+          case Screen.TRADING_SCREEN:
+              if (activeMission?.type === 'trading') return <TradingScreen missionData={activeMission as TradingMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.RHYTHM_MISSION_SCREEN:
+              if (activeMission?.type === 'rhythm') return <RhythmScreen missionData={activeMission as RhythmMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.COLORING_MISSION_SCREEN:
+              if (activeMission?.type === 'coloring') return <ColoringScreen missionData={activeMission as ColoringMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.ACHIEVEMENTS:
+              return <AchievementsScreen unlockedAchievementIds={unlockedAchievementIds} onReturnToMuseum={handleReturnToMuseum} />;
+          case Screen.RALLY_CALL_MISSION_SCREEN:
+              if (activeMission?.type === 'rallyCall') return <RallyCallScreen missionData={activeMission as RallyCallMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.FORGING_MISSION_SCREEN:
+              if (activeMission?.type === 'forging') return <ForgingScreen missionData={activeMission as ForgingMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.QUEST_CHAIN_SCREEN:
+              if (activeQuestChainId) {
+                  const questChain = ALL_QUEST_CHAINS[activeQuestChainId];
+                  if (questChain) {
+                      return <QuestChainScreen questChain={questChain} progress={questProgress[activeQuestChainId] || 0} onStartStep={(missionId) => {
+                          const missionInfo = HOI_DATA.flatMap(h => h.missions).find(m => m.missionId === missionId);
+                          if (missionInfo) handleStartMission(missionInfo);
+                      }} onReturnToMuseum={handleReturnToMuseum} />;
+                  }
+              }
+              return null;
+          case Screen.TACTICAL_MAP_MISSION_SCREEN:
+              if (activeMission?.type === 'tacticalMap') return <TacticalMapScreen missionData={activeMission as TacticalMapMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.DEFENSE_MISSION_SCREEN:
+              if (activeMission?.type === 'defense') return <DefenseScreen missionData={activeMission as DefenseMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.STRATEGY_MAP_MISSION_SCREEN:
+              if (activeMission?.type === 'strategyMap') return <StrategyMapScreen missionData={activeMission as StrategyMapMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.COIN_MINTING_MISSION_SCREEN:
+              if (activeMission?.type === 'coinMinting') return <CoinMintingScreen missionData={activeMission as CoinMintingMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.CITY_PLANNING_MISSION_SCREEN:
+              if (activeMission?.type === 'cityPlanning') return <CityPlanningScreen missionData={activeMission as CityPlanningMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.TYPESETTING_MISSION_SCREEN:
+              if (activeMission?.type === 'typesetting') return <TypesettingScreen missionData={activeMission as TypesettingMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.ADVENTURE_PUZZLE_SCREEN:
+              if (activeMission?.type === 'adventurePuzzle') return <AdventurePuzzleScreen missionData={activeMission as AdventurePuzzleMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+              return null;
+          case Screen.STRATEGIC_PATH_MISSION_SCREEN:
+              if (activeMission?.type === 'strategicPath') return <StrategicPathScreen missionData={activeMission as StrategicPathMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} unlockedNotebookPages={unlockedNotebookPages} onUnlockNotebookPage={handleUnlockNotebookPage} onTriggerDialogue={handleTriggerDialogue} activeSideQuest={activeSideQuest} onCompleteSideQuestStage={handleCompleteSideQuestStage} />;
+              return null;
+          default:
+              return <p>Lỗi: Không tìm thấy màn hình!</p>;
+      }
+  };
 
   return (
-    <div className={`flex items-center justify-center min-h-screen bg-transparent text-stone-800 dark:text-amber-100 ${currentScreen !== Screen.LANDING_PAGE ? 'p-0 sm:p-4' : ''} ${transitionClass}`}>
-      {arScreenContentVisible && renderScreen()}
-      {rewardItemForModal && (
-        <ArtifactInfoModal
-          isOpen={showSharedArtifactInfoModal}
-          item={rewardItemForModal}
-          onClose={closeSharedArtifactModalAndNavigate}
-        />
-      )}
-      {itemForDetailModal && (
-        <ItemDetailModal
-            isOpen={!!itemForDetailModal}
-            item={itemForDetailModal}
-            onClose={handleCloseItemDetails}
-        />
-      )}
-      {instructionModalState.isOpen && instructionModalState.gameType && (
-        <InstructionModal
-            isOpen={instructionModalState.isOpen}
-            gameType={instructionModalState.gameType}
-            onClose={handleCloseInstructionModal}
-        />
-      )}
-      {showChatbot && userName && ( 
-        <Chatbot 
-          isOpen={showChatbot} 
-          onClose={handleToggleChatbot}
-          unlockedCharacterIds={unlockedCharacterIds}
-          isPremium={isPremium}
-          dailyChatCount={dailyChatCount}
-          onIncrementChatCount={handleIncrementChatCount}
-          onUpgradePrompt={handleShowPremium}
-        />
-      )}
-      <PremiumWelcomeModal 
-        isOpen={showPremiumWelcomeModal}
-        onClose={handleClosePremiumWelcomeModal}
+    <div className={`app-container ${theme} font-sans`}>
+      <div className={`screen-transition-container ${transitionClass}`}>
+        {renderCurrentScreen()}
+      </div>
+      
+      {/* Modals and Overlays */}
+      <ArtifactInfoModal 
+        isOpen={showSharedArtifactInfoModal}
+        item={rewardItemForModal as (Artifact | MemoryFragment)}
+        onClose={() => setShowSharedArtifactInfoModal(false)}
       />
-      {activeTutorial && tutorialForOverlay && (
+      <ItemDetailModal 
+        item={itemForDetailModal as (Artifact | HeroCard | Decoration)}
+        isOpen={itemForDetailModal !== null}
+        onClose={() => setItemForDetailModal(null)}
+      />
+      <Chatbot 
+        isOpen={showChatbot}
+        onClose={() => setShowChatbot(false)}
+        unlockedCharacterIds={unlockedCharacterIds}
+        isPremium={isPremium}
+        dailyChatCount={dailyChatCount}
+        onIncrementChatCount={handleIncrementChatCount}
+        onUpgradePrompt={() => navigateTo(Screen.PREMIUM_SCREEN)}
+      />
+      <PremiumWelcomeModal
+        isOpen={showPremiumWelcomeModal}
+        onClose={() => setShowPremiumWelcomeModal(false)}
+      />
+      {activeTutorial && (
         <TutorialOverlay
-          tutorialData={tutorialForOverlay}
+          tutorialData={TUTORIAL_DATA[activeTutorial.id]}
           stepIndex={activeTutorial.stepIndex}
           onNext={handleNextTutorialStep}
           onSkip={handleSkipTutorial}
         />
       )}
+      <InstructionModal
+          isOpen={instructionModalState.isOpen}
+          gameType={instructionModalState.gameType || ''}
+          onClose={handleCloseInstructionModal}
+      />
        <AchievementToast
-        notification={achievementNotification}
-        onDismiss={() => setAchievementNotification(null)}
+          notification={achievementNotification}
+          onDismiss={() => setAchievementNotification(null)}
+       />
+       {pageUnlockNotification && (
+          <div id="page-unlock-notification" className="animate-fadeInOut">{pageUnlockNotification}</div>
+       )}
+       <DialogueModal
+        isOpen={isDialogueOpen}
+        script={activeScriptKey ? HOI_6_SCRIPT[activeScriptKey] : []}
+        speakers={SPEAKER_DATA}
+        playerAvatar={avatarCustomization}
+        gender={gender}
+        onClose={handleDialogueClose}
+        onEvent={handleDialogueEvent}
+        onOptionClick={handleDialogueOptionClick}
       />
     </div>
   );
 };
-
-export default App;

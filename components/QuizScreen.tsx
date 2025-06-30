@@ -47,15 +47,15 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ missionData, onReturnToMuseum, 
     setSelectedAnswer(answer);
 
     if (answer === currentQuestion.correctAnswer) {
-      playSound('sfx-success');
+      playSound('sfx_success');
       setScore(prev => prev + 1);
     } else {
-      // playSound('sfx-error'); // Optional: Add an error sound
+      playSound('sfx_fail');
     }
   };
 
   const handleNextQuestion = () => {
-    playSound('sfx-click');
+    playSound('sfx_click');
     setIsAnswered(false);
     setSelectedAnswer(null);
     if (currentQuestionIndex < totalQuestions - 1) {

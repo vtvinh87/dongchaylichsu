@@ -7,7 +7,7 @@
 
 
 
-import { MissionInfo, Hoi, Artifact, PuzzlePieceItem, HeroCard, PuzzleMissionData, NarrativeMissionData, TimelineEventItem, TimelineMissionData, MissionData, NarrativeNode, ARMissionData, AiCharacter, Decoration, HiddenObjectMissionData, HiddenObjectItem, QuizMissionData, ConstructionMissionData, Tutorial, CustomizationItem, DiplomacyMissionData, DiplomacyRound, MemoryFragment, Reward, TradingMissionData, TradingGood, TradingEvent, RhythmMissionData, RhythmNote, ColoringMissionData, SandboxBackground, Achievement, SavedGameState, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, MapCellType, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, BuildingPlacement, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData, NotebookPage } from './types';
+import { MissionInfo, Hoi, Artifact, PuzzlePieceItem, HeroCard, PuzzleMissionData, NarrativeMissionData, TimelineEventItem, TimelineMissionData, MissionData, NarrativeNode, ARMissionData, AiCharacter, Decoration, HiddenObjectMissionData, HiddenObjectItem, QuizMissionData, ConstructionMissionData, Tutorial, CustomizationItem, DiplomacyMissionData, DiplomacyRound, MemoryFragment, Reward, TradingMissionData, TradingGood, TradingEvent, RhythmMissionData, RhythmNote, ColoringMissionData, SandboxBackground, Achievement, SavedGameState, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, MapCellType, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, BuildingPlacement, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData, NotebookPage, DialogueEntry, SpeakerKey, Speaker, SideQuest, NotebookUnlockEvent } from './types';
 import * as ImageUrls from './imageUrls';
 
 export const APP_NAME = "Dòng Chảy Lịch Sử";
@@ -208,6 +208,15 @@ export const TRUONG_SON_COMPASS_ARTIFACT: Artifact = {
     detailedDescription: "Chiếc la bàn đơn sơ này là người bạn đồng hành không thể thiếu của các chiến sĩ trên đường Trường Sơn. Giữa núi rừng trùng điệp, nó đã giúp họ xác định phương hướng, vượt qua bom đạn và những điều kiện khắc nghiệt nhất để vận chuyển quân lương, vũ khí chi viện cho chiến trường miền Nam, góp phần to lớn vào cuộc kháng chiến giải phóng dân tộc."
 };
 
+export const DIEN_DAI_TRINH_SAT_ARTIFACT_ID = 'dien_dai_trinh_sat_artifact';
+export const DIEN_DAI_TRINH_SAT_ARTIFACT: Artifact = {
+    id: DIEN_DAI_TRINH_SAT_ARTIFACT_ID,
+    name: "Điện đài trinh sát",
+    imageUrl: ImageUrls.DIEN_DAI_TRINH_SAT_ARTIFACT_URL,
+    description: "Một chiếc điện đài cũ, công cụ liên lạc quan trọng của các chiến sĩ trinh sát.",
+    detailedDescription: "Trong điều kiện chiến đấu gian khổ, thông tin liên lạc là mạch máu của trận đánh. Chiếc điện đài này đã giúp các chiến sĩ trinh sát truyền đi những thông tin tình báo quý giá, góp phần vào thắng lợi chung. Nó là biểu tượng của sự mưu trí, dũng cảm và thầm lặng của người lính thông tin."
+};
+
 
 export const ALL_ARTIFACTS_MAP: Record<string, Artifact> = {
   [BRONZE_DRUM_ARTIFACT_ID]: BRONZE_DRUM_ARTIFACT,
@@ -230,6 +239,7 @@ export const ALL_ARTIFACTS_MAP: Record<string, Artifact> = {
   [GIA_DINH_BAO_ARTIFACT_ID]: GIA_DINH_BAO_ARTIFACT,
   [VALI_DONG_DU_ARTIFACT_ID]: VALI_DONG_DU_ARTIFACT,
   [TRUONG_SON_COMPASS_ARTIFACT_ID]: TRUONG_SON_COMPASS_ARTIFACT,
+  [DIEN_DAI_TRINH_SAT_ARTIFACT_ID]: DIEN_DAI_TRINH_SAT_ARTIFACT,
 };
 
 // --- Memory Fragments ---
@@ -367,20 +377,28 @@ export const ALL_SANDBOX_BACKGROUNDS_MAP: Record<string, SandboxBackground> = {
 
 
 // --- Puzzle Mission ---
-export const PUZZLE_PIECES_COUNT = 9;
 export const BRONZE_DRUM_PUZZLE_IMAGE_URL = ImageUrls.TRONG_DONG_URL;
-
-export const INITIAL_PUZZLE_PIECES: PuzzlePieceItem[] = Array.from({ length: PUZZLE_PIECES_COUNT }, (_, i) => ({
-  id: i,
-  imageUrl: BRONZE_DRUM_PUZZLE_IMAGE_URL
-}));
+export const BRONZE_DRUM_PIECES: PuzzlePieceItem[] = [
+    { id: 0, imageUrl: BRONZE_DRUM_PUZZLE_IMAGE_URL, funFact: 'Họa tiết người nhảy múa thể hiện các lễ hội và sinh hoạt cộng đồng sôi nổi.' },
+    { id: 1, imageUrl: BRONZE_DRUM_PUZZLE_IMAGE_URL, funFact: 'Ngôi sao ở trung tâm trống đồng tượng trưng cho Mặt Trời, vị thần tối cao trong tín ngưỡng của người Việt cổ.' },
+    { id: 2, imageUrl: BRONZE_DRUM_PUZZLE_IMAGE_URL, funFact: 'Hình ảnh nhà sàn cho thấy kiến trúc nhà ở độc đáo, thích nghi với môi trường sông nước.' },
+    { id: 3, imageUrl: BRONZE_DRUM_PUZZLE_IMAGE_URL, funFact: 'Đoàn thuyền trên trống thể hiện kỹ năng đi biển và tầm quan trọng của giao thương đường thủy.' },
+    { id: 4, imageUrl: BRONZE_DRUM_PUZZLE_IMAGE_URL, funFact: 'Các vòng tròn đồng tâm tượng trưng cho vũ trụ quan, nhận thức về thế giới của người xưa.' },
+    { id: 5, imageUrl: BRONZE_DRUM_PUZZLE_IMAGE_URL, funFact: 'Họa tiết chim Lạc đang bay là biểu tượng của dân tộc, thể hiện khát vọng tự do.' },
+    { id: 6, imageUrl: BRONZE_DRUM_PUZZLE_IMAGE_URL, funFact: 'Hình ảnh chiến binh cầm vũ khí phản ánh tinh thần thượng võ và sẵn sàng bảo vệ lãnh thổ.' },
+    { id: 7, imageUrl: BRONZE_DRUM_PUZZLE_IMAGE_URL, funFact: 'Hươu, nai là biểu tượng của sự trù phú, giàu có của thiên nhiên và đời sống săn bắt.' },
+    { id: 8, imageUrl: BRONZE_DRUM_PUZZLE_IMAGE_URL, funFact: 'Dàn nhạc công đang chơi các nhạc cụ cho thấy âm nhạc giữ một vai trò quan trọng trong các nghi lễ.' },
+];
 
 export const MISSION_BRONZE_DRUM_ID = "mission_bronze_drum_puzzle";
 const MISSION_BRONZE_DRUM_PUZZLE: PuzzleMissionData = {
   type: 'puzzle',
   id: MISSION_BRONZE_DRUM_ID,
-  title: "Nhiệm vụ: Phục dựng Trống đồng Đông Sơn",
+  title: "Thắp sáng Hoa văn Trống đồng",
   reward: { type: 'artifact', id: BRONZE_DRUM_ARTIFACT_ID },
+  puzzleImage: BRONZE_DRUM_PUZZLE_IMAGE_URL,
+  pieces: BRONZE_DRUM_PIECES,
+  timeLimit: 90,
 };
 
 // --- Rally Call Mission ---
@@ -428,13 +446,16 @@ const MISSION_HUNG_VUONG_TIMELINE: TimelineMissionData = {
   type: 'timeline',
   id: MISSION_HUNG_VUONG_TIMELINE_ID,
   title: "Dòng Thời Gian Hùng Vương",
-  instructionText: "Kéo và thả các sự kiện vào đúng vị trí trên dòng thời gian để tái hiện lại lịch sử.",
+  instructionText: "Nhấp để xem chi tiết, sau đó kéo và thả các sự kiện vào đúng vị trí trên dòng thời gian.",
   events: [
-    { id: 'event1', text: 'Nhà nước Văn Lang ra đời', correctOrder: 1 },
-    { id: 'event2', text: 'Sự tích Bánh Chưng, Bánh Dày', correctOrder: 2 },
-    { id: 'event3', text: 'Thục Phán An Dương Vương nối ngôi', correctOrder: 3 },
+    { id: 'hve_1', text: 'Lạc Long Quân và Âu Cơ', correctOrder: 1, imageUrl: 'https://i.ibb.co/PZX5JJHC/E-lac-long-quan-au-co.png', details: 'Truyền thuyết kể rằng, Lạc Long Quân thuộc nòi rồng, lấy Âu Cơ thuộc dòng dõi tiên. Âu Cơ sinh ra một bọc trăm trứng, nở ra một trăm người con, là tổ tiên của người Việt ta. Sau đó, 50 người con theo cha xuống biển, 50 người con theo mẹ lên non, lập nên đất nước.' },
+    { id: 'hve_2', text: 'Vua Hùng dạy dân cấy lúa', correctOrder: 2, imageUrl: 'https://i.ibb.co/0pbbKvTW/E-vua-Hung-day-dan-cay-lua.png', details: 'Để giúp người dân có cuộc sống no đủ, các Vua Hùng đã dạy dân cách cấy lúa nước, biến những vùng đầm lầy thành những cánh đồng trù phú. Đây là nền tảng của nền văn minh lúa nước của chúng ta.' },
+    { id: 'hve_3', text: 'Sự tích Bánh Chưng, Bánh Dày', correctOrder: 3, imageUrl: 'https://i.ibb.co/QFQZPWH9/E-banh-chung-banh-day.png', details: 'Vào đời Hùng Vương thứ 6, hoàng tử Lang Liêu đã sáng tạo ra bánh chưng (tượng trưng cho Đất) và bánh dày (tượng trưng cho Trời) để dâng lên vua cha, và sau đó được truyền ngôi. Sự tích thể hiện sự trân trọng trời đất và thành quả lao động.' },
+    { id: 'hve_4', text: 'Thánh Gióng', correctOrder: 4, imageUrl: 'https://i.ibb.co/xKXB21q8/E-thanh-giong.png', details: 'Khi giặc Ân xâm lược, một cậu bé làng Gióng bỗng vươn vai thành tráng sĩ khổng lồ, cưỡi ngựa sắt, dùng roi sắt và cả những bụi tre để đánh tan quân giặc. Thánh Gióng là biểu tượng cho sức mạnh và lòng yêu nước của dân tộc.' },
+    { id: 'hve_5', text: 'An Dương Vương và Nỏ thần', correctOrder: 5, imageUrl: 'https://i.ibb.co/ymSvwzMP/E-an-duong-vuong-va-no-than.png', details: 'Sau thời Hùng Vương, vua An Dương Vương xây thành Cổ Loa và được thần Kim Quy giúp chế tạo nỏ thần có thể bắn ra hàng ngàn mũi tên. Đây là biểu tượng cho sự phát triển về quân sự và ý thức bảo vệ đất nước.' }
   ],
   reward: { type: 'artifact', id: NHA_SAN_ARTIFACT_ID },
+  timeLimit: 120, // Time limit in seconds
 };
 
 // --- AR Mission ---
@@ -461,6 +482,20 @@ const MISSION_HIDDEN_OBJECT_LY_MARKET: HiddenObjectMissionData = {
         { id: 'pottery', name: 'Bình gốm', iconUrl: ImageUrls.TRADING_CERAMICS_ICON_URL, coords: { x: 80, y: 55, width: 10, height: 15 } },
     ],
     reward: { type: 'artifact', id: LY_DYNASTY_COIN_ARTIFACT_ID },
+};
+
+export const MISSION_HIDDEN_OBJECT_HOI_LANG_ID = 'mission_hidden_object_hoi_lang';
+const MISSION_HIDDEN_OBJECT_HOI_LANG: HiddenObjectMissionData = {
+    type: 'hiddenObject',
+    id: MISSION_HIDDEN_OBJECT_HOI_LANG_ID,
+    title: 'Hội Làng Ngày Mùa',
+    backgroundImageUrl: 'https://i.ibb.co/Pvk6TK7Z/B-tranh-le-hoi-chi-tiet.png',
+    objectsToFind: [
+      { id: 'da-gao', name: 'Người giã gạo', iconUrl: 'https://i.ibb.co/8n8f2T4M/icon-nguoi-da-gao.png', coords: { x: 10, y: 60, width: 15, height: 20 } },
+      { id: 'thuyen-doc-moc', name: 'Thuyền độc mộc', iconUrl: 'https://i.ibb.co/vvj6qTX2/icon-thuyen-doc-moc.png', coords: { x: 70, y: 75, width: 20, height: 10 } },
+      { id: 'nha-san', name: 'Nhà sàn', iconUrl: 'https://i.ibb.co/84SstZJ8/icon-nha-san.png', coords: { x: 5, y: 20, width: 25, height: 30 } }
+    ],
+    reward: { type: 'artifact', id: GIAO_DONG_DONG_SON_ARTIFACT_ID },
 };
 
 // --- Quiz Mission ---
@@ -502,9 +537,9 @@ const MISSION_CRAFTING_FRAGMENTS_HBT: TimelineMissionData = {
     title: 'Dấu Vết Khởi Nghĩa',
     instructionText: 'Sắp xếp các dấu mốc của cuộc khởi nghĩa để tìm lại các mảnh ký ức.',
     events: [
-        { id: 'hbt_event1', text: 'Trưng Trắc dấy binh khởi nghĩa trả nợ nước, thù nhà.', correctOrder: 1 },
-        { id: 'hbt_event2', text: 'Nghĩa quân chiếm thành Luy Lâu, lật đổ ách đô hộ.', correctOrder: 2 },
-        { id: 'hbt_event3', text: 'Trưng Trắc lên ngôi, xưng là Trưng Nữ Vương.', correctOrder: 3 },
+        { id: 'hbt_event1', text: 'Trưng Trắc dấy binh khởi nghĩa trả nợ nước, thù nhà.', correctOrder: 1, imageUrl: '', details: '' },
+        { id: 'hbt_event2', text: 'Nghĩa quân chiếm thành Luy Lâu, lật đổ ách đô hộ.', correctOrder: 2, imageUrl: '', details: '' },
+        { id: 'hbt_event3', text: 'Trưng Trắc lên ngôi, xưng là Trưng Nữ Vương.', correctOrder: 3, imageUrl: '', details: '' },
     ],
     // This mission grants a fragment instead of a full artifact
     reward: { type: 'fragment', id: SEAL_FRAGMENT_1_ID },
@@ -826,21 +861,21 @@ const MISSION_TRUONG_SON_PATH: StrategicPathMissionData = {
     start: { x: 0, y: 14 }, // bottom-left
     end: { x: 9, y: 0 },   // top-right
     initialSupplies: 100,
-    mapLayout: [ // 0:j, 1:m, 2:r, 3:c, 4:b, 5:w, 6:s, 7:ds, 8:op, 9:tb, 10:rs, 11:sc
+    mapLayout: [ // 0-16: herb, 17: hidden_sensor, 18: scout
         [1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-        [1, 5, 8, 8, 8, 1, 0, 6, 0, 1], // open path
-        [1, 0, 1, 1, 3, 1, 0, 1, 0, 1],
-        [1, 0, 1, 2, 2, 2, 8, 1, 5, 1], // open path
-        [0, 0, 1, 3, 0, 8, 8, 1, 0, 0], // open path
-        [0, 1, 1, 0, 1, 1, 1, 1, 1, 0],
-        [5, 1, 0, 0, 0, 3, 0, 2, 2, 0], 
-        [0, 1, 0, 1, 6, 1, 0, 1, 4, 0], 
-        [0, 8, 8, 1, 0, 5, 0, 1, 0, 1], // open path
+        [1, 5, 8, 8, 8, 1, 17, 1, 0, 1],
+        [1, 16, 1, 1, 3, 1, 0, 1, 0, 1],
+        [1, 0, 1, 2, 2, 2, 18, 1, 5, 1],
+        [0, 0, 1, 3, 0, 8, 8, 1, 0, 0],
+        [0, 1, 1, 0, 1, 1, 1, 1, 16, 0],
+        [5, 1, 0, 0, 0, 3, 0, 2, 2, 0],
+        [0, 1, 0, 1, 6, 1, 0, 1, 4, 0],
+        [0, 8, 8, 1, 0, 5, 0, 1, 0, 1],
         [1, 1, 0, 1, 3, 1, 1, 1, 0, 1],
-        [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
-        [1, 6, 1, 1, 8, 1, 0, 1, 2, 2], // open path
-        [1, 0, 1, 3, 8, 0, 0, 1, 0, 1], // open path
-        [1, 0, 1, 5, 1, 1, 1, 1, 0, 1], 
+        [1, 0, 17, 0, 0, 1, 0, 0, 0, 1],
+        [1, 6, 1, 1, 15, 1, 0, 1, 2, 2],
+        [1, 16, 1, 3, 8, 0, 0, 1, 0, 1],
+        [1, 0, 1, 5, 1, 1, 1, 1, 0, 1],
         [0, 0, 0, 0, 0, 0, 0, 3, 0, 1],
     ],
 };
@@ -887,7 +922,7 @@ const MISSION_SEBANGHIENG_PATH: StrategicPathMissionData = {
         { x: 0, y: 7 }, { x: 1, y: 7 }, { x: 2, y: 7 }, { x: 3, y: 7 }, { x: 4, y: 7 },
         { x: 5, y: 7 }, { x: 6, y: 7 }, { x: 7, y: 7 }, { x: 8, y: 7 }, { x: 9, y: 7 }
     ],
-    mapLayout: [ // 0:j, 1:m, 2:r, 3:c, 4:b, 5:w, 6:s, 7:ds, 8:op, 9:tb, 10:rs, 11:sc, 12:sr, 13:lv, 14:pb
+    mapLayout: [ // 0-14, 15: fc
         [1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
         [1, 0, 0, 0, 5, 13, 0, 0, 0, 1], // Lao Village
         [0, 0, 1, 0, 0, 0, 1, 1, 0, 0],
@@ -919,6 +954,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
   [MISSION_WHAT_IF_QUANG_TRUNG_ID]: MISSION_WHAT_IF_QUANG_TRUNG,
   [MISSION_CRAFTING_FRAGMENTS_HBT_ID]: MISSION_CRAFTING_FRAGMENTS_HBT,
   [MISSION_HIDDEN_OBJECT_LY_MARKET_ID]: MISSION_HIDDEN_OBJECT_LY_MARKET,
+  [MISSION_HIDDEN_OBJECT_HOI_LANG_ID]: MISSION_HIDDEN_OBJECT_HOI_LANG,
   [MISSION_QUIZ_GENERAL_KNOWLEDGE_ID]: MISSION_QUIZ_GENERAL_KNOWLEDGE,
   // [MISSION_CONSTRUCTION_CO_LOA_ID]: MISSION_CONSTRUCTION_CO_LOA, // Replaced by Quest Chain
   [MISSION_DIPLOMACY_LY_THAI_TO_ID]: MISSION_DIPLOMACY_LY_THAI_TO,
@@ -958,13 +994,14 @@ export const ALL_QUEST_CHAINS: Record<string, QuestChain> = {
 // --- Hoi Data (Chapters) ---
 
 // Hồi 1
-const MISSION_INFO_BRONZE_DRUM: MissionInfo = { id: 'card_1_1', title: 'Phục dựng Trống đồng', imageUrl: ImageUrls.SAGA_KHAI_QUOC_URL, description: "Ghép các mảnh vỡ để phục hồi lại Trống đồng Đông Sơn.", missionId: MISSION_BRONZE_DRUM_ID };
+const MISSION_INFO_BRONZE_DRUM: MissionInfo = { id: 'card_1_1', title: 'Thắp sáng Hoa văn Trống đồng', imageUrl: ImageUrls.SAGA_KHAI_QUOC_URL, description: "Ghép các mảnh hoa văn để phục hồi lại Trống đồng Đông Sơn và khám phá ý nghĩa của chúng.", missionId: MISSION_BRONZE_DRUM_ID };
 const MISSION_INFO_HUNG_VUONG: MissionInfo = { id: 'card_1_2', title: 'Dòng Thời Gian Hùng Vương', imageUrl: ImageUrls.SAGA_HUNG_VUONG_URL, description: "Sắp xếp các sự kiện đúng thứ tự trong thời đại các vua Hùng.", missionId: MISSION_HUNG_VUONG_TIMELINE_ID };
+const MISSION_INFO_HOI_LANG: MissionInfo = { id: 'card_1_3', title: 'Hội Làng Ngày Mùa', imageUrl: 'https://i.ibb.co/Kp283Kjb/Q-hoi-lang-ngay-mua.png', description: "Tìm các vật phẩm và hoạt động trong một bức tranh lễ hội chi tiết.", missionId: MISSION_HIDDEN_OBJECT_HOI_LANG_ID, dependsOnMissionId: MISSION_HUNG_VUONG_TIMELINE_ID };
 const HOI_1_DUNG_NUOC: Hoi = {
   id: 'hoi_1_dung_nuoc',
   title: "Hồi 1: Buổi đầu Dựng nước",
   description: "Khám phá thời kỳ sơ khai của lịch sử Việt Nam qua các câu chuyện và di vật của nền văn hóa Đông Sơn và thời đại Hùng Vương.",
-  missions: [MISSION_INFO_BRONZE_DRUM, MISSION_INFO_HUNG_VUONG],
+  missions: [MISSION_INFO_BRONZE_DRUM, MISSION_INFO_HUNG_VUONG, MISSION_INFO_HOI_LANG],
 };
 
 // Hồi 2
@@ -1129,8 +1166,8 @@ export const TUTORIAL_DATA: Record<string, Tutorial> = {
 // --- Instruction Data ---
 export const INSTRUCTION_DATA: Record<string, { title: string, text: string }> = {
     'puzzle': {
-        title: 'Hướng dẫn: Ghép hình',
-        text: 'Kéo các mảnh ghép từ dưới vào đúng vị trí trên khung để phục dựng lại hình ảnh cổ vật. Khi tất cả các mảnh được đặt đúng, bạn sẽ hoàn thành nhiệm vụ.'
+        title: 'Hướng dẫn: Thắp sáng Hoa văn',
+        text: 'Kéo các mảnh hoa văn từ dưới vào đúng vị trí trên mặt trống. Mỗi khi đặt đúng, một bí mật về hoa văn sẽ được bật mí. Hoàn thành toàn bộ trong thời gian thử thách để nhận thưởng thêm!'
     },
     'narrative': {
         title: 'Hướng dẫn: Nhiệm vụ Tường thuật',
@@ -1251,4 +1288,120 @@ export const NOTEBOOK_PAGES: NotebookPage[] = [
   { type: 'text', content: "Báo động! Máy bay địch! May mắn thoát nạn trong gang tấc. Tim vẫn còn đập thình thịch. Con đường này không chỉ đo bằng bước chân." },
   { type: 'text', content: "Đã đi được nửa chặng đường. Mái tóc đã dài, da đã sạm đi, nhưng ánh mắt thì sáng hơn. Miền Nam ơi, ta tới đây!" },
   { type: 'text', content: "Bài hát chép vội:\n\n'Đêm Trường Sơn, chúng cháu nhìn trăng, nhìn cây...\nLòng thầm gọi tên Bác bao mến thương...'" },
+  { type: 'text', content: "Trường Sơn, ngày... \nHôm nay gặp một cô y tá. Cô ấy dạy mình về vài loại cây thuốc quý. Cây chó đẻ răng cưa chữa bệnh gan, cây huyết dụ cầm máu. Những kiến thức này thật quý giá nơi chiến trường." },
 ];
+
+// --- Dialogue Data ---
+export const SPEAKER_DATA: Record<SpeakerKey, Speaker> = {
+    'chi_huy': {
+        name: 'Chỉ huy',
+        avatarUrl: ImageUrls.CHI_HUY_AVATAR_URL,
+    },
+    'nhan_vat_chinh': {
+        name: 'Bạn', // The player
+        avatarUrl: ImageUrls.AVATAR_PLACEHOLDER_URL, // This will be dynamically replaced by player's avatar
+    },
+    'cong_binh': {
+        name: 'Đồng chí Công binh',
+        avatarUrl: ImageUrls.CONG_BINH_AVATAR_URL,
+    },
+    'giao_lien': {
+        name: 'Lính Giao liên',
+        avatarUrl: ImageUrls.GIAO_LIEN_AVATAR_URL,
+    },
+    'co_y_ta': {
+        name: 'Cô y tá Tâm',
+        avatarUrl: ImageUrls.CO_Y_TA_AVATAR_URL,
+    },
+    'anh_trinh_sat': {
+        name: 'Anh trinh sát Dũng',
+        avatarUrl: ImageUrls.ANH_TRINH_SAT_AVATAR_URL,
+    },
+    'system': {
+        name: 'Hệ thống',
+        avatarUrl: ImageUrls.LOGO_SMALL_URL,
+    }
+};
+
+export const HOI_6_SCRIPT: Record<string, DialogueEntry[]> = {
+    'before_mission_dong_loc_path': [
+        { type: 'dialogue', speaker: 'chi_huy', text: 'Nhiệm vụ của chúng ta tại Ngã ba Đồng Lộc rất nặng nề, phải đảm bảo thông đường bằng mọi giá!' },
+        { type: 'dialogue', speaker: 'nhan_vat_chinh', text: 'Rõ! Tôi sẽ cố gắng hết sức!' },
+    ],
+    'after_mission_dong_loc_path': [
+        { type: 'notebook_unlock', pageIndex: 2, message: 'Bạn đã ghi lại cảm xúc sau trận bom vào sổ tay.' },
+        { type: 'dialogue', speaker: 'cong_binh', text: 'Tốt lắm! Nhưng phía trước là Đèo Phu La Nhích còn hiểm trở hơn nhiều...' },
+    ],
+    'after_mission_truong_son_path': [
+      { type: 'notebook_unlock', pageIndex: 3, message: 'Bạn đã phác thảo lại cây cầu tạm vào sổ tay.' },
+      { type: 'dialogue', speaker: 'chi_huy', text: 'Làm tốt lắm, đường Trường Sơn đã được mở. Nhưng kẻ địch sẽ không để yên, hãy chuẩn bị cho những thử thách tiếp theo.' }
+    ],
+    'start_thu_gui_hau_phuong': [
+        { type: 'dialogue', speaker: 'giao_lien', text: 'Chào đồng chí, tôi thấy đồng chí là người đáng tin cậy. Tôi có một lá thư quan trọng cần gửi về hậu phương, nhưng đường đi phía trước quá nguy hiểm.' },
+        { type: 'dialogue', speaker: 'giao_lien', text: 'Đồng chí có thể giúp tôi chuyển lá thư này qua các trạm giao liên được không? Tôi sẽ rất biết ơn.' },
+        { type: 'dialogue', speaker: 'nhan_vat_chinh', text: '(Một nhiệm vụ không bắt buộc, nhưng có thể giúp đỡ đồng đội và tìm hiểu thêm về cuộc sống nơi chiến trường.)', options: [{text: 'Chấp nhận nhiệm vụ', action: 'accept_quest', questId: 'thu_gui_hau_phuong'}] },
+    ],
+    'end_thu_gui_hau_phuong': [
+        { type: 'dialogue', speaker: 'nhan_vat_chinh', text: 'Lá thư đã được gửi đi an toàn. Mong rằng nó sẽ mang lại hơi ấm cho một gia đình nào đó.' },
+        { type: 'dialogue', speaker: 'system', text: 'Hoàn thành nhiệm vụ "Thư gửi hậu phương"!' },
+    ],
+    'start_gianh_giat_su_song': [
+        { type: 'dialogue', speaker: 'co_y_ta', text: 'Chào đồng chí, tôi là y tá Tâm. Tình hình thương binh rất nguy kịch, chúng tôi lại đang thiếu thuốc men.' },
+        { type: 'dialogue', speaker: 'co_y_ta', text: 'Tôi nghe nói quanh đây có vài loại thảo dược quý hiếm. Đồng chí có thể giúp tôi đi tìm chúng được không? Mỗi một giây phút đều quý giá!' },
+        { type: 'dialogue', speaker: 'nhan_vat_chinh', text: '(Một nhiệm vụ cấp bách để cứu giúp đồng đội. Mình phải nhận lời!)', options: [{text: 'Chấp nhận nhiệm vụ', action: 'accept_quest', questId: 'gianh_giat_su_song'}] },
+    ],
+    'end_gianh_giat_su_song': [
+        { type: 'dialogue', speaker: 'co_y_ta', text: 'Thật tuyệt vời! Đồng chí đã tìm đủ thảo dược rồi. Cảm ơn đồng chí rất nhiều, nhờ có đồng chí mà chúng tôi có thể cứu được thêm nhiều thương binh.' },
+        { type: 'dialogue', speaker: 'system', text: 'Hoàn thành nhiệm vụ "Giành giật sự sống"!' },
+    ],
+    'start_mat_than': [
+        { type: 'dialogue', speaker: 'anh_trinh_sat', text: 'Chào đồng chí, tôi là lính trinh sát Dũng. Bọn địch gần đây rải một loại cảm biến điện tử mới, chúng gọi là "cây nhiệt đới". Rất khó phát hiện và cực kỳ nguy hiểm.' },
+        { type: 'dialogue', speaker: 'anh_trinh_sat', text: 'Tôi cần một người dũng cảm giúp tôi tìm và vô hiệu hóa chúng. Đồng chí có sẵn lòng không?' },
+        { type: 'dialogue', speaker: 'nhan_vat_chinh', text: '(Một nhiệm vụ nguy hiểm nhưng quan trọng để bảo vệ đồng đội.)', options: [{text: 'Tôi sẽ giúp!', action: 'accept_quest', questId: 'mat_than'}] },
+    ],
+    'end_mat_than': [
+        { type: 'dialogue', speaker: 'anh_trinh_sat', text: 'Tuyệt vời! Đồng chí đã vô hiệu hóa hết cảm biến rồi. Cảm ơn đồng chí, nhờ vậy mà đơn vị của chúng ta sẽ an toàn hơn rất nhiều.' },
+        { type: 'dialogue', speaker: 'system', text: 'Hoàn thành nhiệm vụ "Mắt thần"!' },
+    ]
+};
+
+// --- Side Quest Data ---
+export const SIDE_QUESTS: Record<string, SideQuest> = {
+    'thu_gui_hau_phuong': {
+        id: 'thu_gui_hau_phuong',
+        title: 'Thư gửi hậu phương',
+        giver: 'giao_lien',
+        startDialogueKey: 'start_thu_gui_hau_phuong',
+        endDialogueKey: 'end_thu_gui_hau_phuong',
+        stages: [
+            { description: 'Đưa thư đến trạm giao liên A.', targetMap: MISSION_TRUONG_SON_PATH_ID, target: { x: 2, y: 8 } },
+            { description: 'Đưa thư đến trạm giao liên B.', targetMap: MISSION_TRUONG_SON_PATH_ID, target: { x: 6, y: 3 } },
+        ],
+        reward: { type: 'notebook_unlock', pageIndex: 5, message: 'Bạn đã ghi lại cảm xúc sau khi hoàn thành nhiệm vụ đặc biệt này.'}
+    },
+    'gianh_giat_su_song': {
+        id: 'gianh_giat_su_song',
+        title: 'Giành giật sự sống',
+        giver: 'co_y_ta',
+        startDialogueKey: 'start_gianh_giat_su_song',
+        endDialogueKey: 'end_gianh_giat_su_song',
+        stages: [
+            { description: 'Tìm cây thảo dược ở phía Tây Bắc.', targetMap: MISSION_TRUONG_SON_PATH_ID, target: { x: 1, y: 2 } },
+            { description: 'Tìm cây thảo dược ở phía Đông.', targetMap: MISSION_TRUONG_SON_PATH_ID, target: { x: 8, y: 5 } },
+            { description: 'Tìm cây thảo dược ở gần khu vực sạt lở.', targetMap: MISSION_TRUONG_SON_PATH_ID, target: { x: 1, y: 12 } },
+        ],
+        reward: { type: 'notebook_unlock', pageIndex: 8, message: 'Kiến thức về các loại cây thuốc đã được ghi lại trong sổ tay.'}
+    },
+    'mat_than': {
+        id: 'mat_than',
+        title: 'Mắt thần',
+        giver: 'anh_trinh_sat',
+        startDialogueKey: 'start_mat_than',
+        endDialogueKey: 'end_mat_than',
+        stages: [
+            { description: 'Vô hiệu hóa cảm biến ở phía Đông Bắc.', targetMap: MISSION_TRUONG_SON_PATH_ID, target: { x: 6, y: 1 } },
+            { description: 'Vô hiệu hóa cảm biến ở phía Tây Nam.', targetMap: MISSION_TRUONG_SON_PATH_ID, target: { x: 2, y: 10 } },
+        ],
+        reward: { type: 'artifact', id: DIEN_DAI_TRINH_SAT_ARTIFACT_ID }
+    }
+};

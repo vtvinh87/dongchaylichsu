@@ -20,7 +20,7 @@ const PremiumWelcomeModal: React.FC<PremiumWelcomeModalProps> = ({ isOpen, onClo
   }
 
   const handleCloseAction = () => {
-    playSound('sfx-click');
+    playSound('sfx_click');
     onClose();
   };
 

@@ -41,8 +41,13 @@ const DiplomacyScreen: React.FC<DiplomacyScreenProps> = ({
 
   const handleSelectChoice = (points: number) => {
     if (isChoiceMade) return;
-
-    playSound('sfx-click');
+    
+    if(points > 0) {
+        playSound('sfx_success');
+    } else {
+        playSound('sfx_fail');
+    }
+    
     setIsChoiceMade(true);
     setLastChoicePoints(points);
     
@@ -54,7 +59,7 @@ const DiplomacyScreen: React.FC<DiplomacyScreenProps> = ({
             setOutcome('loss');
             setIsMissionOver(true);
         } else if (newGoodwill >= missionData.targetGoodwill) {
-            playSound('sfx-unlock');
+            playSound('sfx_unlock');
             setOutcome('win');
             setIsMissionOver(true);
             setTimeout(() => onComplete(missionData.reward), 1500);

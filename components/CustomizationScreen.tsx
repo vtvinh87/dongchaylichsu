@@ -8,6 +8,7 @@ interface CustomizationScreenProps {
   currentAvatar: AvatarCustomization;
   unlockedItemIds: string[];
   onAvatarChange: (item: CustomizationItem) => void;
+  gender: 'male' | 'female';
 }
 
 const CustomizationScreen: React.FC<CustomizationScreenProps> = ({
@@ -15,6 +16,7 @@ const CustomizationScreen: React.FC<CustomizationScreenProps> = ({
   currentAvatar,
   unlockedItemIds,
   onAvatarChange,
+  gender,
 }) => {
   // Group items by type (outfits, hats, etc.)
   const outfits = Object.values(ALL_CUSTOMIZATION_ITEMS_MAP).filter(item => item.type === 'outfit');
@@ -75,7 +77,7 @@ const CustomizationScreen: React.FC<CustomizationScreenProps> = ({
       <div className="flex flex-col md:flex-row flex-grow gap-6">
         {/* Avatar Display Area */}
         <div id="avatar-display-container" className="md:w-1/3 flex-shrink-0 flex flex-col items-center justify-center bg-white/50 dark:bg-stone-700/50 p-4 rounded-xl shadow-inner">
-            <AvatarDisplay avatar={currentAvatar} className="w-64 h-80" />
+            <AvatarDisplay avatar={currentAvatar} gender={gender} className="w-64 h-80" />
             <p className="mt-4 text-lg font-semibold text-stone-700 dark:text-stone-200">Nhà Sử Học Nhí</p>
         </div>
 

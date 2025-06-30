@@ -1,15 +1,18 @@
 
 
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { PuzzleMissionData, Reward, PuzzlePieceItem } from '../types';
-import { INITIAL_PUZZLE_PIECES, PUZZLE_PIECES_COUNT, ALL_ARTIFACTS_MAP } from '../constants';
+import { ALL_ARTIFACTS_MAP } from '../constants';
 import PuzzlePiece from './PuzzlePiece';
 import PuzzleSlot from './PuzzleSlot';
+import { playSound } from '../utils/audio';
 
 interface MissionScreenProps {
   mission: PuzzleMissionData;
   onReturnToMuseum: () => void;
   onMissionComplete: (reward: Reward) => void;
+  onGrantBonusSupplies: (amount: number) => void;
 }
 
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -25,37 +28,59 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
   mission,
   onReturnToMuseum,
   onMissionComplete,
+  onGrantBonusSupplies,
 }) => {
   const [draggablePieces, setDraggablePieces] = useState<PuzzlePieceItem[]>([]);
-  const [solvedSlots, setSolvedSlots] = useState<(PuzzlePieceItem | null)[]>(Array(PUZZLE_PIECES_COUNT).fill(null));
+  const [solvedSlots, setSolvedSlots] = useState<(PuzzlePieceItem | null)[]>([]);
   const [isPuzzleComplete, setIsPuzzleComplete] = useState<boolean>(false);
   const [rewardImageUrl, setRewardImageUrl] = useState<string>('');
+  
+  const [timeLeft, setTimeLeft] = useState(mission.timeLimit || 90);
+  const [timeChallengeSuccess, setTimeChallengeSuccess] = useState(true);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [funFactModal, setFunFactModal] = useState<{ isOpen: boolean; text: string }>({ isOpen: false, text: '' });
+  const [justSolvedSlotIndex, setJustSolvedSlotIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    setDraggablePieces(shuffleArray(INITIAL_PUZZLE_PIECES));
-    setSolvedSlots(Array(PUZZLE_PIECES_COUNT).fill(null));
+    setDraggablePieces(shuffleArray(mission.pieces));
+    setSolvedSlots(Array(mission.pieces.length).fill(null));
     setIsPuzzleComplete(false);
+    setTimeLeft(mission.timeLimit || 90);
+    setTimeChallengeSuccess(true);
+    setIsTimerRunning(false); // Don't start timer until user clicks Start
     
-    // Determine the image URL for the final reward display
-    if(mission.reward.type === 'artifact'){
+    if (mission.reward.type === 'artifact'){
         const artifact = ALL_ARTIFACTS_MAP[mission.reward.id];
         if(artifact) setRewardImageUrl(artifact.imageUrl);
     }
-    // Could add logic for other reward types if a puzzle could grant them
-    
   }, [mission]); 
 
+  useEffect(() => {
+    if (isTimerRunning && timeLeft > 0) {
+        const timerId = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+        return () => clearTimeout(timerId);
+    } else if (timeLeft === 0 && isTimerRunning) {
+        setIsTimerRunning(false);
+        if (timeChallengeSuccess) {
+            setTimeChallengeSuccess(false);
+            alert("Hết giờ thử thách! Bạn có thể tiếp tục hoàn thành puzzle nhưng sẽ không nhận được phần thưởng thêm.");
+        }
+    }
+  }, [timeLeft, isTimerRunning, timeChallengeSuccess]);
+
   const handleDragStart = useCallback((event: React.DragEvent<HTMLDivElement>, pieceId: number) => {
+    if (!isTimerRunning && !isPuzzleComplete) return;
     event.dataTransfer.setData("application/json", JSON.stringify({ pieceId }));
-  }, []);
+  }, [isTimerRunning, isPuzzleComplete]);
   
   const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    if (!isTimerRunning) return;
     event.preventDefault(); 
-  }, []);
+  }, [isTimerRunning]);
 
   const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>, slotIndex: number) => {
     event.preventDefault();
-    if (solvedSlots[slotIndex] || isPuzzleComplete) return;
+    if (solvedSlots[slotIndex] || isPuzzleComplete || !isTimerRunning) return;
 
     try {
         const data = event.dataTransfer.getData("application/json");
@@ -65,6 +90,14 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
         const pieceToPlace = draggablePieces.find(p => p.id === pieceId);
 
         if (pieceToPlace && pieceToPlace.id === slotIndex) { 
+          playSound('sfx-success');
+          setIsTimerRunning(false); // Pause timer
+          setJustSolvedSlotIndex(slotIndex);
+
+          if (pieceToPlace.funFact) {
+            setFunFactModal({ isOpen: true, text: pieceToPlace.funFact });
+          }
+          
           const newSolvedSlots = [...solvedSlots];
           newSolvedSlots[slotIndex] = pieceToPlace;
           setSolvedSlots(newSolvedSlots);
@@ -75,23 +108,47 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
             setIsPuzzleComplete(true);
             setTimeout(() => {
               onMissionComplete(mission.reward);
+              if (timeChallengeSuccess) {
+                onGrantBonusSupplies(50);
+              }
             }, 300); 
           }
         }
     } catch (e) {
         console.error("Error parsing drag data:", e);
     }
-  }, [draggablePieces, solvedSlots, isPuzzleComplete, mission.reward, onMissionComplete]);
+  }, [draggablePieces, solvedSlots, isPuzzleComplete, mission.reward, onMissionComplete, timeChallengeSuccess, onGrantBonusSupplies, isTimerRunning]);
+
+  const handleCloseFunFactModal = () => {
+    playSound('sfx_click');
+    setFunFactModal({ isOpen: false, text: '' });
+    setJustSolvedSlotIndex(null);
+    if (!isPuzzleComplete) {
+        setIsTimerRunning(true);
+    }
+  };
+  
+  const handleStartGame = () => {
+    playSound('sfx_click');
+    setIsTimerRunning(true);
+  };
 
   return (
-    <div className="screen-container w-full max-w-2xl p-6 bg-amber-100 dark:bg-stone-800 rounded-lg shadow-xl text-center">
+    <div className="screen-container w-full max-w-2xl p-6 bg-amber-100 dark:bg-stone-800 rounded-lg shadow-xl text-center relative">
       <button
         onClick={onReturnToMuseum}
-        className="absolute top-4 left-4 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-stone-900 font-semibold py-2 px-4 rounded-lg shadow-md transition-colors duration-300 z-10"
+        className="absolute top-4 left-4 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-stone-900 font-semibold py-2 px-4 rounded-lg shadow-md transition-colors duration-300 z-20"
         aria-label="Quay về Bảo tàng"
       >
         Quay về Bảo tàng
       </button>
+
+      {mission.timeLimit && (
+        <div id="mission-timer" className={timeLeft <= 10 ? 'low-time' : ''}>
+          ⏳ {timeLeft}s
+        </div>
+      )}
+
       <h2 className="text-3xl font-bold text-amber-700 dark:text-amber-400 mb-6">{mission.title}</h2>
 
       {isPuzzleComplete ? (
@@ -101,7 +158,7 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
         </div>
       ) : (
         <>
-          <div id="puzzle-container" className="grid grid-cols-3 gap-1 mx-auto w-max bg-white dark:bg-stone-700 p-2 rounded-lg shadow-inner mb-6">
+          <div id="puzzle-container" className="grid grid-cols-3 gap-1 mx-auto w-max bg-white/10 dark:bg-stone-700/10 p-2 rounded-lg shadow-inner mb-6">
             {solvedSlots.map((piece, index) => (
               <PuzzleSlot
                 key={index}
@@ -109,21 +166,43 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
                 solvedPiece={piece}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
+                justSolved={index === justSolvedSlotIndex}
               />
             ))}
           </div>
 
-          <div id="puzzle-pieces" className="flex flex-wrap justify-center items-center p-4 bg-white/70 dark:bg-stone-700/70 rounded-lg min-h-[100px] shadow">
-            {draggablePieces.length > 0 ? draggablePieces.map((piece) => (
-              <PuzzlePiece
-                key={piece.id}
-                piece={piece}
-                onDragStart={handleDragStart}
-                isSolved={!!solvedSlots.find(p => p?.id === piece.id)}
-              />
-            )) : <p className="text-stone-500 dark:text-stone-400 italic">Không còn mảnh ghép nào.</p>}
-          </div>
+          {!isTimerRunning && !isPuzzleComplete ? (
+            <button onClick={handleStartGame} className="action-button mb-6">
+                Bắt đầu Thử thách
+            </button>
+          ) : (
+            <div className="flex flex-wrap justify-center items-center gap-2 mb-6 min-h-[100px] bg-amber-50 dark:bg-stone-700/50 p-3 rounded-lg">
+                {draggablePieces.map(piece => (
+                    <PuzzlePiece
+                    key={piece.id}
+                    piece={piece}
+                    onDragStart={handleDragStart}
+                    isSolved={solvedSlots.some(s => s?.id === piece.id)}
+                    />
+                ))}
+            </div>
+          )}
         </>
+      )}
+
+      {funFactModal.isOpen && (
+        <div className="fixed inset-0 bg-black/60 z-30 flex items-center justify-center p-4">
+          <div className="bg-amber-50 dark:bg-stone-800 p-6 rounded-xl shadow-lg max-w-sm w-full text-center animate-fadeInScaleUp">
+            <h3 className="text-xl font-bold text-amber-700 dark:text-amber-400 mb-2">💡 Bạn có biết?</h3>
+            <p className="text-stone-700 dark:text-stone-200 mb-4">{funFactModal.text}</p>
+            <button
+              onClick={handleCloseFunFactModal}
+              className="action-button"
+            >
+              Tiếp tục
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

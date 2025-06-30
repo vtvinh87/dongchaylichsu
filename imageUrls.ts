@@ -9,7 +9,8 @@ export const BACKGROUND_IMAGE_URL = 'https://i.ibb.co/ch4hzT8w/B-Main.png';
 export const LANDING_PAGE_BACKGROUND_URL = 'https://i.ibb.co/ch4hzT8w/B-Main.png';
 export const AVATAR_PLACEHOLDER_URL = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI0U1RTdFQiI+CiAgPHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yYzAtMi42Ni01LjMzLTQtOC00eiIvPgo8L3N2Zz4=';
 export const TRANSPARENT_GIF_URL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
-export const AVATAR_BASE_URL = 'https://i.ibb.co/mH0yM00/avatar-base.png';
+export const AVATAR_BASE_MALE_URL = 'https://i.ibb.co/mCmTJC90/Avt-nguoi-choi-nam.png';
+export const AVATAR_BASE_FEMALE_URL = 'https://i.ibb.co/tPC2svPK/Avt-nguoi-choi-nu.png';
 export const AVATAR_OUTFIT_DEFAULT_URL = 'https://i.ibb.co/3kMvBwz/avatar-outfit-default.png';
 export const AVATAR_HAT_NON_LA_URL = 'https://i.ibb.co/q0QBkDj/avatar-hat-nonla.png';
 export const AVATAR_OUTFIT_NHAT_BINH_URL = 'https://i.ibb.co/VMyXpgr/avatar-outfit-nhatbinh.png';
@@ -44,6 +45,7 @@ export const MO_HINH_CUU_DINH_URL = 'https://i.ibb.co/LXtFtbxP/M-mo-hinh-cuu-din
 export const ARTIFACT_GIA_DINH_BAO_URL = 'https://i.ibb.co/WWL4PKmf/M-Gia-Dinh-bao.png';
 export const VALI_DONG_DU_ARTIFACT_URL = 'https://i.ibb.co/LdyGLXc5/M-vali-cua-nha-yeu-nuoc.png';
 export const TRUONG_SON_COMPASS_ARTIFACT_URL = 'https://i.ibb.co/8ggcd9jY/M-la-ban.png';
+export const DIEN_DAI_TRINH_SAT_ARTIFACT_URL = 'https://i.ibb.co/XkYXr23P/M-dien-dai-trinh-sat.png';
 
 
 // --- Memory Fragment Images ---
@@ -118,6 +120,8 @@ export const SUPPLY_CACHE_ICON_URL = 'https://i.ibb.co/rRGsq9Dz/icon-kho-vat-tu.
 export const ICON_PONTOON_BRIDGE_URL = 'https://i.ibb.co/xKjNQ4rG/icon-cau-phao.png';
 export const ICON_LAO_VILLAGE_URL = 'https://i.ibb.co/y4Y2Qwq/icon-lang-lao.png';
 export const ICON_CONVOY_URL = 'https://i.ibb.co/ZwBs0YQ/icon-xe-khong-kinh-ngang.png';
+export const FRIENDLY_CAMP_ICON_URL = 'https://i.ibb.co/x78hC1Q/icon-trai-ban.png';
+export const ICON_HERB_URL = 'https://i.ibb.co/0j4pb33x/icon-cay-thao-duoc.png';
 
 
 // --- Trading Good Icons ---
@@ -130,6 +134,12 @@ export const QUANG_TRUNG_AVATAR_URL = "https://i.ibb.co/5g2fxwbm/Avt-Quang-Trung
 // Using the hero card image for Hai Ba Trung avatar for consistency
 export const HAI_BA_TRUNG_AVATAR_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Tranh_Hai_B%C3%A0_Tr%C6%B0ng_kh%E1%BB%9Fi_ngh%C4%A9a.jpg/640px-Tranh_Hai_B%C3%A0_Tr%C6%B0ng_kh%E1%BB%9Fi_ngh%C4%A9a.jpg";
 export const LY_THAI_TO_AVATAR_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/T%C6%B0%E1%BB%A3ng_vua_L%C3%BD_Th%C3%A1i_T%E1%BB%95_t%E1%BA%A1i_%C4%90%E1%BB%81n_%C4%90%C3%B4.jpg/800px-T%C6%B0%E1%BB%A3ng_vua_L%C3%BD_Th%C3%A1i_T%E1%BB%95_t%E1%BA%A1i_%C4%90%E1%BB%81n_%C4%90%C3%B4.jpg";
+export const CHI_HUY_AVATAR_URL = 'https://i.ibb.co/M5xZymsZ/Avt-chi-huy.png';
+export const CONG_BINH_AVATAR_URL = 'https://i.ibb.co/nNQyDThb/Avt-linh-cong-binh.png';
+export const GIAO_LIEN_AVATAR_URL = 'https://i.ibb.co/v6X4wQxT/Avt-linh-giao-lien.png';
+export const CO_Y_TA_AVATAR_URL = 'https://i.ibb.co/q3m3F0z5/Avt-co-y-ta.png';
+export const ANH_TRINH_SAT_AVATAR_URL = 'https://i.ibb.co/1fwczYGf/Avt-anh-linh-trinh-sat.png';
+
 
 // --- Achievement Icons ---
 export const ACHIEVEMENT_ARCHAEOLOGIST_URL = "https://i.ibb.co/sv5H05pP/M-nha-khao-co.png";

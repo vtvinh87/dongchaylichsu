@@ -6,18 +6,22 @@ interface TimelineEventCardProps {
   eventItem: TimelineEventItem;
   onDragStart: (event: React.DragEvent<HTMLDivElement>, item: TimelineEventItem) => void;
   onDragEnd: (event: React.DragEvent<HTMLDivElement>) => void;
+  onShowDetails: (item: TimelineEventItem) => void;
 }
 
-const TimelineEventCard: React.FC<TimelineEventCardProps> = ({ eventItem, onDragStart, onDragEnd }) => {
+const TimelineEventCard: React.FC<TimelineEventCardProps> = ({ eventItem, onDragStart, onDragEnd, onShowDetails }) => {
   return (
     <div
       draggable
       onDragStart={(e) => onDragStart(e, eventItem)}
       onDragEnd={onDragEnd}
-      className="bg-amber-200 dark:bg-stone-600 p-3 rounded-md shadow-md cursor-grab active:cursor-grabbing border-2 border-amber-400 dark:border-amber-500 hover:shadow-lg transition-all duration-200 min-w-[150px] max-w-[200px] text-center"
+      onClick={() => onShowDetails(eventItem)} // Added onClick
+      className="event-card-with-image bg-amber-200 dark:bg-stone-600 rounded-md shadow-md cursor-grab active:cursor-grabbing border-2 border-amber-400 dark:border-amber-500 hover:shadow-lg transition-all duration-200 text-center"
       aria-label={`Sự kiện: ${eventItem.text}`}
+      title="Nhấp để xem chi tiết, kéo để sắp xếp"
     >
-      <p className="text-sm text-amber-800 dark:text-amber-100 font-medium select-none">{eventItem.text}</p>
+      <img src={eventItem.imageUrl} alt={eventItem.text} draggable="false" />
+      <h3 className="text-sm text-amber-800 dark:text-amber-100 font-bold select-none">{eventItem.text}</h3>
     </div>
   );
 };

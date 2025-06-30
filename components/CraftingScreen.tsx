@@ -22,7 +22,7 @@ const CraftingScreen: React.FC<CraftingScreenProps> = ({
   );
 
   const handleCraftClick = (artifactId: string) => {
-    playSound('sfx-click');
+    playSound('sfx_click');
     onCraftItem(artifactId);
   };
 

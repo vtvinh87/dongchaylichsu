@@ -36,6 +36,11 @@ export enum Screen {
   STRATEGIC_PATH_MISSION_SCREEN,
 }
 
+export interface Point {
+  x: number;
+  y: number;
+}
+
 export interface Artifact {
   id: string;
   name: string;
@@ -90,8 +95,9 @@ export interface Hoi {
 }
 
 export interface PuzzlePieceItem {
-  id: number; 
+  id: number;
   imageUrl: string;
+  funFact?: string; // Optional fun fact for the piece
 }
 
 export type RewardType = 'artifact' | 'heroCard' | 'decoration' | 'fragment';
@@ -122,6 +128,9 @@ export interface PuzzleMissionData {
   id: string;
   title: string;
   reward: Reward;
+  puzzleImage: string; // The full image for the puzzle
+  pieces: PuzzlePieceItem[]; // The pieces with their data, including fun facts
+  timeLimit?: number; // Optional time limit in seconds
 }
 
 export interface NarrativeMissionData {
@@ -134,9 +143,11 @@ export interface NarrativeMissionData {
 }
 
 export interface TimelineEventItem {
-  id: string; 
-  text: string; 
-  correctOrder: number; 
+  id: string;
+  text: string; // Title of the event
+  correctOrder: number;
+  imageUrl: string; // New: URL for the event's illustration
+  details: string; // New: Detailed description for the modal
 }
 
 export interface TimelineMissionData {
@@ -146,6 +157,7 @@ export interface TimelineMissionData {
   instructionText: string;
   events: TimelineEventItem[];
   reward: Reward;
+  timeLimit?: number; // Optional time limit in seconds
 }
 
 export interface ARMissionData {
@@ -428,7 +440,7 @@ export interface StrategicPathMissionData {
   type: 'strategicPath';
   id: string;
   title: string;
-  // 0:jungle, 1:mountain, 2:river, 3:crater, 4:broken_bridge, 5:wood, 6:sensor, 7:disabled_sensor, 8:open_path, 9:timed_bomb, 10:rockslide, 11:supply_cache, 12:sebanghieng_river, 13:lao_village, 14:pontoon_bridge
+  // 0:jungle, 1:mountain, 2:river, 3:crater, 4:broken_bridge, 5:wood, 6:sensor, 7:disabled_sensor, 8:open_path, 9:timed_bomb, 10:rockslide, 11:supply_cache, 12:sebanghieng_river, 13:lao_village, 14:pontoon_bridge, 15:friendly_camp, 16:herb, 17:hidden_sensor, 18:scout
   mapLayout: number[][]; 
   start: { x: number; y: number };
   end: { x: number; y: number };
@@ -576,10 +588,62 @@ export interface NotebookPage {
   content: string;
 }
 
+// --- Dialogue & Scripting Types ---
+export type SpeakerKey = 'chi_huy' | 'nhan_vat_chinh' | 'cong_binh' | 'giao_lien' | 'system' | 'co_y_ta' | 'anh_trinh_sat';
+
+export interface DialogueOption {
+  text: string;
+  action: 'accept_quest';
+  questId: string;
+}
+
+export interface DialogueLine {
+  type: 'dialogue';
+  speaker: SpeakerKey;
+  text: string;
+  options?: DialogueOption[];
+}
+
+export interface NotebookUnlockEvent {
+  type: 'notebook_unlock';
+  pageIndex: number;
+  message: string;
+}
+
+export type DialogueEntry = DialogueLine | NotebookUnlockEvent;
+
+export interface Speaker {
+    name: string;
+    avatarUrl: string;
+}
+
+// --- Side Quest Types ---
+export interface SideQuestStage {
+  description: string;
+  targetMap: string; // The missionId of the map where this stage takes place
+  target: Point;
+}
+
+export interface SideQuest {
+  id: string;
+  title: string;
+  giver: SpeakerKey;
+  startDialogueKey: string;
+  endDialogueKey: string;
+  stages: SideQuestStage[];
+  reward: Reward | NotebookUnlockEvent; 
+}
+
+export interface ActiveSideQuestState {
+  questId: string;
+  currentStage: number;
+}
+
 
 // --- Game State Type ---
 export interface SavedGameState {
   userName:string;
+  gender: 'male' | 'female';
   collectedArtifactIds: string[];
   collectedHeroCardIds: string[];
   collectedDecorationIds?: string[];
@@ -597,4 +661,5 @@ export interface SavedGameState {
   sandboxState?: SandboxState;
   unlockedAchievementIds?: string[]; // New property for achievements
   unlockedNotebookPages?: number[]; // New property for the soldier's notebook
+  activeSideQuest?: ActiveSideQuestState | null; // New property for side quests
 }

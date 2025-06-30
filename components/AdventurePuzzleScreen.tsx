@@ -49,7 +49,7 @@ const AdventurePuzzleScreen: React.FC<{
         const correctAnswer = normalizeString(currentRiddle.correctAnswer);
 
         if (userAnswer === correctAnswer) {
-            playSound('sfx-success');
+            playSound('sfx_success');
             setFeedback(null);
             setInputValue('');
 
@@ -57,13 +57,13 @@ const AdventurePuzzleScreen: React.FC<{
                 setCurrentRiddleIndex(prev => prev + 1);
             } else {
                 setIsComplete(true);
-                playSound('sfx-unlock');
+                playSound('sfx_unlock');
                 setTimeout(() => {
                     onComplete(missionData.reward);
                 }, 2000);
             }
         } else {
-            playSound('sfx-click'); // Or a failure sound
+            playSound('sfx_click'); // Or a failure sound
             setFeedback(currentRiddle.hint || 'Câu trả lời không đúng. Hãy thử lại!');
         }
     };

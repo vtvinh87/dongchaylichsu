@@ -6,10 +6,10 @@ import { playSound } from '../utils/audio';
 interface ColoringScreenProps {
   missionData: ColoringMissionData;
   onReturnToMuseum: () => void;
-  onMissionComplete: (reward: Reward) => void;
+  onComplete: (reward: Reward) => void;
 }
 
-const ColoringScreen: React.FC<ColoringScreenProps> = ({ missionData, onReturnToMuseum, onMissionComplete }) => {
+const ColoringScreen: React.FC<ColoringScreenProps> = ({ missionData, onReturnToMuseum, onComplete }) => {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [filledPaths, setFilledPaths] = useState<Record<string, string>>({});
   const [isComplete, setIsComplete] = useState(false);
@@ -49,10 +49,10 @@ const ColoringScreen: React.FC<ColoringScreenProps> = ({ missionData, onReturnTo
       setIsComplete(true);
       playSound('sfx-unlock');
       setTimeout(() => {
-        onMissionComplete(missionData.reward);
+        onComplete(missionData.reward);
       }, 1500);
     }
-  }, [filledPaths, solutionKeys, missionData.solution, missionData.reward, onMissionComplete]);
+  }, [filledPaths, solutionKeys, missionData.solution, missionData.reward, onComplete]);
 
   // Create a version of the SVG with React-style fill attributes using a robust DOM parser
   const renderedSVG = useMemo(() => {

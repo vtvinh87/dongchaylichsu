@@ -1,11 +1,10 @@
 
-
 import React, { useEffect } from 'react';
 
 import { ARMissionData, Reward } from '../types';
 import { playSound } from '../utils/audio';
 
-// A-Frame types are now declared globally in types.ts
+// A-Frame types are declared globally in aframe.d.ts
 
 interface ArScreenComponentProps {
   missionData: ARMissionData;
@@ -55,7 +54,7 @@ const ArScreenComponent: React.FC<ArScreenComponentProps> = ({
 
 
   const handleBackButtonClick = () => {
-    playSound('sfx-click');
+    playSound('sfx_click');
     onReturnAndClaimReward();
   };
 
@@ -102,7 +101,7 @@ const ArScreenComponent: React.FC<ArScreenComponentProps> = ({
           >
           </a-entity>
         </a-marker>
-        <a-entity camera></a-entity>
+        <a-camera></a-camera>
       </a-scene>
       
       {arRewardMessage && (

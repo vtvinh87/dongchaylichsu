@@ -30,13 +30,13 @@ const NotebookModal: React.FC<NotebookModalProps> = ({
   }
 
   const handleClose = () => {
-    playSound('sfx-click');
+    playSound('sfx_click');
     onClose();
   };
 
   const handlePrevPage = () => {
     if (currentPageIndex > 0) {
-      playSound('sfx-page-turn');
+      playSound('sfx_page_turn');
       setCurrentPageIndex(prev => prev - 2);
     }
   };
@@ -44,7 +44,7 @@ const NotebookModal: React.FC<NotebookModalProps> = ({
   const handleNextPage = () => {
     const nextLeftPageIndex = currentPageIndex + 2;
     if (unlockedPageIndices.includes(nextLeftPageIndex)) {
-      playSound('sfx-page-turn');
+      playSound('sfx_page_turn');
       setCurrentPageIndex(prev => prev + 2);
     }
   };

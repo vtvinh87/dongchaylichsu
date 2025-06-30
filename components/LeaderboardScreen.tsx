@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { LeaderboardEntry } from '../types';
 import { LEADERBOARD_LOCAL_STORAGE_KEY, MAX_LEADERBOARD_ENTRIES } from '../constants';
@@ -30,7 +31,7 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ currentUserName, 
   }, []);
 
   const handleReturnClick = () => {
-    playSound('sfx-click');
+    playSound('sfx_click');
     onReturnToMuseum();
   };
 

@@ -11,6 +11,7 @@ import { ALL_MISSIONS, ALL_QUEST_CHAINS } from '../constants';
 
 interface MainInterfaceProps {
   userName: string;
+  gender: 'male' | 'female';
   avatarCustomization: AvatarCustomization;
   hois: Hoi[];
   collectedArtifacts: Artifact[];
@@ -29,10 +30,13 @@ interface MainInterfaceProps {
   onShowCustomization: () => void;
   onShowCrafting: () => void;
   onShowAchievements: () => void;
+  isSoundEnabled: boolean;
+  onToggleSound: () => void;
 }
 
 const MainInterface: React.FC<MainInterfaceProps> = ({
   userName,
+  gender,
   avatarCustomization,
   hois,
   collectedArtifacts,
@@ -51,6 +55,8 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
   onShowCustomization,
   onShowCrafting,
   onShowAchievements,
+  isSoundEnabled,
+  onToggleSound,
 }) => {
 
     // Memoize sets of collected IDs for efficient O(1) lookups.
@@ -138,12 +144,20 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
     <div className="w-full max-w-4xl mx-auto p-6 bg-amber-100/30 dark:bg-stone-800/30 rounded-lg shadow-xl space-y-8 main-screen-container backdrop-blur-sm">
       <header id="main-header" className="flex flex-col sm:flex-row justify-between items-center pb-4 border-b-2 border-amber-300 dark:border-stone-700 gap-4">
         <div className="flex items-center gap-3">
-          <AvatarDisplay avatar={avatarCustomization} className="w-16 h-16 flex-shrink-0" />
+          <AvatarDisplay avatar={avatarCustomization} gender={gender} className="w-16 h-16 flex-shrink-0" />
           <h1 className="text-3xl font-bold text-amber-800 dark:text-amber-300 text-center sm:text-left">
             Chào mừng, {userName}!
           </h1>
         </div>
         <div id="main-header-controls" className="flex items-center gap-2 flex-wrap justify-center">
+            <button
+              onClick={onToggleSound}
+              className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-semibold py-2 px-3 rounded-lg shadow-md"
+              aria-label={isSoundEnabled ? "Tắt âm thanh" : "Bật âm thanh"}
+              id="toggle-sound-button"
+            >
+              {isSoundEnabled ? '🔊' : '🔇'}
+            </button>
             <button
               onClick={onToggleTheme}
               className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-semibold py-2 px-3 rounded-lg shadow-md"

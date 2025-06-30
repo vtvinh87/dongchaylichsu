@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { StrategicPathMissionData, Reward } from '../types';
+import { StrategicPathMissionData, Reward, ActiveSideQuestState } from '../types';
 import { playSound } from '../utils/audio';
-import { ALL_ARTIFACTS_MAP, NOTEBOOK_PAGES, MISSION_DONG_LOC_PATH_ID, MISSION_CUA_CHUA_PATH_ID, MISSION_SEBANGHIENG_PATH_ID } from '../constants';
+import { ALL_ARTIFACTS_MAP, NOTEBOOK_PAGES, MISSION_DONG_LOC_PATH_ID, MISSION_CUA_CHUA_PATH_ID, MISSION_SEBANGHIENG_PATH_ID, SIDE_QUESTS } from '../constants';
 import NotebookModal from './NotebookModal';
 import { NOTEBOOK_ICON_URL } from '../imageUrls';
 
@@ -19,7 +19,10 @@ const StrategicPathScreen: React.FC<{
     onComplete: (reward: Reward) => void;
     unlockedNotebookPages: number[];
     onUnlockNotebookPage: (pageIndex: number) => void;
-}> = ({ missionData, onReturnToMuseum, onComplete, unlockedNotebookPages, onUnlockNotebookPage }) => {
+    onTriggerDialogue: (scriptKey: string) => void;
+    activeSideQuest: ActiveSideQuestState | null;
+    onCompleteSideQuestStage: (questId: string) => void;
+}> = ({ missionData, onReturnToMuseum, onComplete, unlockedNotebookPages, onUnlockNotebookPage, onTriggerDialogue, activeSideQuest, onCompleteSideQuestStage }) => {
     const [playerPath, setPlayerPath] = useState<Point[]>([]);
     const [isComplete, setIsComplete] = useState(false);
     const [currentMapLayout, setCurrentMapLayout] = useState(missionData.mapLayout);
@@ -107,6 +110,7 @@ const StrategicPathScreen: React.FC<{
                 const newTime = bombTimers[key] - 1;
                 if (newTime <= 0) {
                     explosions++;
+                    playSound('sfx_explosion');
                     totalSuppliesLost += 50;
                     if (!layoutToUpdate) {
                         layoutToUpdate = currentMapLayout.map(r => [...r]);
@@ -157,7 +161,7 @@ const StrategicPathScreen: React.FC<{
 
         // Supply Event
         if (Math.random() < 0.15) {
-            playSound('sfx-unlock');
+            playSound('sfx_unlock');
             const bonusSupplies = 25;
             alert(`Một đồng chí giao liên vừa đi qua và để lại cho bạn một ít vật tư! Bạn nhận được ${bonusSupplies} Vật tư.`);
             setSupplies(s => s + bonusSupplies);
@@ -165,7 +169,7 @@ const StrategicPathScreen: React.FC<{
 
         // Flash Flood Event (for Se Bang Hieng mission)
         if (missionData.id === MISSION_SEBANGHIENG_PATH_ID && Math.random() < 0.1) { // 10% chance
-            playSound('sfx-click'); // Replace with a water sound later
+            playSound('sfx_flood');
             alert("Lũ quét bất ngờ! Toàn bộ cầu phao đã bị cuốn trôi!");
             setShowFlashFlood(true);
             setTimeout(() => setShowFlashFlood(false), 1500);
@@ -190,6 +194,7 @@ const StrategicPathScreen: React.FC<{
                     const targetCell = validTargets[Math.floor(Math.random() * validTargets.length)];
                     newLayout[targetCell.y][targetCell.x] = 10; // Rockslide
                     layoutChanged = true;
+                    playSound('sfx_explosion');
                     break;
                 }
             }
@@ -205,6 +210,7 @@ const StrategicPathScreen: React.FC<{
         const attackChance = Math.random() * 100;
         if (attackChance < riskLevel) {
             alert('Báo động! Máy bay địch tấn công! Mất 20 Vật tư!');
+            playSound('sfx_fail');
             setSupplies(s => Math.max(0, s - 20));
             setRiskLevel(r => Math.max(0, r - 30));
             if (!unlockedNotebookPages.includes(5)) {
@@ -260,7 +266,7 @@ const StrategicPathScreen: React.FC<{
                     // Check for win condition
                     if (currentConvoyIndex + 1 === missionData.convoyPath.length - 1) {
                          setIsComplete(true);
-                         playSound('sfx-unlock');
+                         playSound('sfx_unlock');
                          setTimeout(() => onComplete(missionData.reward), 2000);
                     }
                 }
@@ -270,7 +276,7 @@ const StrategicPathScreen: React.FC<{
     }, [currentTurn, timeOfDay, currentMapLayout, onUnlockNotebookPage, unlockedNotebookPages, checkForLandslide, triggerRandomEvents, missionData, convoyProgress, onComplete]);
     
     const handleSkillClick = (skill: ActiveSkill) => {
-        playSound('sfx-click');
+        playSound('sfx_click');
         setActiveSkill(prev => prev === skill ? null : skill);
     };
     
@@ -279,11 +285,33 @@ const StrategicPathScreen: React.FC<{
         const terrainType = currentMapLayout[y][x];
         const actionPoint = { x, y };
 
+        // Check for starting a new side quest at a friendly camp
+        if (terrainType === 15 && !activeSideQuest) { 
+            onTriggerDialogue('start_gianh_giat_su_song');
+            return;
+        }
+
+        // Check for completing a side quest stage
+        if (activeSideQuest && missionData.id === SIDE_QUESTS[activeSideQuest.questId].stages[activeSideQuest.currentStage].targetMap) {
+            const currentStage = SIDE_QUESTS[activeSideQuest.questId].stages[activeSideQuest.currentStage];
+            if (currentStage.target.x === x && currentStage.target.y === y) {
+                if (activeSideQuest.questId === 'gianh_giat_su_song' && terrainType === 16) {
+                    playSound('sfx_success');
+                    alert('Bạn đã tìm thấy một loại thảo dược quý!');
+                    const newLayout = currentMapLayout.map(row => [...row]);
+                    newLayout[y][x] = 0; // Turn herb into jungle
+                    setCurrentMapLayout(newLayout);
+                    onCompleteSideQuestStage(activeSideQuest.questId);
+                    return; 
+                }
+            }
+        }
+
         if (activeSkill) {
-            const handleActionWithSkill = (cost: number, newTerrain: number, pageToUnlock?: number) => {
+            const handleActionWithSkill = (cost: number, newTerrain: number, sfx: string, pageToUnlock?: number) => {
                 const finalCost = Math.ceil(cost * bridgeCostModifier);
                 if (supplies >= finalCost) {
-                    playSound('sfx-success');
+                    playSound(sfx);
                     setSupplies(s => s - finalCost);
                     setBridgeCostModifier(1.0); // Reset buff after use
                     const newLayout = currentMapLayout.map(row => [...row]);
@@ -295,21 +323,22 @@ const StrategicPathScreen: React.FC<{
                     }
                     endPlayerTurn(actionPoint);
                 } else {
+                    playSound('sfx_fail');
                     alert('Không đủ vật tư!');
                 }
                 setActiveSkill(null);
             };
 
             switch (activeSkill) {
-                case 'sanlap': if (terrainType === 3) handleActionWithSkill(10, 0, 2); else setActiveSkill(null); return;
-                case 'xaycau': if (terrainType === 4) handleActionWithSkill(30, 0, 3); else setActiveSkill(null); return;
-                case 'luacambien': if (terrainType === 6) handleActionWithSkill(15, 7); else setActiveSkill(null); return;
-                case 'phada': if (terrainType === 10) handleActionWithSkill(30, 0); else setActiveSkill(null); return;
-                case 'xaycauphao': if (terrainType === 12) handleActionWithSkill(40, 14); else setActiveSkill(null); return;
+                case 'sanlap': if (terrainType === 3) handleActionWithSkill(10, 0, 'sfx_dig', 2); else setActiveSkill(null); return;
+                case 'xaycau': if (terrainType === 4) handleActionWithSkill(30, 0, 'sfx_build', 3); else setActiveSkill(null); return;
+                case 'luacambien': if (terrainType === 6) handleActionWithSkill(15, 7, 'sfx_success'); else setActiveSkill(null); return;
+                case 'phada': if (terrainType === 10) handleActionWithSkill(30, 0, 'sfx_explosion'); else setActiveSkill(null); return;
+                case 'xaycauphao': if (terrainType === 12) handleActionWithSkill(40, 14, 'sfx_build'); else setActiveSkill(null); return;
                 case 'gobo':
                      if (terrainType === 9) {
                         if (supplies >= 25) {
-                            playSound('sfx-success');
+                            playSound('sfx_success');
                             setSupplies(s => s - 25);
                             const newLayout = currentMapLayout.map(row => [...row]);
                             newLayout[y][x] = 0;
@@ -320,7 +349,7 @@ const StrategicPathScreen: React.FC<{
                                 return newTimers;
                             });
                             endPlayerTurn({ x, y });
-                        } else { alert('Không đủ vật tư!'); }
+                        } else { playSound('sfx_fail'); alert('Không đủ vật tư!'); }
                         setActiveSkill(null);
                     } else { setActiveSkill(null); }
                     return;
@@ -330,14 +359,14 @@ const StrategicPathScreen: React.FC<{
         
         if (activeSkill === null) {
             if (terrainType === 5) {
-                playSound('sfx-success');
+                playSound('sfx_success');
                 setSupplies(s => s + 20);
                 const newLayout = currentMapLayout.map(row => [...row]); newLayout[y][x] = 0; setCurrentMapLayout(newLayout);
                 endPlayerTurn(actionPoint);
                 return;
             }
             if (terrainType === 11) {
-                playSound('sfx-unlock');
+                playSound('sfx_unlock');
                 const bonusSupplies = 50; alert(`Bạn đã tìm thấy một kho vật tư! Nhận ${bonusSupplies} Vật tư.`); setSupplies(s => s + bonusSupplies);
                 const newLayout = currentMapLayout.map(row => [...row]); newLayout[y][x] = 0; setCurrentMapLayout(newLayout);
                 endPlayerTurn(actionPoint);
@@ -346,7 +375,7 @@ const StrategicPathScreen: React.FC<{
             if (terrainType === 13) { // Lao Village
                 const villageId = `${y}-${x}`;
                 if (!visitedAllies.has(villageId)) {
-                    playSound('sfx-unlock');
+                    playSound('sfx_unlock');
                     alert("Bạn nhận được sự giúp đỡ của nhân dân Lào anh em! Nhận 50 Vật tư và giảm 50% chi phí xây cầu tiếp theo.");
                     setSupplies(s => s + 50);
                     setBridgeCostModifier(0.5);
@@ -366,7 +395,7 @@ const StrategicPathScreen: React.FC<{
         const isInPath = playerPath.some(p => p.x === x && p.y === y);
 
         if (isAdjacent && !isInPath) {
-            playSound('sfx-click');
+            playSound('sfx_click');
             const newPath = [...playerPath, actionPoint]; setPlayerPath(newPath);
             if (newPath.length > 7 && !unlockedNotebookPages.includes(6)) {
                  onUnlockNotebookPage(6); showUnlockNotification("Bạn vừa tìm thấy một trang nhật ký mới!");
@@ -376,11 +405,11 @@ const StrategicPathScreen: React.FC<{
                  if (missionData.id === MISSION_DONG_LOC_PATH_ID && Object.keys(bombTimers).length > 0) {
                     alert('Bạn phải gỡ hết bom nổ chậm trước khi hoàn thành nhiệm vụ!'); return;
                 }
-                setIsComplete(true); playSound('sfx-unlock');
+                setIsComplete(true); playSound('sfx_unlock');
                 setTimeout(() => onComplete(missionData.reward), 2000);
             }
         }
-    }, [isComplete, activeSkill, supplies, currentMapLayout, playerPath, end, onComplete, missionData, endPlayerTurn, onUnlockNotebookPage, unlockedNotebookPages, bombTimers, visitedAllies, bridgeCostModifier, convoyProgress]);
+    }, [isComplete, activeSkill, supplies, currentMapLayout, playerPath, end, onComplete, missionData, endPlayerTurn, onUnlockNotebookPage, unlockedNotebookPages, bombTimers, visitedAllies, bridgeCostModifier, convoyProgress, activeSideQuest, onTriggerDialogue, onCompleteSideQuestStage]);
     
     const getCellClass = (x: number, y: number) => {
         const terrainType = currentMapLayout[y][x];
@@ -402,7 +431,16 @@ const StrategicPathScreen: React.FC<{
             case 12: classes += `cell-sebanghieng-river ${activeSkill === 'xaycauphao' ? 'cursor-pointer' : ''}`; break;
             case 13: classes += `cell-lao-village ${visitedAllies.has(`${y}-${x}`) ? 'visited' : ''}`; break;
             case 14: classes += 'cell-pontoon-bridge cursor-pointer'; break;
+            case 15: classes += 'cell-friendly-camp'; break;
+            case 16: classes += 'cell-herb'; break;
             default: classes += 'cell-jungle';
+        }
+        
+        if (activeSideQuest && missionData.id === SIDE_QUESTS[activeSideQuest.questId].stages[activeSideQuest.currentStage].targetMap) {
+            const currentStage = SIDE_QUESTS[activeSideQuest.questId].stages[activeSideQuest.currentStage];
+            if (currentStage.target.x === x && currentStage.target.y === y) {
+                classes += ' cell-quest-location';
+            }
         }
 
         if (missionData.unstableMountains?.some(p => p.x === x && p.y === y)) classes += ' cell-unstable-mountain';

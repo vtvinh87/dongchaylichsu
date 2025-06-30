@@ -98,12 +98,12 @@ const TypesettingScreen: React.FC<{
         const targetText = missionData.targetText;
 
         if (composedText === targetText) {
-            playSound('sfx-unlock');
+            playSound('sfx_unlock');
             setFeedback({ message: 'Chính xác! Bản in hoàn hảo!', type: 'success'});
             setIsComplete(true);
             setTimeout(() => onComplete(missionData.reward), 2000);
         } else {
-            playSound('sfx-click');
+            playSound('sfx_fail');
             setFeedback({ message: 'Sắp chữ sai rồi! Hãy kiểm tra lại.', type: 'error'});
         }
     };

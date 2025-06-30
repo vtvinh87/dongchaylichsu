@@ -16,7 +16,7 @@ const ArtifactInfoModal: React.FC<ArtifactInfoModalProps> = ({ item, isOpen, onC
   }
 
   const handleCloseAction = () => {
-    playSound('sfx-click');
+    playSound('sfx_click');
     onClose();
   };
 

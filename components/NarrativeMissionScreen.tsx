@@ -29,7 +29,7 @@ const NarrativeMissionScreen: React.FC<NarrativeMissionScreenProps> = ({
   }, [missionData]);
 
   const handleChoiceClick = useCallback((targetNodeId: string) => {
-    playSound('sfx-click');
+    playSound('sfx_click');
     const nextNode = missionData.nodes[targetNodeId];
     if (nextNode) {
       setCurrentNodeId(targetNodeId);
@@ -41,7 +41,7 @@ const NarrativeMissionScreen: React.FC<NarrativeMissionScreenProps> = ({
   }, [missionData.nodes]);
 
   const handleEndMissionButton = useCallback(() => {
-    playSound('sfx-click');
+    playSound('sfx_click');
     if (currentNode?.isTerminal) {
       if (currentNode.isSuccessOutcome && currentNode.grantsMissionReward) {
         onComplete(missionData.reward);

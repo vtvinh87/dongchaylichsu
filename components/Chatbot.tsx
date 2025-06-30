@@ -103,7 +103,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
     }
     
     if (characterId !== activeCharacterId) {
-      playSound('sfx-click');
+      playSound('sfx_click');
       setActiveCharacterId(characterId);
       initializeChat(characterId);
     }
@@ -119,7 +119,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
             text: `Bạn đã hết ${FREE_DAILY_CHAT_LIMIT} lượt trò chuyện miễn phí hôm nay. Nâng cấp Premium để trò chuyện không giới hạn!`,
             timestamp: new Date()
         }]);
-        playSound('sfx-click');
+        playSound('sfx_click');
         if(onUpgradePrompt) {
             setTimeout(() => {
                 onClose(); 
@@ -140,7 +140,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
     setInputValue('');
     setIsLoading(true);
     setError(null);
-    playSound('sfx-click');
+    playSound('sfx_click');
 
     const historyForAPI = [...geminiHistory];
 

@@ -58,7 +58,7 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, isOpen, onClose
   }, [item, isOpen]);
 
   const handleCloseAction = () => {
-    playSound('sfx-click');
+    playSound('sfx_click');
     onClose();
   };
 

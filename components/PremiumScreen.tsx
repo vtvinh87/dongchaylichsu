@@ -15,7 +15,7 @@ const PremiumFeature: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 const PremiumPlan: React.FC<{ title: string; price: string; description: string; onSelect: () => void; isPopular?: boolean; }> = ({ title, price, description, onSelect, isPopular }) => {
   const handleSelect = () => {
-    playSound('sfx-click');
+    playSound('sfx_click');
     onSelect();
   };
 
@@ -38,7 +38,7 @@ const PremiumPlan: React.FC<{ title: string; price: string; description: string;
 
 const PremiumScreen: React.FC<PremiumScreenProps> = ({ onClose, onUpgrade }) => {
   const handleCloseClick = () => {
-    playSound('sfx-click');
+    playSound('sfx_click');
     onClose();
   };
 

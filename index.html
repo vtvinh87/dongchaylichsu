@@ -38,6 +38,18 @@
       /* background-image is now handled by App.tsx */
     }
 
+    /* --- CSS to center all mission screens --- */
+    .screen-transition-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      min-height: 100vh;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
     /* --- CSS cho Landing Screen --- */
     .landing-screen {
       position: fixed;
@@ -515,6 +527,7 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: white;
       font-weight: 600;
+      position: relative;
     }
 
     #skill-bar {
@@ -840,16 +853,386 @@
       10%, 90% { opacity: 1; transform: translate(-50%, 0); }
     }
 
+    /* --- CSS for Dialogue Modal --- */
+    .dialogue-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: 250; /* Above most things, below system-level modals if any */
+      -webkit-animation: fadeInScreen 0.3s forwards;
+      animation: fadeInScreen 0.3s forwards;
+    }
+
+    .dialogue-box {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 800px;
+      background-color: #fdfbf6; /* A slightly creamy white */
+      border: 4px solid #a16207; /* amber-700 */
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      animation: slideUpIn 0.5s ease-out forwards;
+    }
+    .dark .dialogue-box {
+      background-color: #292524; /* stone-800 */
+      border-color: #d97706; /* amber-600 */
+    }
+
+    @keyframes slideUpIn {
+      from {
+        transform: translate(-50%, 50px);
+        opacity: 0;
+      }
+      to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+      }
+    }
+
+    .character-portrait {
+      flex-shrink: 0;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 3px solid #fcd34d; /* amber-300 */
+      object-fit: cover;
+      background-color: #fefce8; /* amber-50 */
+    }
+    .dark .character-portrait {
+      border-color: #f59e0b; /* amber-500 */
+      background-color: #44403c; /* stone-700 */
+    }
+
+    .dialogue-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100px; /* Ensure a minimum height */
+    }
+
+    .speaker-name {
+      font-family: 'Special Elite', cursive;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #78350f; /* amber-800 */
+      margin-bottom: 0.5rem;
+    }
+    .dark .speaker-name {
+      color: #fcd34d; /* amber-300 */
+    }
+
+    #dialogue-text {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.125rem; /* 18px */
+      color: #3f3f46; /* stone-700 */
+      flex-grow: 1;
+      min-height: 50px;
+    }
+    .dark #dialogue-text {
+      color: #e7e5e4; /* stone-200 */
+    }
+
+    .dialogue-controls {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    #dialogue-continue-button {
+      background-color: #a16207; /* amber-700 */
+      color: white;
+      padding: 0.5rem 2rem;
+      border: none;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    #dialogue-continue-button:hover {
+      background-color: #78350f; /* amber-800 */
+      transform: scale(1.05);
+    }
+    .dark #dialogue-continue-button {
+      background-color: #f59e0b; /* amber-500 */
+      color: #44403c;
+    }
+    .dark #dialogue-continue-button:hover {
+      background-color: #d97706; /* amber-600 */
+    }
+    
+    /* --- CSS for Side Quest System --- */
+    .dialogue-option-button {
+      background-color: #16a34a; /* green-600 */
+      color: white;
+      padding: 0.5rem 1.5rem;
+      border: none;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .dialogue-option-button:hover {
+      background-color: #15803d; /* green-700 */
+      transform: scale(1.05);
+    }
+    #side-quest-tracker {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background-color: rgba(255, 250, 235, 0.9);
+      color: #78350f;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 2px solid #fcd34d;
+      max-width: 250px;
+      z-index: 10;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      backdrop-filter: blur(4px);
+      animation: fadeInScaleUp 0.4s ease-out forwards;
+    }
+    .dark #side-quest-tracker {
+      background-color: rgba(30, 27, 27, 0.9);
+      color: #fef3c7;
+      border-color: #a16207;
+    }
+    #side-quest-tracker h4 {
+        font-family: 'Special Elite', cursive;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        border-bottom: 1px dashed #fcd34d;
+        padding-bottom: 0.25rem;
+    }
+    #side-quest-tracker p {
+        font-family: 'Nunito', sans-serif;
+        font-size: 0.9rem;
+    }
+    .cell-quest-location {
+        animation: pulse-yellow 2s infinite;
+    }
+    @keyframes pulse-yellow {
+        0% { box-shadow: inset 0 0 0 0px rgba(250, 204, 21, 0.9); }
+        70% { box-shadow: inset 0 0 0 10px rgba(250, 204, 21, 0); }
+        100% { box-shadow: inset 0 0 0 0px rgba(250, 204, 21, 0); }
+    }
+    .cell-herb {
+        background-color: #166534; /* jungle base */
+        background-image: url('https://i.ibb.co/0j4pb33x/icon-cay-thao-duoc.png');
+        background-size: 80%;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+    }
+    .cell-herb:hover {
+        outline: 2px solid #facc15; /* amber-400 */
+        z-index: 10;
+    }
+    .cell-friendly-camp {
+        background-color: #166534; /* jungle base */
+        background-image: url('https://i.ibb.co/x78hC1Q/icon-trai-ban.png');
+        background-size: 90%;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+    }
+    .cell-friendly-camp:hover {
+        outline: 2px solid #facc15; /* amber-400 */
+        z-index: 10;
+    }
+    .cell-scout {
+        background-color: #166534; /* jungle base */
+        background-image: url('https://i.ibb.co/1fwczYGf/Avt-anh-linh-trinh-sat.png');
+        background-size: 90%;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+    }
+    .cell-scout:hover {
+        outline: 2px solid #facc15; /* amber-400 */
+        z-index: 10;
+    }
+    .cell-hidden-sensor {
+        background-color: #166534; /* jungle base */
+    }
+    .cell-hidden-sensor:hover {
+       background-color: #15803d; /* green-700 */
+    }
+
+    /* --- Puzzle Mission Update --- */
+    #fun-fact-modal {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        padding: 1rem;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease-in-out;
+    }
+    #fun-fact-modal.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    #fun-fact-modal .modal-content {
+        background-color: #fef3c7; /* amber-100 */
+        color: #78350f; /* amber-800 */
+        padding: 2rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+        border: 3px solid #fcd34d; /* amber-300 */
+        max-width: 450px;
+        text-align: center;
+    }
+    .dark #fun-fact-modal .modal-content {
+        background-color: #44403c; /* stone-700 */
+        color: #fef3c7; /* amber-100 */
+        border-color: #f59e0b; /* amber-500 */
+    }
+    #mission-timer {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background-color: rgba(255, 255, 255, 0.8);
+        color: #1f2937;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 10;
+        transition: all 0.3s ease;
+    }
+    .dark #mission-timer {
+        background-color: rgba(0, 0, 0, 0.7);
+        color: #f3f4f6;
+    }
+    #mission-timer.low-time {
+        color: #ef4444; /* red-500 */
+        transform: scale(1.1);
+        animation: pulse-red-timer 1s infinite;
+    }
+    @keyframes pulse-red-timer {
+      0%, 100% { transform: scale(1.1); }
+      50% { transform: scale(1.15); }
+    }
+    @keyframes lightUp {
+      from { box-shadow: 0 0 0px rgba(251, 191, 36, 0); }
+      to { box-shadow: 0 0 25px rgba(251, 191, 36, 0.8); }
+    }
+    .light-up-animation {
+      animation: lightUp 0.5s forwards;
+    }
+    #puzzle-container {
+        background-image: url('https://i.ibb.co/2YM7bfkB/trong-dong.png');
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    /* --- CSS cho Timeline Mission Mới --- */
+    #timeline-timer {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background-color: rgba(255, 255, 255, 0.8);
+      color: #1f2937;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
+    .dark #timeline-timer {
+        background-color: rgba(0, 0, 0, 0.7);
+        color: #f3f4f6;
+    }
+    #timeline-timer.low-time {
+        color: #ef4444; /* red-500 */
+        transform: scale(1.1);
+        animation: pulse-red-timer 1s infinite;
+    }
+
+    .event-card-with-image {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        min-width: 160px; /* Allow more space */
+    }
+
+    .event-card-with-image img {
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 0.25rem;
+        border: 1px solid rgba(0,0,0,0.1);
+        pointer-events: none; /* Make image non-draggable */
+    }
+
+    .timeline-slot-with-image {
+        padding: 0.5rem;
+    }
+    .timeline-slot-with-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 0.375rem;
+    }
+
+    #event-detail-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 1rem;
+      animation: fadeInScreen 0.3s forwards;
+    }
+    #event-detail-modal-content {
+      background-color: #fef3c7; /* amber-100 */
+      color: #78350f; /* amber-800 */
+      padding: 2rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+      border: 3px solid #fcd34d; /* amber-300 */
+      max-width: 500px;
+      text-align: center;
+      position: relative;
+    }
+    .dark #event-detail-modal-content {
+        background-color: #44403c; /* stone-700 */
+        color: #fef3c7; /* amber-100 */
+        border-color: #f59e0b; /* amber-500 */
+    }
+    #event-detail-modal-content img {
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
 
   </style>
 <link rel="stylesheet" href="/index.css">
 </head>
 <body>
   <div id="root"></div>
-  <audio id="sfx-click" src="https://pixabay.com/sound-effects/download/sounds-1323-click-button-140881.mp3" preload="auto"></audio>
-  <audio id="sfx-success" src="https://pixabay.com/sound-effects/download/sounds-1323-success-1-6297.mp3" preload="auto"></audio>
-  <audio id="sfx-unlock" src="https://pixabay.com/sound-effects/download/sounds-1323-magic-wand-2-164832.mp3" preload="auto"></audio>
-  <audio id="sfx-page-turn" src="https://pixabay.com/sound-effects/download/sounds-1323-paper-slide-1-140728.mp3" preload="auto"></audio>
   <script type="module" src="/index.tsx"></script>
 </body>
 </html>

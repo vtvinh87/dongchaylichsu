@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
-import { LOGO_FULL_URL } from '../imageUrls';
+import { LOGO_FULL_URL, AVATAR_BASE_MALE_URL, AVATAR_BASE_FEMALE_URL } from '../imageUrls';
+
+type Gender = 'male' | 'female';
 
 interface LoginScreenProps {
-  onLogin: (name: string) => void;
+  onLogin: (name: string, gender: Gender) => void;
   appName: string;
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, appName }) => {
   const [name, setName] = useState('');
+  const [gender, setGender] = useState<Gender>('male');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
-      onLogin(name.trim());
+      onLogin(name.trim(), gender);
     } else {
       alert("Vui lòng nhập tên Nhà Sử Học Nhí!");
     }
@@ -21,6 +24,26 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, appName }) => {
   return (
     <div className="login-screen screen-container bg-amber-100 dark:bg-stone-800 p-8 rounded-xl shadow-2xl w-full max-w-md text-center transform transition-all duration-500 hover:scale-105">
       <img src={LOGO_FULL_URL} alt={`${appName} Logo`} className="app-logo mx-auto" />
+      
+      {/* Gender Selection */}
+      <div className="my-6">
+        <label className="block text-stone-700 dark:text-stone-300 font-semibold mb-3">Chọn nhân vật của bạn</label>
+        <div className="flex justify-center gap-8">
+          <div
+            className={`cursor-pointer p-2 rounded-full transition-all duration-300 ${gender === 'male' ? 'bg-amber-400 ring-4 ring-amber-500' : 'bg-transparent hover:bg-amber-200'}`}
+            onClick={() => setGender('male')}
+          >
+            <img src={AVATAR_BASE_MALE_URL} alt="Nhân vật nam" className="w-24 h-24 object-contain rounded-full" />
+          </div>
+          <div
+            className={`cursor-pointer p-2 rounded-full transition-all duration-300 ${gender === 'female' ? 'bg-amber-400 ring-4 ring-amber-500' : 'bg-transparent hover:bg-amber-200'}`}
+            onClick={() => setGender('female')}
+          >
+            <img src={AVATAR_BASE_FEMALE_URL} alt="Nhân vật nữ" className="w-24 h-24 object-contain rounded-full" />
+          </div>
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <input
           type="text"

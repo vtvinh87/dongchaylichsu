@@ -51,21 +51,23 @@ const TradingScreen: React.FC<TradingScreenProps> = ({ missionData, onReturnToMu
   const handleBuy = (goodId: string, amount: number) => {
     const price = marketPrices[goodId] * amount;
     if (capital >= price) {
-      playSound('sfx-click');
+      playSound('sfx_click');
       setCapital(prev => prev - price);
       setInventory(prev => ({ ...prev, [goodId]: (prev[goodId] || 0) + amount }));
     } else {
+      playSound('sfx_fail');
       alert('Không đủ vốn!');
     }
   };
 
   const handleSell = (goodId: string, amount: number) => {
     if ((inventory[goodId] || 0) >= amount) {
-      playSound('sfx-click');
+      playSound('sfx_click');
       const price = marketPrices[goodId] * amount;
       setCapital(prev => prev + price);
       setInventory(prev => ({ ...prev, [goodId]: prev[goodId] - amount }));
     } else {
+      playSound('sfx_fail');
       alert('Không đủ hàng trong kho!');
     }
   };
@@ -73,14 +75,14 @@ const TradingScreen: React.FC<TradingScreenProps> = ({ missionData, onReturnToMu
   const handleNextDay = () => {
     if (isMissionOver) return;
 
-    playSound('sfx-click');
+    playSound('sfx_click');
     const newDay = currentDay + 1;
 
     // Check win/loss condition BEFORE advancing day
     if (capital >= missionData.targetCapital) {
       setGameOutcome('win');
       setIsMissionOver(true);
-      playSound('sfx-unlock');
+      playSound('sfx_unlock');
       setTimeout(() => onComplete(missionData.reward), 2000);
       return;
     }
