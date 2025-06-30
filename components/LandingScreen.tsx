@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { LANDING_PAGE_BACKGROUND_URL } from '../imageUrls';
+import { LANDING_PAGE_BACKGROUND_URL, LOGO_FULL_URL } from '../imageUrls';
 
 interface LandingScreenProps {
   onStartAdventure: () => void;
@@ -18,7 +18,7 @@ const LandingScreen: React.FC<LandingScreenProps> = ({ onStartAdventure }) => {
       style={{ backgroundImage: `url('${LANDING_PAGE_BACKGROUND_URL}')` }}
     >
       <div className="landing-content">
-        <h1 className="text-white">Dòng Chảy Lịch Sử</h1>
+        <img src={LOGO_FULL_URL} alt="Dòng Chảy Lịch Sử Logo" className="app-logo" />
         <h2 className="text-amber-200">Cuộc Phiêu Lưu Khám Phá Lịch Sử Việt Nam!</h2>
         <button
           id="start-adventure-button"

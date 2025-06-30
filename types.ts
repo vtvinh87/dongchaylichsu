@@ -1,3 +1,5 @@
+// types.ts
+
 
 
 export enum Screen {
@@ -426,10 +428,14 @@ export interface StrategicPathMissionData {
   type: 'strategicPath';
   id: string;
   title: string;
-  mapLayout: number[][]; // 0: jungle, 1: mountain, 2: river
+  // 0:jungle, 1:mountain, 2:river, 3:crater, 4:broken_bridge, 5:wood, 6:sensor, 7:disabled_sensor, 8:open_path, 9:timed_bomb, 10:rockslide, 11:supply_cache, 12:sebanghieng_river, 13:lao_village, 14:pontoon_bridge
+  mapLayout: number[][]; 
   start: { x: number; y: number };
   end: { x: number; y: number };
   reward: Reward;
+  initialSupplies: number;
+  unstableMountains?: { x: number, y: number }[];
+  convoyPath?: { x: number, y: number }[];
 }
 
 
@@ -564,6 +570,12 @@ export interface Achievement {
   condition: (gameState: SavedGameState) => boolean;
 }
 
+// --- Notebook Types ---
+export interface NotebookPage {
+  type: 'text' | 'image';
+  content: string;
+}
+
 
 // --- Game State Type ---
 export interface SavedGameState {
@@ -584,4 +596,5 @@ export interface SavedGameState {
   unlockedBackgroundIds?: string[];
   sandboxState?: SandboxState;
   unlockedAchievementIds?: string[]; // New property for achievements
+  unlockedNotebookPages?: number[]; // New property for the soldier's notebook
 }

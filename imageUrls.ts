@@ -1,8 +1,12 @@
 // imageUrls.ts
 
+// --- Logos & Branding ---
+export const LOGO_SMALL_URL = 'https://i.ibb.co/hJ9VKmNf/Logo-s.png';
+export const LOGO_FULL_URL = 'https://i.ibb.co/bgkLpX7W/Logo-full.png';
+
 // --- Backgrounds & Placeholders ---
-export const BACKGROUND_IMAGE_URL = 'https://i.ibb.co/dsbg9pV9/background.png';
-export const LANDING_PAGE_BACKGROUND_URL = 'https://images.pexels.com/photos/1658967/pexels-photo-1658967.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2';
+export const BACKGROUND_IMAGE_URL = 'https://i.ibb.co/ch4hzT8w/B-Main.png';
+export const LANDING_PAGE_BACKGROUND_URL = 'https://i.ibb.co/ch4hzT8w/B-Main.png';
 export const AVATAR_PLACEHOLDER_URL = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI0U1RTdFQiI+CiAgPHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yYzAtMi42Ni01LjMzLTQtOC00eiIvPgo8L3N2Zz4=';
 export const TRANSPARENT_GIF_URL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
 export const AVATAR_BASE_URL = 'https://i.ibb.co/mH0yM00/avatar-base.png';
@@ -39,7 +43,7 @@ export const ARTIFACT_QUANG_TRUNG_COIN_MINTED_URL = "https://i.ibb.co/35z9bGX3/M
 export const MO_HINH_CUU_DINH_URL = 'https://i.ibb.co/LXtFtbxP/M-mo-hinh-cuu-dinh.png';
 export const ARTIFACT_GIA_DINH_BAO_URL = 'https://i.ibb.co/WWL4PKmf/M-Gia-Dinh-bao.png';
 export const VALI_DONG_DU_ARTIFACT_URL = 'https://i.ibb.co/LdyGLXc5/M-vali-cua-nha-yeu-nuoc.png';
-export const TRUONG_SON_COMPASS_ARTIFACT_URL = 'https://i.ibb.co/mSgM1fX/M-la-ban-cua-nguoi-linh.png';
+export const TRUONG_SON_COMPASS_ARTIFACT_URL = 'https://i.ibb.co/8ggcd9jY/M-la-ban.png';
 
 
 // --- Memory Fragment Images ---
@@ -77,6 +81,9 @@ export const SAGA_KINH_THANH_HUE_URL = 'https://i.ibb.co/JjcfLCpd/Q-xay-dung-kin
 export const SAGA_TYPESETTING_URL = 'https://i.ibb.co/ytPyNW9/Q-in-bao-chu-quoc-ngu.png';
 export const SAGA_DONG_DU_URL = 'https://i.ibb.co/6cv9fnP6/Q-vuot-bien-dong-du.png';
 export const SAGA_TRUONG_SON_URL = 'https://i.ibb.co/k6H6nVRt/Q-mo-duong-truong-son.png';
+export const SAGA_DONG_LOC_URL = 'https://i.ibb.co/xtzPRtKF/Q-nga-ba-dong-loc.png';
+export const SAGA_CUA_CHUA_URL = 'https://i.ibb.co/S40M8DnN/Q-cua-chu-A-deo-phu-la-nhich.png';
+export const SAGA_SEBANGHIENG_URL = 'https://i.ibb.co/kVhbv8Qb/Q-vuot-song-se-bang-hieng.png';
 export const BACH_DANG_DO_THAM_ICON_URL = "https://i.ibb.co/B5hFBJtW/Q-do-tham-dia-hinh.png";
 export const BACH_DANG_CAM_COC_ICON_URL = "https://i.ibb.co/BKfFgHX9/Q-cam-coc-go.png";
 export const BACH_DANG_VICTORY_ICON_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/T%C6%B0%E1%BB%A3ng_%C4%90%E1%BB%A9c_vua_Ng%C3%B4_Quy%E1%BB%81n.jpg/800px-T%C6%B0%E1%BB%A3ng_%C4%90%E1%BB%A9c_vua_Ng%C3%B4_Quy%E1%BB%81n.jpg";
@@ -100,6 +107,18 @@ export const MOLD_LY_URL = "https://i.ibb.co/z5y7pWj/mold-ly.png";
 export const ICON_NGO_MON_URL = 'https://i.ibb.co/yY13V6R/icon-ngo-mon.png';
 export const ICON_THAI_HOA_URL = 'https://i.ibb.co/q1z6R4w/icon-thai-hoa.png';
 export const ICON_THE_MIEU_URL = 'https://i.ibb.co/X3p7f3G/icon-the-mieu.png';
+export const RESOURCE_WOOD_ICON_URL = 'https://i.ibb.co/k5JqTz5/icon-go.png';
+export const SENSOR_ICON_URL = 'https://i.ibb.co/3cqFHRd/icon-cam-bien.png';
+export const SENSOR_DISABLED_ICON_URL = 'https://i.ibb.co/JqjT2W9/icon-cam-bien-disabled.png';
+export const ICON_TIMED_BOMB_URL = 'https://i.ibb.co/ks9Fp1cg/icon-bom-no-cham.png';
+export const NOTEBOOK_ICON_URL = 'https://i.ibb.co/LX40JfqD/icon-so-tay.png';
+export const NOTEBOOK_BG_URL = 'https://i.ibb.co/vCT5GHZJ/B-so-tay.png';
+export const ICON_ROCKSLIDE_URL = 'https://i.ibb.co/DPjfMP4x/icon-sat-lo-da.png';
+export const SUPPLY_CACHE_ICON_URL = 'https://i.ibb.co/rRGsq9Dz/icon-kho-vat-tu.png';
+export const ICON_PONTOON_BRIDGE_URL = 'https://i.ibb.co/xKjNQ4rG/icon-cau-phao.png';
+export const ICON_LAO_VILLAGE_URL = 'https://i.ibb.co/y4Y2Qwq/icon-lang-lao.png';
+export const ICON_CONVOY_URL = 'https://i.ibb.co/ZwBs0YQ/icon-xe-khong-kinh-ngang.png';
+
 
 // --- Trading Good Icons ---
 export const TRADING_SILK_ICON_URL = "https://i.ibb.co/j3yq1p4/vai-lua-icon.png";

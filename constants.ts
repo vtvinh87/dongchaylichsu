@@ -1,10 +1,13 @@
+// constants.ts
 
 
 
 
 
 
-import { MissionInfo, Hoi, Artifact, PuzzlePieceItem, HeroCard, PuzzleMissionData, NarrativeMissionData, TimelineEventItem, TimelineMissionData, MissionData, NarrativeNode, ARMissionData, AiCharacter, Decoration, HiddenObjectMissionData, HiddenObjectItem, QuizMissionData, ConstructionMissionData, Tutorial, CustomizationItem, DiplomacyMissionData, DiplomacyRound, MemoryFragment, Reward, TradingMissionData, TradingGood, TradingEvent, RhythmMissionData, RhythmNote, ColoringMissionData, SandboxBackground, Achievement, SavedGameState, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, MapCellType, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, BuildingPlacement, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData } from './types';
+
+
+import { MissionInfo, Hoi, Artifact, PuzzlePieceItem, HeroCard, PuzzleMissionData, NarrativeMissionData, TimelineEventItem, TimelineMissionData, MissionData, NarrativeNode, ARMissionData, AiCharacter, Decoration, HiddenObjectMissionData, HiddenObjectItem, QuizMissionData, ConstructionMissionData, Tutorial, CustomizationItem, DiplomacyMissionData, DiplomacyRound, MemoryFragment, Reward, TradingMissionData, TradingGood, TradingEvent, RhythmMissionData, RhythmNote, ColoringMissionData, SandboxBackground, Achievement, SavedGameState, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, MapCellType, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, BuildingPlacement, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData, NotebookPage } from './types';
 import * as ImageUrls from './imageUrls';
 
 export const APP_NAME = "Dòng Chảy Lịch Sử";
@@ -786,6 +789,34 @@ const MISSION_ADVENTURE_PUZZLE_DONG_DU: AdventurePuzzleMissionData = {
 };
 
 // --- Strategic Path Mission ---
+export const MISSION_DONG_LOC_PATH_ID = 'mission_dong_loc_path';
+const MISSION_DONG_LOC_PATH: StrategicPathMissionData = {
+    type: 'strategicPath',
+    id: MISSION_DONG_LOC_PATH_ID,
+    title: 'Ngã ba Đồng Lộc',
+    reward: { type: 'artifact', id: TRUONG_SON_COMPASS_ARTIFACT_ID }, // Re-using reward for now
+    start: { x: 4, y: 14 }, // bottom-center
+    end: { x: 4, y: 0 },   // top-center
+    initialSupplies: 200,
+    mapLayout: [ // 0:j, 1:m, 2:r, 3:c, 4:b, 5:w, 6:s, 7:ds, 8:op, 9:tb, 10:rs, 11:sc
+        [0, 0, 3, 0, 0, 0, 3, 0, 0, 0],
+        [0, 1, 3, 0, 8, 8, 3, 1, 0, 1],
+        [0, 1, 3, 0, 3, 3, 0, 1, 11, 1],
+        [0, 1, 9, 3, 0, 3, 9, 1, 5, 1],
+        [0, 0, 0, 3, 0, 3, 0, 0, 0, 0],
+        [0, 1, 1, 3, 9, 3, 1, 1, 1, 0],
+        [5, 1, 0, 3, 3, 3, 0, 3, 3, 0], 
+        [0, 1, 0, 1, 3, 1, 0, 1, 3, 0], 
+        [0, 8, 8, 1, 3, 11, 0, 1, 3, 1], 
+        [1, 1, 0, 1, 9, 1, 1, 1, 0, 1],
+        [1, 0, 0, 3, 3, 3, 0, 0, 0, 1],
+        [1, 6, 1, 1, 8, 1, 0, 1, 3, 3], 
+        [1, 0, 1, 3, 8, 0, 0, 1, 0, 1], 
+        [1, 0, 1, 5, 1, 1, 1, 1, 0, 1], 
+        [0, 0, 0, 0, 0, 0, 0, 3, 0, 1],
+    ],
+};
+
 export const MISSION_TRUONG_SON_PATH_ID = 'mission_truong_son_path';
 const MISSION_TRUONG_SON_PATH: StrategicPathMissionData = {
     type: 'strategicPath',
@@ -794,24 +825,87 @@ const MISSION_TRUONG_SON_PATH: StrategicPathMissionData = {
     reward: { type: 'artifact', id: TRUONG_SON_COMPASS_ARTIFACT_ID },
     start: { x: 0, y: 14 }, // bottom-left
     end: { x: 9, y: 0 },   // top-right
-    mapLayout: [
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-        [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
-        [1, 0, 1, 1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 1, 2, 2, 2, 0, 1, 0, 1],
-        [0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+    initialSupplies: 100,
+    mapLayout: [ // 0:j, 1:m, 2:r, 3:c, 4:b, 5:w, 6:s, 7:ds, 8:op, 9:tb, 10:rs, 11:sc
+        [1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+        [1, 5, 8, 8, 8, 1, 0, 6, 0, 1], // open path
+        [1, 0, 1, 1, 3, 1, 0, 1, 0, 1],
+        [1, 0, 1, 2, 2, 2, 8, 1, 5, 1], // open path
+        [0, 0, 1, 3, 0, 8, 8, 1, 0, 0], // open path
         [0, 1, 1, 0, 1, 1, 1, 1, 1, 0],
-        [0, 1, 0, 0, 0, 0, 0, 2, 2, 0],
-        [0, 1, 0, 1, 1, 1, 0, 1, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0, 1, 0, 1],
-        [1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+        [5, 1, 0, 0, 0, 3, 0, 2, 2, 0], 
+        [0, 1, 0, 1, 6, 1, 0, 1, 4, 0], 
+        [0, 8, 8, 1, 0, 5, 0, 1, 0, 1], // open path
+        [1, 1, 0, 1, 3, 1, 1, 1, 0, 1],
         [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
-        [1, 0, 1, 1, 0, 1, 0, 1, 2, 2],
-        [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 1, 1, 1, 0, 1],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 6, 1, 1, 8, 1, 0, 1, 2, 2], // open path
+        [1, 0, 1, 3, 8, 0, 0, 1, 0, 1], // open path
+        [1, 0, 1, 5, 1, 1, 1, 1, 0, 1], 
+        [0, 0, 0, 0, 0, 0, 0, 3, 0, 1],
     ],
 };
+
+export const MISSION_CUA_CHUA_PATH_ID = 'mission_cua_chua_path';
+const MISSION_CUA_CHUA_PATH: StrategicPathMissionData = {
+    type: 'strategicPath',
+    id: MISSION_CUA_CHUA_PATH_ID,
+    title: 'Cua Chữ A - Đèo Phu La Nhích',
+    reward: { type: 'artifact', id: TRUONG_SON_COMPASS_ARTIFACT_ID }, // Placeholder reward
+    start: { x: 8, y: 14 },
+    end: { x: 1, y: 1 },
+    initialSupplies: 300,
+    unstableMountains: [{ x: 2, y: 2 }, { x: 3, y: 5 }, { x: 7, y: 9 }, { x: 3, y: 11 }],
+    mapLayout: [ // 0:j, 1:m, 2:r, 3:c, 4:b, 5:w, 6:s, 7:ds, 8:op, 9:tb, 10:rs, 11:sc
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 1, 11, 1, 1, 1],
+        [1, 0, 1, 1, 0, 1, 0, 1, 1, 1],
+        [1, 0, 1, 1, 0, 1, 0, 1, 1, 1],
+        [1, 0, 0, 1, 10, 1, 0, 0, 0, 1],
+        [1, 1, 0, 1, 1, 1, 1, 1, 0, 1],
+        [1, 1, 11, 5, 0, 0, 0, 1, 0, 1],
+        [1, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+        [1, 1, 0, 0, 0, 1, 0, 1, 0, 1],
+        [1, 1, 0, 1, 0, 1, 0, 1, 10, 1],
+        [1, 1, 0, 1, 0, 1, 0, 0, 0, 1],
+        [1, 1, 0, 1, 0, 0, 0, 1, 0, 1],
+        [1, 1, 0, 1, 1, 1, 1, 1, 0, 1],
+        [1, 1, 5, 1, 1, 1, 1, 1, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 8, 1],
+    ],
+};
+
+export const MISSION_SEBANGHIENG_PATH_ID = 'mission_sebanghieng_path';
+const MISSION_SEBANGHIENG_PATH: StrategicPathMissionData = {
+    type: 'strategicPath',
+    id: MISSION_SEBANGHIENG_PATH_ID,
+    title: 'Vượt sông Sê Băng Hiêng',
+    reward: { type: 'artifact', id: TRUONG_SON_COMPASS_ARTIFACT_ID }, // Placeholder reward
+    start: { x: 0, y: 7 }, // Convoy starts here
+    end: { x: 9, y: 7 },   // Convoy needs to reach here
+    initialSupplies: 350,
+    convoyPath: [
+        { x: 0, y: 7 }, { x: 1, y: 7 }, { x: 2, y: 7 }, { x: 3, y: 7 }, { x: 4, y: 7 },
+        { x: 5, y: 7 }, { x: 6, y: 7 }, { x: 7, y: 7 }, { x: 8, y: 7 }, { x: 9, y: 7 }
+    ],
+    mapLayout: [ // 0:j, 1:m, 2:r, 3:c, 4:b, 5:w, 6:s, 7:ds, 8:op, 9:tb, 10:rs, 11:sc, 12:sr, 13:lv, 14:pb
+        [1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
+        [1, 0, 0, 0, 5, 13, 0, 0, 0, 1], // Lao Village
+        [0, 0, 1, 0, 0, 0, 1, 1, 0, 0],
+        [0, 1, 0, 0, 1, 1, 0, 0, 5, 0],
+        [0, 0, 0, 1, 12, 12, 12, 1, 0, 0],
+        [1, 0, 0, 12, 12, 12, 12, 12, 0, 0],
+        [0, 0, 12, 12, 12, 12, 12, 12, 12, 0],
+        [8, 8, 8, 8, 8, 8, 8, 8, 8, 8], // The road for convoy
+        [0, 0, 12, 12, 12, 12, 12, 12, 12, 0],
+        [1, 0, 0, 12, 12, 12, 12, 12, 0, 0],
+        [0, 0, 0, 1, 12, 12, 12, 1, 0, 0],
+        [0, 1, 0, 0, 1, 1, 0, 0, 5, 0],
+        [0, 0, 1, 0, 0, 0, 1, 1, 0, 0],
+        [1, 0, 0, 0, 5, 13, 0, 0, 0, 1], // Lao Village
+        [1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
+    ],
+};
+
 
 
 // --- ALL MISSIONS MAP ---
@@ -840,7 +934,10 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
   [MISSION_CITY_PLANNING_HUE_ID]: MISSION_CITY_PLANNING_HUE,
   [MISSION_TYPESETTING_ID]: MISSION_TYPESETTING_DONG_CO,
   [MISSION_ADVENTURE_PUZZLE_DONG_DU_ID]: MISSION_ADVENTURE_PUZZLE_DONG_DU,
+  [MISSION_DONG_LOC_PATH_ID]: MISSION_DONG_LOC_PATH,
   [MISSION_TRUONG_SON_PATH_ID]: MISSION_TRUONG_SON_PATH,
+  [MISSION_CUA_CHUA_PATH_ID]: MISSION_CUA_CHUA_PATH,
+  [MISSION_SEBANGHIENG_PATH_ID]: MISSION_SEBANGHIENG_PATH,
 };
 
 // --- Quest Chains ---
@@ -917,12 +1014,15 @@ const HOI_5_VAN_NUOC_DOI_THAY: Hoi = {
 };
 
 // Hồi 6
-const MISSION_INFO_TRUONG_SON: MissionInfo = { id: 'card_6_1', title: 'Mở đường Trường Sơn', imageUrl: ImageUrls.SAGA_TRUONG_SON_URL, description: 'Lựa chọn con đường an toàn qua núi rừng hiểm trở để vận chuyển quân lương.', missionId: MISSION_TRUONG_SON_PATH_ID };
+const MISSION_INFO_DONG_LOC: MissionInfo = { id: 'card_6_0', title: 'Ngã ba Đồng Lộc', imageUrl: ImageUrls.SAGA_DONG_LOC_URL, description: 'Đối mặt với bom nổ chậm và khai thông tuyến đường huyết mạch.', missionId: MISSION_DONG_LOC_PATH_ID };
+const MISSION_INFO_TRUONG_SON: MissionInfo = { id: 'card_6_1', title: 'Mở đường Trường Sơn', imageUrl: ImageUrls.SAGA_TRUONG_SON_URL, description: 'Lựa chọn con đường an toàn qua núi rừng hiểm trở để vận chuyển quân lương.', missionId: MISSION_TRUONG_SON_PATH_ID, dependsOnMissionId: MISSION_DONG_LOC_PATH_ID };
+const MISSION_INFO_CUA_CHUA: MissionInfo = { id: 'card_6_2', title: 'Cua Chữ A - Đèo Phu La Nhích', imageUrl: ImageUrls.SAGA_CUA_CHUA_URL, description: 'Đối mặt với nguy cơ sạt lở và những con đường hiểm trở.', missionId: MISSION_CUA_CHUA_PATH_ID, dependsOnMissionId: MISSION_TRUONG_SON_PATH_ID };
+const MISSION_INFO_SEBANGHIENG: MissionInfo = { id: 'card_6_3', title: 'Vượt sông Sê Băng Hiêng', imageUrl: ImageUrls.SAGA_SEBANGHIENG_URL, description: 'Xây cầu phao, hộ tống đoàn xe và đối mặt với lũ quét bất ngờ.', missionId: MISSION_SEBANGHIENG_PATH_ID, dependsOnMissionId: MISSION_CUA_CHUA_PATH_ID };
 const HOI_6_CON_DUONG_GIAI_PHONG: Hoi = {
   id: 'hoi_6_con_duong_giai_phong',
   title: "Hồi 6: Con Đường Giải Phóng",
   description: "Trải qua những năm tháng kháng chiến gian khổ nhưng hào hùng, mà đỉnh cao là con đường mòn Hồ Chí Minh huyền thoại.",
-  missions: [MISSION_INFO_TRUONG_SON],
+  missions: [MISSION_INFO_DONG_LOC, MISSION_INFO_TRUONG_SON, MISSION_INFO_CUA_CHUA, MISSION_INFO_SEBANGHIENG],
 };
 
 
@@ -1110,7 +1210,7 @@ export const INSTRUCTION_DATA: Record<string, { title: string, text: string }> =
     },
     'strategicPath': {
         title: 'Hướng dẫn: Mở đường',
-        text: 'Nhấn vào các ô trên bản đồ để tạo một con đường mòn. Con đường phải bắt đầu từ ô xuất phát (màu vàng) và các ô phải liền kề nhau. Tránh các địa hình hiểm trở như núi và sông. Hãy mở đường đến điểm kết thúc (màu đỏ)!'
+        text: 'Sử dụng các kỹ năng và vật tư để tạo một con đường an toàn từ điểm Bắt đầu (Vàng) đến điểm Kết thúc (Đỏ). Chú ý đến các mối nguy hiểm như hố bom, cầu sập, và cảm biến của địch.'
     }
 };
 
@@ -1140,3 +1240,15 @@ export const ALL_ACHIEVEMENTS_MAP: Record<string, Achievement> = {
     condition: (gs: SavedGameState) => (gs.unlockedCharacterIds?.length || 0) >= Object.keys(AI_CHARACTERS).length,
   },
 };
+
+// --- Soldier's Notebook Data ---
+export const NOTEBOOK_PAGES: NotebookPage[] = [
+  { type: 'text', content: "Trường Sơn, ngày... \nRời xa mái nhà, lòng nặng trĩu. Con đường phía trước mịt mùng, chỉ có ý chí làm bạn đồng hành." },
+  { type: 'text', content: "Thơ chép tay:\n\n'Đi dọc Trường Sơn cứu nước\nMà lòng phơi phới dậy tương lai.'" },
+  { type: 'text', content: "Rừng rậm, muỗi vắt, và tiếng chim lạ. Đêm qua nghe tiếng máy bay gầm rú xa xa. Phải cẩn thận hơn." },
+  { type: 'text', content: "[Bản phác thảo nhanh một cây cầu tạm bợ bắc qua con suối chảy xiết. Có vài bóng người đang gùi hàng đi qua.]" },
+  { type: 'text', content: "Gặp một đơn vị bạn, chia nhau điếu thuốc, củ sắn. Tình đồng đội sưởi ấm cả núi rừng. Hẹn ngày gặp lại ở Sài Gòn." },
+  { type: 'text', content: "Báo động! Máy bay địch! May mắn thoát nạn trong gang tấc. Tim vẫn còn đập thình thịch. Con đường này không chỉ đo bằng bước chân." },
+  { type: 'text', content: "Đã đi được nửa chặng đường. Mái tóc đã dài, da đã sạm đi, nhưng ánh mắt thì sáng hơn. Miền Nam ơi, ta tới đây!" },
+  { type: 'text', content: "Bài hát chép vội:\n\n'Đêm Trường Sơn, chúng cháu nhìn trăng, nhìn cây...\nLòng thầm gọi tên Bác bao mến thương...'" },
+];

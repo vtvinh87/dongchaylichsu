@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { LOGO_FULL_URL } from '../imageUrls';
 
 interface LoginScreenProps {
   onLogin: (name: string) => void;
@@ -18,8 +19,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, appName }) => {
   };
 
   return (
-    <div className="screen-container bg-amber-100 dark:bg-stone-800 p-8 rounded-xl shadow-2xl w-full max-w-md text-center transform transition-all duration-500 hover:scale-105">
-      <h1 className="text-5xl font-bold text-amber-700 dark:text-amber-400 mb-8 font-serif">{appName}</h1>
+    <div className="login-screen screen-container bg-amber-100 dark:bg-stone-800 p-8 rounded-xl shadow-2xl w-full max-w-md text-center transform transition-all duration-500 hover:scale-105">
+      <img src={LOGO_FULL_URL} alt={`${appName} Logo`} className="app-logo mx-auto" />
       <form onSubmit={handleSubmit} className="space-y-6">
         <input
           type="text"

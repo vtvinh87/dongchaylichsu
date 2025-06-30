@@ -99,6 +99,9 @@ const App: React.FC = () => {
   const [unlockedAchievementIds, setUnlockedAchievementIds] = useState<string[]>([]);
   const [achievementNotification, setAchievementNotification] = useState<Achievement | null>(null);
 
+  // Notebook State
+  const [unlockedNotebookPages, setUnlockedNotebookPages] = useState<number[]>([0, 1]);
+
   // Instruction Modal State
   const [instructionModalState, setInstructionModalState] = useState<{
     isOpen: boolean;
@@ -225,6 +228,7 @@ const App: React.FC = () => {
             setUnlockedBackgroundIds(loadedState.unlockedBackgroundIds ?? ['lang-que']);
 
             setUnlockedAchievementIds(loadedState.unlockedAchievementIds ?? []);
+            setUnlockedNotebookPages(loadedState.unlockedNotebookPages ?? [0, 1]);
 
         } catch (error) {
             console.error("Failed to parse game state from localStorage:", error);
@@ -239,6 +243,7 @@ const App: React.FC = () => {
          setSandboxState({ activeBackgroundId: 'lang-que', placedItems: [], speechBubbles: [] });
          setUnlockedAchievementIds([]);
          setQuestProgress({});
+         setUnlockedNotebookPages([0, 1]);
     }
     
     navigateTo(nextScreen);
@@ -283,11 +288,12 @@ const App: React.FC = () => {
         unlockedBackgroundIds,
         sandboxState,
         unlockedAchievementIds,
+        unlockedNotebookPages,
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(gameState));
       checkAndAwardAchievements(gameState);
     }
-  }, [userName, collectedArtifacts, collectedHeroCards, collectedDecorations, inventory, isPremium, dailyChatCount, lastChatDate, tutorialsSeen, seenInstructions, avatarCustomization, unlockedCustomizationItemIds, unlockedCharacterIds, unlockedBackgroundIds, sandboxState, unlockedAchievementIds, questProgress, checkAndAwardAchievements]);
+  }, [userName, collectedArtifacts, collectedHeroCards, collectedDecorations, inventory, isPremium, dailyChatCount, lastChatDate, tutorialsSeen, seenInstructions, avatarCustomization, unlockedCustomizationItemIds, unlockedCharacterIds, unlockedBackgroundIds, sandboxState, unlockedAchievementIds, unlockedNotebookPages, questProgress, checkAndAwardAchievements]);
 
   // Effect to unlock customization items & characters based on completed chapters
   useEffect(() => {
@@ -668,6 +674,15 @@ const App: React.FC = () => {
     }
   }, [isPremium]);
 
+  const handleUnlockNotebookPage = useCallback((pageIndex: number) => {
+    setUnlockedNotebookPages(prev => {
+        if (prev.includes(pageIndex)) {
+            return prev; // Already unlocked
+        }
+        return [...prev, pageIndex].sort((a,b) => a - b);
+    });
+  }, []);
+
   const handleToggleChatbot = useCallback(() => {
     playSound('sfx-click');
     setShowChatbot(prev => !prev);
@@ -1031,6 +1046,8 @@ const App: React.FC = () => {
                     missionData={activeMission as StrategicPathMissionData}
                     onReturnToMuseum={handleReturnToMuseum}
                     onComplete={handleMissionCompletion}
+                    unlockedNotebookPages={unlockedNotebookPages}
+                    onUnlockNotebookPage={handleUnlockNotebookPage}
                 />
             );
         }

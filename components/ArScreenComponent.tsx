@@ -5,6 +5,8 @@ import React, { useEffect } from 'react';
 import { ARMissionData, Reward } from '../types';
 import { playSound } from '../utils/audio';
 
+// A-Frame types are now declared globally in types.ts
+
 interface ArScreenComponentProps {
   missionData: ARMissionData;
   onReturnAndClaimReward: () => void;

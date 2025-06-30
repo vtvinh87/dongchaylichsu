@@ -1,8 +1,5 @@
-/// <reference types="react" />
-
-// This simplified version should avoid any potential type conflicts.
-// It uses `any` to bypass detailed prop checking for A-Frame components,
-// which is a common and effective way to resolve these JSX-related TS errors.
+// --- A-Frame Type Declarations for JSX ---
+// This ensures TypeScript knows about the custom A-Frame elements when using them in JSX.
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -15,6 +12,3 @@ declare global {
     }
   }
 }
-
-// The empty export is important to make this a module.
-export {};
