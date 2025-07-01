@@ -25,7 +25,7 @@ export const SANDBOX_BG_THANG_LONG_URL = 'https://i.ibb.co/7tXbLxkG/B-cung-dien-
 export const SKETCHFAB_BRONZE_DRUM_EMBED_URL = "https://sketchfab.com/models/c91e55f6db8742f09ad2d5815ca6b749/embed";
 
 // --- Artifact & Puzzle Images ---
-export const TRONG_DONG_URL = "https://i.ibb.co/2YM7bfkB/trong-dong.png";
+export const TRONG_DONG_URL = "https://lh3.googleusercontent.com/pw/AP1GczNcItQtNleM-QCkrTSz_HJ981XrtkJzZ-nI0gn2P9UGvOh0fb-o4cdp1ovSLGnEjM7bAxA-fVeNiVGarwQIHiDTqxMaDo3l3dgmdZhBv-Y1jB-eqPW8fuiP5yGMNi8wyUV2h08a7Wg9yyI89QIBbX8QlawVH9l2FXSwu16NDrHy79naAYZiMhBRA9dnkqfrh04ADU8baNZE1LE71WIY7J8hlQkkis-brVJI9gr82ZTdZn1fk86bp9hSj7kt732mnDtn7Pcpr8vtqhHgpNgcxkuPfVCbRhCW08bscrQozRbhw3GpQcnm7TPnXR1WfpJv7PGVfubL6kFVobVr7Gv32HRE7gzEEJ4TTErx8jSrVgYfhQ9d8-L8mdQZYhvG1ffUL9XAlWxI4n66WroS3-LrJhX_mfiiwnUXy22IhSMOWkCI4pHqRdbn2lT2jKHZlvl5C8qznOjLL0lxBVxcCpjkY2IGhXCIS4L3spUycnTZMIWTUtQxopelxsU6E3cqQCWCLtSr3Cxr5a9QEoHNLGFC1c0aG-BURDC3Wfqmc14v-zaJabrJ0c-iOTYWWBcMsRjw8Z1_Ix7fqLCYjwtmlM9uEtTyIzUpVN3sRV57WeL0hf99qFm43SDYSTtSEtLNbAA9nbZ7r7oLPoYktHM3AU4GM4yBqkBEOMFu6lBiBCs2HUrItz-FAdjPlkZTygDZucP3dkkOmUz8ArlaoImzgWpmDtQHXMJB6kDWrPE0Li5cfCcKkglHnps80B8B-itiXGun0v-bg_unjvmrQ8bzPUN3VfS4u6gS8hRPre1wJ9ktzgjtRKY8zg5qV2nWwxUaZ1OR8roRky7-AV-oD9mZ5jOpMo67oce0iKVZYEB8twEvY5HjwWYJEdT2udagGorpW81I8XoJ-L_HAP6gff8lA7kLPDQYv8ixfVluyhqIHpGo58DEZkU0cPWcEdyXEsqbmTsWBwb0m6CbJ6LjL2EVw7v9SAry884IApHMcCg0MzI9iw=w745-h745-s-no?authuser=0";
 export const NHA_SAN_URL = "https://i.ibb.co/1f8WLZvf/nha-san-hung-vuong.png";
 export const TRUNG_NU_VUONG_SEAL_URL = "https://i.ibb.co/ccVkW5Qj/an-trung-nu-vuong.png";
 export const GOLDEN_TURTLE_MODEL_IMAGE_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Hoan_Kiem_turtle_specimen.jpeg/800px-Hoan_Kiem_turtle_specimen.jpeg";
@@ -46,6 +46,10 @@ export const ARTIFACT_GIA_DINH_BAO_URL = 'https://i.ibb.co/WWL4PKmf/M-Gia-Dinh-b
 export const VALI_DONG_DU_ARTIFACT_URL = 'https://i.ibb.co/LdyGLXc5/M-vali-cua-nha-yeu-nuoc.png';
 export const TRUONG_SON_COMPASS_ARTIFACT_URL = 'https://i.ibb.co/8ggcd9jY/M-la-ban.png';
 export const DIEN_DAI_TRINH_SAT_ARTIFACT_URL = 'https://i.ibb.co/XkYXr23P/M-dien-dai-trinh-sat.png';
+export const BA_TRIEU_CLOGS_ARTIFACT_ID = 'https://i.ibb.co/3WJcWgJ/M-guoc-nga-ba-trieu.png';
+export const BA_TRIEU_PHOENIX_HAIRPIN_URL = 'https://i.ibb.co/xS3FS7Yn/M-tram-cai-toc-hinh-phuong.png';
+export const MO_HINH_CHUA_VAN_XUAN_URL = 'https://i.ibb.co/SDbyRmk5/M-mo-hinh-van-xuan.png';
+export const COC_GO_BACH_DANG_URL = 'https://i.ibb.co/LdyY8ShX/M-coc-go-bac-dang.png';
 
 
 // --- Memory Fragment Images ---
@@ -63,6 +67,7 @@ export const HAI_BA_TRUNG_HERO_CARD_URL = "https://upload.wikimedia.org/wikipedi
 // --- Saga & Quest Cover Images ---
 export const SAGA_KHAI_QUOC_URL = "https://i.ibb.co/fYLNkBgD/Q-trong-dong.png";
 export const SAGA_HUNG_VUONG_URL = "https://i.ibb.co/4wjWnKnR/Q-dong-thoi-gian.png";
+export const SAGA_LOI_THE_SONG_HAT_URL = "https://i.ibb.co/PGcgX0SF/Q-loi-the-song-hat.png";
 export const SAGA_BAT_KHUAT_URL = "https://i.ibb.co/6cptztMQ/Q-loi-hieu-trieu-2.png";
 export const SAGA_KHOI_NGHIA_HBT_URL = "https://i.ibb.co/b5jXT6fT/Q-khoi-nghia.png";
 export const SAGA_AR_URL = "https://i.ibb.co/FLzfX8C2/Q-cua-so-thoi-gian.png";
@@ -86,9 +91,12 @@ export const SAGA_TRUONG_SON_URL = 'https://i.ibb.co/k6H6nVRt/Q-mo-duong-truong-
 export const SAGA_DONG_LOC_URL = 'https://i.ibb.co/xtzPRtKF/Q-nga-ba-dong-loc.png';
 export const SAGA_CUA_CHUA_URL = 'https://i.ibb.co/S40M8DnN/Q-cua-chu-A-deo-phu-la-nhich.png';
 export const SAGA_SEBANGHIENG_URL = 'https://i.ibb.co/kVhbv8Qb/Q-vuot-song-se-bang-hieng.png';
+export const SAGA_CUOI_VOI_DANH_GIAC_URL = 'https://i.ibb.co/fzK3V6v1/Q-cuoi-voi-danh-giac.png';
+export const SAGA_LY_BI_VAN_XUAN_URL = 'https://i.ibb.co/YF2dLbqZ/Q-Ly-Bi-va-nuoc-van-xuan.png';
 export const BACH_DANG_DO_THAM_ICON_URL = "https://i.ibb.co/B5hFBJtW/Q-do-tham-dia-hinh.png";
 export const BACH_DANG_CAM_COC_ICON_URL = "https://i.ibb.co/BKfFgHX9/Q-cam-coc-go.png";
 export const BACH_DANG_VICTORY_ICON_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/T%C6%B0%E1%BB%A3ng_%C4%90%E1%BB%A9c_vua_Ng%C3%B4_Quy%E1%BB%81n.jpg/800px-T%C6%B0%E1%BB%A3ng_%C4%90%E1%BB%A9c_vua_Ng%C3%B4_Quy%E1%BB%81n.jpg";
+export const QUEST_CHAIN_BACH_DANG_BANNER_URL = 'https://i.ibb.co/s90G8mgf/Q-dai-pha-quan-nam-han-tren-song-bach-dang.png';
 export const STRATEGY_MAP_NGOC_HOI_URL = "https://i.ibb.co/8XYddzK/map-ngoc-hoi.jpg";
 export const MAP_KINH_THANH_HUE_URL = 'https://i.ibb.co/C0wVqKs/map-kinh-thanh-hue.jpg';
 
@@ -101,7 +109,8 @@ export const HIDDEN_OBJECT_BG_URL = 'https://i.ibb.co/yBrgKkX/hidden-object-mark
 export const FORGE_ANVIL_BG_URL = "https://i.ibb.co/yWX5Y01/forge-anvil-bg.png";
 export const FORGE_SPARKS_GIF_URL = "https://i.ibb.co/xL5KScg/sparks-gif.gif";
 export const DEFENSE_PERSON_ICON_URL = "https://i.ibb.co/wJ1Fj89/person-icon.png";
-export const DEFENSE_FOOD_ICON_URL = "https://i.ibb.co/51v518h/food-cart-icon.png";
+export const DEFENSE_SUPPLIES_ICON_URL = "https://i.ibb.co/51v518h/food-cart-icon.png";
+export const DEFENSE_WOUNDED_ICON_URL = "https://i.ibb.co/pW9B3Yf/icon-thuong-binh.png";
 export const METAL_COPPER_URL = "https://i.ibb.co/LgB6Lqg/metal-copper.png";
 export const METAL_IRON_URL = "https://i.ibb.co/3z10fVq/metal-iron.png";
 export const MOLD_QUANG_TRUNG_URL = "https://i.ibb.co/6P7gJ0m/mold-quang-trung.png";
@@ -122,6 +131,18 @@ export const ICON_LAO_VILLAGE_URL = 'https://i.ibb.co/y4Y2Qwq/icon-lang-lao.png'
 export const ICON_CONVOY_URL = 'https://i.ibb.co/ZwBs0YQ/icon-xe-khong-kinh-ngang.png';
 export const FRIENDLY_CAMP_ICON_URL = 'https://i.ibb.co/x78hC1Q/icon-trai-ban.png';
 export const ICON_HERB_URL = 'https://i.ibb.co/0j4pb33x/icon-cay-thao-duoc.png';
+export const ENEMY_SHIP_ICON_URL = 'https://i.ibb.co/JvW2kC1/icon-thuyen-dich.png';
+export const RALLY_CALL_BG_LOW_MORALE_URL = 'https://i.ibb.co/6JgQdRH9/B-si-khi-thap-trung-binh.png';
+export const RALLY_CALL_BG_HIGH_MORALE_URL = 'https://i.ibb.co/B24Why36/B-si-khi-cao-bung-no.png';
+export const ICON_RAISE_FLAG_URL = 'https://i.ibb.co/G34S2fV3/icon-co-hieu-khoi-nghia.png';
+export const ICON_BEAT_DRUM_URL = 'https://i.ibb.co/q3hQ78Nc/icon-trong-tran.png';
+export const ICON_POUR_WINE_URL = 'https://i.ibb.co/PG9P9JSf/icon-chen-ruou-the.png';
+export const ICON_POINT_SWORD_URL = 'https://i.ibb.co/zZfWdKq/fragment-sword.png'; // Reusing
+export const ICON_SHOUT_SLOGAN_URL = 'https://i.ibb.co/PvZj96mQ/M-ao-bao-nghia-quan-Tay-Son.png'; // Placeholder
+export const ICON_STOMP_FOOT_URL = 'https://i.ibb.co/3WJcWgJ/M-guoc-nga-ba-trieu.png'; // Reusing
+export const ICON_VOW_NATION_URL = 'https://i.ibb.co/TBMTQD8q/M-hich-tuong-si.png'; // Reusing
+export const ICON_VOW_PERSONAL_URL = 'https://i.ibb.co/xS3FS7Yn/M-tram-cai-toc-hinh-phuong.png'; // Reusing
+export const ICON_VOW_WEALTH_URL = 'https://i.ibb.co/L5kLqVf/ly-dynasty-coin.png'; // Reusing
 
 
 // --- Trading Good Icons ---

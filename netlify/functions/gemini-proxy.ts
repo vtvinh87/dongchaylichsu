@@ -16,7 +16,7 @@ const handler: Handler = async (event: HandlerEvent) => {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const { type, prompt, systemInstruction, history } = body;
+    const { type, prompt, systemInstruction, history, hichText } = body;
 
     if (type === 'chat') {
         if (!prompt || !systemInstruction) {
@@ -47,6 +47,39 @@ const handler: Handler = async (event: HandlerEvent) => {
             statusCode: 200,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text: response.text }),
+        };
+    } else if (type === 'generate_hich_puzzle') {
+        if (!hichText) {
+            return { statusCode: 400, body: JSON.stringify({ error: "Yêu cầu generate_hich_puzzle thiếu 'hichText'." }) };
+        }
+        const puzzlePrompt = `Phân tích đoạn văn sau: "${hichText}".
+Nhiệm vụ: Tạo một câu đố điền từ cho trò chơi lịch sử.
+Yêu cầu:
+- Chọn 10 từ hoặc cụm từ có ý nghĩa (danh từ, động từ, tính từ).
+- Thay thế chúng bằng "_BLANK_" trong văn bản gốc.
+- Cung cấp định nghĩa ngắn gọn, dễ hiểu cho mỗi từ/cụm từ đã chọn.
+- Trả về một đối tượng JSON duy nhất, không có markdown hay giải thích.
+Format JSON: { "modifiedText": string, "answers": string[], "definitions": Record<string, string> }`;
+
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash-preview-04-17",
+            contents: puzzlePrompt,
+            config: {
+              responseMimeType: "application/json",
+            },
+        });
+        
+        let jsonStr = response.text.trim();
+        const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
+        const match = jsonStr.match(fenceRegex);
+        if (match && match[2]) {
+          jsonStr = match[2].trim();
+        }
+
+        return {
+            statusCode: 200,
+            headers: { "Content-Type": "application/json" },
+            body: jsonStr, // Return the clean JSON string
         };
     } else {
         return { statusCode: 400, body: JSON.stringify({ error: 'Loại yêu cầu không hợp lệ.' }) };

@@ -1,5 +1,4 @@
 
-
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import LoginScreen from './components/LoginScreen';
 import MainInterface from './components/MainInterface';
@@ -39,8 +38,10 @@ import CityPlanningScreen from './components/CityPlanningScreen'; // Import City
 import TypesettingScreen from './components/TypesettingScreen'; // Import Typesetting Screen
 import AdventurePuzzleScreen from './components/AdventurePuzzleScreen';
 import StrategicPathScreen from './components/StrategicPathScreen';
+import ConstructionPuzzleScreen from './components/ConstructionPuzzleScreen';
+import NavalBattleScreen from './components/NavalBattleScreen';
 import DialogueModal from './components/DialogueModal';
-import { Screen, Artifact, MissionInfo, HeroCard, MissionData, PuzzleMissionData, NarrativeMissionData, TimelineMissionData, ARMissionData, HiddenObjectMissionData, LeaderboardEntry, AiCharacter, Decoration, QuizMissionData, ConstructionMissionData, Tutorial, SavedGameState, AvatarCustomization, CustomizationItem, DiplomacyMissionData, Reward, MemoryFragment, TradingMissionData, ColoringMissionData, RhythmMissionData, SandboxState, Achievement, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData, DialogueEntry, ActiveSideQuestState, DialogueOption, NotebookUnlockEvent } from './types';
+import { Screen, Artifact, MissionInfo, HeroCard, MissionData, PuzzleMissionData, NarrativeMissionData, TimelineMissionData, ARMissionData, HiddenObjectMissionData, LeaderboardEntry, AiCharacter, Decoration, QuizMissionData, ConstructionMissionData, Tutorial, SavedGameState, AvatarCustomization, CustomizationItem, DiplomacyMissionData, Reward, MemoryFragment, TradingMissionData, ColoringMissionData, RhythmMissionData, SandboxState, Achievement, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData, DialogueEntry, ActiveSideQuestState, DialogueOption, NotebookUnlockEvent, ConstructionPuzzleMissionData, NavalBattleMissionData } from './types';
 import { 
   HOI_DATA, ALL_MISSIONS, APP_NAME, ALL_HERO_CARDS,
   LEADERBOARD_LOCAL_STORAGE_KEY, POINTS_PER_ARTIFACT, MAX_LEADERBOARD_ENTRIES,
@@ -200,7 +201,7 @@ export const App: React.FC = () => {
 
 
   const navigateTo = useCallback((screen: Screen, mission: MissionData | null = null) => {
-    const nonStandardNavScreens = [Screen.AR_MISSION_SCREEN, Screen.PREMIUM_SCREEN, Screen.SANDBOX, Screen.HIDDEN_OBJECT_SCREEN, Screen.QUIZ_MISSION_SCREEN, Screen.CONSTRUCTION_MISSION_SCREEN, Screen.DIPLOMACY_MISSION_SCREEN, Screen.CUSTOMIZATION, Screen.CRAFTING_SCREEN, Screen.TRADING_SCREEN, Screen.COLORING_MISSION_SCREEN, Screen.RHYTHM_MISSION_SCREEN, Screen.ACHIEVEMENTS, Screen.RALLY_CALL_MISSION_SCREEN, Screen.FORGING_MISSION_SCREEN, Screen.QUEST_CHAIN_SCREEN, Screen.TACTICAL_MAP_MISSION_SCREEN, Screen.DEFENSE_MISSION_SCREEN, Screen.STRATEGY_MAP_MISSION_SCREEN, Screen.COIN_MINTING_MISSION_SCREEN, Screen.CITY_PLANNING_MISSION_SCREEN, Screen.TYPESETTING_MISSION_SCREEN, Screen.ADVENTURE_PUZZLE_SCREEN, Screen.STRATEGIC_PATH_MISSION_SCREEN];
+    const nonStandardNavScreens = [Screen.AR_MISSION_SCREEN, Screen.PREMIUM_SCREEN, Screen.SANDBOX, Screen.HIDDEN_OBJECT_SCREEN, Screen.QUIZ_MISSION_SCREEN, Screen.CONSTRUCTION_MISSION_SCREEN, Screen.DIPLOMACY_MISSION_SCREEN, Screen.CUSTOMIZATION, Screen.CRAFTING_SCREEN, Screen.TRADING_SCREEN, Screen.COLORING_MISSION_SCREEN, Screen.RHYTHM_MISSION_SCREEN, Screen.ACHIEVEMENTS, Screen.RALLY_CALL_MISSION_SCREEN, Screen.FORGING_MISSION_SCREEN, Screen.QUEST_CHAIN_SCREEN, Screen.TACTICAL_MAP_MISSION_SCREEN, Screen.DEFENSE_MISSION_SCREEN, Screen.STRATEGY_MAP_MISSION_SCREEN, Screen.COIN_MINTING_MISSION_SCREEN, Screen.CITY_PLANNING_MISSION_SCREEN, Screen.TYPESETTING_MISSION_SCREEN, Screen.ADVENTURE_PUZZLE_SCREEN, Screen.STRATEGIC_PATH_MISSION_SCREEN, Screen.CONSTRUCTION_PUZZLE_SCREEN, Screen.NAVAL_BATTLE_TIMING_SCREEN];
     if (currentScreen !== screen || activeMission?.id !== mission?.id || nonStandardNavScreens.includes(screen)) {
       setTransitionClass('screen-fade-out');
       setTimeout(() => {
@@ -391,22 +392,6 @@ export const App: React.FC = () => {
     }
   }, [collectedArtifacts, collectedHeroCards, collectedDecorations, unlockedCharacterIds, unlockedBackgroundIds, unlockedCustomizationItemIds, activeMission, activeQuestChainId, questProgress, navigateTo]);
   
-  const handleStartMission = (missionInfo: MissionInfo) => {
-    playSound('sfx_click');
-    setPendingMissionInfo(missionInfo);
-    
-    // Logic for pre-mission dialogue
-    const scriptKey = `before_mission_${missionInfo.missionId}`;
-    if (HOI_6_SCRIPT[scriptKey]) {
-        setActiveScriptKey(scriptKey);
-        setIsDialogueOpen(true);
-        return; // Wait for dialogue to finish
-    }
-
-    // If no dialogue, proceed to start
-    actuallyStartMission(missionInfo);
-  };
-  
   const actuallyStartMission = (missionInfo: MissionInfo) => {
     if (missionInfo.isPremium && !isPremium) {
       navigateTo(Screen.PREMIUM_SCREEN);
@@ -442,6 +427,8 @@ export const App: React.FC = () => {
           'typesetting': Screen.TYPESETTING_MISSION_SCREEN,
           'adventurePuzzle': Screen.ADVENTURE_PUZZLE_SCREEN,
           'strategicPath': Screen.STRATEGIC_PATH_MISSION_SCREEN,
+          'constructionPuzzle': Screen.CONSTRUCTION_PUZZLE_SCREEN,
+          'navalBattle': Screen.NAVAL_BATTLE_TIMING_SCREEN,
         };
         const targetScreen = screenMap[missionData.type] || Screen.MAIN_INTERFACE;
         navigateTo(targetScreen, missionData);
@@ -457,6 +444,22 @@ export const App: React.FC = () => {
         startMission();
       }
     }
+  };
+
+  const handleStartMission = (missionInfo: MissionInfo) => {
+    playSound('sfx_click');
+    setPendingMissionInfo(missionInfo);
+    
+    // Logic for pre-mission dialogue
+    const scriptKey = `before_mission_${missionInfo.missionId}`;
+    if (HOI_6_SCRIPT[scriptKey]) {
+        setActiveScriptKey(scriptKey);
+        setIsDialogueOpen(true);
+        return; // Wait for dialogue to finish
+    }
+
+    // If no dialogue, proceed to start
+    actuallyStartMission(missionInfo);
   };
 
   const handleStartAdventure = () => {
@@ -520,270 +523,389 @@ export const App: React.FC = () => {
         setRewardItemForModal(artifact);
         setShowSharedArtifactInfoModal(true);
     } else {
-        alert("Bạn chưa đủ nguyên liệu để chế tác!");
+        playSound('sfx_fail');
+        alert("Bạn chưa thu thập đủ Mảnh Ký ức để chế tác cổ vật này.");
     }
-  };
-  
-  const handleNextTutorialStep = () => {
-    playSound('sfx_click');
-    if (!activeTutorial) return;
-    const tutorial = TUTORIAL_DATA[activeTutorial.id];
-    if (activeTutorial.stepIndex < tutorial.steps.length - 1) {
-      setActiveTutorial(prev => ({ ...prev!, stepIndex: prev!.stepIndex + 1 }));
-    } else {
-      setTutorialsSeen(prev => [...prev, activeTutorial.id]);
-      setActiveTutorial(null);
-    }
-  };
-
-  const handleSkipTutorial = () => {
-    playSound('sfx_click');
-    if (activeTutorial) {
-        setTutorialsSeen(prev => [...prev, activeTutorial.id]);
-        setActiveTutorial(null);
-    }
-  };
-  
-  const handleCloseInstructionModal = (gameType: string, shouldRemember: boolean) => {
-    if (shouldRemember) {
-      setSeenInstructions(prev => [...prev, gameType]);
-    }
-    const onConfirm = instructionModalState.onConfirm;
-    setInstructionModalState({ isOpen: false, gameType: null, onConfirm: null });
-    if(onConfirm) {
-        onConfirm();
-    }
-  };
-
-  const handleUnlockNotebookPage = (pageIndex: number) => {
-    if (!unlockedNotebookPages.includes(pageIndex)) {
-        playSound('sfx_page_turn');
-        setUnlockedNotebookPages(prev => [...prev, pageIndex].sort((a, b) => a - b));
-    }
-  };
-
-  const handleTriggerDialogue = (scriptKey: string) => {
-    setActiveScriptKey(scriptKey);
-    setIsDialogueOpen(true);
-  };
-
-  const handleDialogueClose = () => {
-    if (pendingMissionInfo) {
-      actuallyStartMission(pendingMissionInfo);
-    }
-    if (pendingReward) {
-      completeMissionLogic(pendingReward);
-    }
-    setPendingMissionInfo(null);
-    setPendingReward(undefined);
-    setActiveScriptKey(null);
-    setIsDialogueOpen(false);
   };
 
   const handleDialogueEvent = (event: DialogueEntry) => {
-    if (event.type === 'notebook_unlock') {
-      handleUnlockNotebookPage(event.pageIndex);
-      setPageUnlockNotification(event.message);
-      setTimeout(() => setPageUnlockNotification(null), 3000);
+      if (event.type === 'notebook_unlock') {
+          if (!unlockedNotebookPages.includes(event.pageIndex)) {
+              onUnlockNotebookPage(event.pageIndex);
+              setPageUnlockNotification(event.message);
+          }
+      }
+  };
+
+  const onUnlockNotebookPage = (pageIndex: number) => {
+      setUnlockedNotebookPages(prev => {
+          if (prev.includes(pageIndex)) return prev;
+          return [...prev, pageIndex].sort((a, b) => a - b);
+      });
+  };
+
+  const onCompleteSideQuestStage = (questId: string) => {
+      if (!activeSideQuest || activeSideQuest.questId !== questId) return;
+      const questData = SIDE_QUESTS[questId];
+      const nextStageIndex = activeSideQuest.currentStage + 1;
+      if (nextStageIndex >= questData.stages.length) {
+          // Quest complete
+          setActiveSideQuest(null);
+          // Trigger end dialogue
+          setActiveScriptKey(questData.endDialogueKey);
+          setIsDialogueOpen(true);
+          // Grant reward from dialogue event
+          if (questData.reward.type === 'notebook_unlock') {
+            handleDialogueEvent(questData.reward);
+          } else {
+            setPendingReward(questData.reward);
+          }
+
+      } else {
+          setActiveSideQuest({ ...activeSideQuest, currentStage: nextStageIndex });
+          alert(`Nhiệm vụ phụ cập nhật: ${questData.stages[nextStageIndex].description}`);
+      }
+  };
+
+
+  const handleDialogueClose = () => {
+    setIsDialogueOpen(false);
+    setActiveScriptKey(null);
+    
+    if (pendingMissionInfo) {
+      // Logic to run after dialogue finishes
+      actuallyStartMission(pendingMissionInfo);
+      setPendingMissionInfo(null);
+    }
+    if (pendingReward) {
+        completeMissionLogic(pendingReward);
+        setPendingReward(undefined);
     }
   };
   
   const handleDialogueOptionClick = (option: DialogueOption) => {
       if (option.action === 'accept_quest') {
-          setActiveSideQuest({ questId: option.questId, currentStage: 0 });
+          const questData = SIDE_QUESTS[option.questId];
+          if (questData) {
+              setActiveSideQuest({ questId: option.questId, currentStage: 0 });
+              alert(`Nhiệm vụ phụ mới: ${questData.title}\n${questData.stages[0].description}`);
+          }
       }
       handleDialogueClose();
   };
-  
-  const handleCompleteSideQuestStage = (questId: string) => {
-      const quest = SIDE_QUESTS[questId];
-      if (!activeSideQuest || activeSideQuest.questId !== questId) return;
-      
-      const newStage = activeSideQuest.currentStage + 1;
-      if (newStage >= quest.stages.length) {
-          setActiveSideQuest(null);
-          handleTriggerDialogue(quest.endDialogueKey);
-          
-          if (quest.reward.type !== 'notebook_unlock') {
-             completeMissionLogic(quest.reward as Reward);
-          }
-      } else {
-          setActiveSideQuest({ questId, currentStage: newStage });
-      }
-  };
-  
-  const handleIncrementChatCount = () => {
-    setDailyChatCount(c => c + 1);
-  };
 
-  const renderCurrentScreen = () => {
-      switch (currentScreen) {
-          case Screen.LANDING_PAGE:
-              return <LandingScreen onStartAdventure={handleStartAdventure} />;
-          case Screen.LOGIN:
-              return <LoginScreen onLogin={handleLogin} appName={APP_NAME} />;
-          case Screen.MAIN_INTERFACE:
-              return <MainInterface
-                  userName={userName} gender={gender} avatarCustomization={avatarCustomization}
-                  hois={HOI_DATA} collectedArtifacts={collectedArtifacts} collectedHeroCards={collectedHeroCards}
-                  collectedDecorations={collectedDecorations} inventory={inventory} onStartMission={handleStartMission}
-                  onShowLeaderboard={() => navigateTo(Screen.LEADERBOARD)} onToggleChatbot={() => setShowChatbot(!showChatbot)}
-                  theme={theme} onToggleTheme={toggleTheme} isPremium={isPremium} onShowPremium={() => navigateTo(Screen.PREMIUM_SCREEN)}
-                  onShowItemDetails={(item) => setItemForDetailModal(item)} onShowSandbox={() => navigateTo(Screen.SANDBOX)}
-                  onShowCustomization={() => navigateTo(Screen.CUSTOMIZATION)} onShowCrafting={() => navigateTo(Screen.CRAFTING_SCREEN)}
-                  onShowAchievements={() => navigateTo(Screen.ACHIEVEMENTS)} isSoundEnabled={isSoundEnabled} onToggleSound={handleToggleSound}
-              />;
-          case Screen.MISSION_SCREEN:
-              if (activeMission?.type === 'puzzle') return <MissionScreen mission={activeMission as PuzzleMissionData} onReturnToMuseum={handleReturnToMuseum} onMissionComplete={completeMissionLogic} onGrantBonusSupplies={handleGrantBonusSupplies} />;
-              return null;
-          case Screen.NARRATIVE_MISSION_SCREEN:
-              if (activeMission?.type === 'narrative') return <NarrativeMissionScreen missionData={activeMission as NarrativeMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.TIMELINE_MISSION_SCREEN:
-              if (activeMission?.type === 'timeline') return <TimelineMissionScreen missionData={activeMission as TimelineMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.LEADERBOARD:
-              return <LeaderboardScreen currentUserName={userName} onReturnToMuseum={handleReturnToMuseum} />;
-          case Screen.AR_MISSION_SCREEN:
-              if (activeMission?.type === 'ar') return <ArScreenComponent missionData={activeMission as ARMissionData} onReturnAndClaimReward={() => completeMissionLogic(activeMission.reward)} onMarkerActuallyFound={handleMarkerFound} arRewardMessage={arRewardMessage}/>;
-              return null;
-          case Screen.PREMIUM_SCREEN:
-              return <PremiumScreen onClose={handleReturnToMuseum} onUpgrade={handleUpgradeToPremium} />;
-          case Screen.SANDBOX:
-              return <SandboxScreen collectedArtifacts={collectedArtifacts} collectedDecorations={collectedDecorations} unlockedBackgroundIds={unlockedBackgroundIds} sandboxState={sandboxState} onUpdateSandboxState={setSandboxState} onReturnToMuseum={handleReturnToMuseum}/>;
-          case Screen.HIDDEN_OBJECT_SCREEN:
-              if (activeMission?.type === 'hiddenObject') return <HiddenObjectScreen missionData={activeMission as HiddenObjectMissionData} onReturnToMuseum={handleReturnToMuseum} onMissionComplete={completeMissionLogic} />;
-              return null;
-          case Screen.QUIZ_MISSION_SCREEN:
-              if (activeMission?.type === 'quiz') return <QuizScreen missionData={activeMission as QuizMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.CONSTRUCTION_MISSION_SCREEN:
-              if (activeMission?.type === 'construction') return <ConstructionScreen missionData={activeMission as ConstructionMissionData} onReturnToMuseum={handleReturnToMuseum} onMissionComplete={completeMissionLogic} />;
-              return null;
-          case Screen.DIPLOMACY_MISSION_SCREEN:
-              if (activeMission?.type === 'diplomacy') return <DiplomacyScreen missionData={activeMission as DiplomacyMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.CUSTOMIZATION:
-              return <CustomizationScreen onReturnToMuseum={handleReturnToMuseum} currentAvatar={avatarCustomization} unlockedItemIds={unlockedCustomizationItemIds} onAvatarChange={handleAvatarChange} gender={gender} />;
-          case Screen.CRAFTING_SCREEN:
-              return <CraftingScreen inventory={inventory} collectedArtifactIds={new Set(collectedArtifacts.map(a => a.id))} onCraftItem={handleCraftItem} onReturnToMuseum={handleReturnToMuseum} />;
-          case Screen.TRADING_SCREEN:
-              if (activeMission?.type === 'trading') return <TradingScreen missionData={activeMission as TradingMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.RHYTHM_MISSION_SCREEN:
-              if (activeMission?.type === 'rhythm') return <RhythmScreen missionData={activeMission as RhythmMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.COLORING_MISSION_SCREEN:
-              if (activeMission?.type === 'coloring') return <ColoringScreen missionData={activeMission as ColoringMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.ACHIEVEMENTS:
-              return <AchievementsScreen unlockedAchievementIds={unlockedAchievementIds} onReturnToMuseum={handleReturnToMuseum} />;
-          case Screen.RALLY_CALL_MISSION_SCREEN:
-              if (activeMission?.type === 'rallyCall') return <RallyCallScreen missionData={activeMission as RallyCallMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.FORGING_MISSION_SCREEN:
-              if (activeMission?.type === 'forging') return <ForgingScreen missionData={activeMission as ForgingMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.QUEST_CHAIN_SCREEN:
-              if (activeQuestChainId) {
-                  const questChain = ALL_QUEST_CHAINS[activeQuestChainId];
-                  if (questChain) {
-                      return <QuestChainScreen questChain={questChain} progress={questProgress[activeQuestChainId] || 0} onStartStep={(missionId) => {
-                          const missionInfo = HOI_DATA.flatMap(h => h.missions).find(m => m.missionId === missionId);
-                          if (missionInfo) handleStartMission(missionInfo);
-                      }} onReturnToMuseum={handleReturnToMuseum} />;
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case Screen.LANDING_PAGE:
+        return <LandingScreen onStartAdventure={handleStartAdventure} />;
+      case Screen.LOGIN:
+        return <LoginScreen onLogin={handleLogin} appName={APP_NAME} />;
+      case Screen.MAIN_INTERFACE:
+        return (
+          <>
+            <MainInterface
+              userName={userName}
+              gender={gender}
+              avatarCustomization={avatarCustomization}
+              hois={HOI_DATA}
+              collectedArtifacts={collectedArtifacts}
+              collectedHeroCards={collectedHeroCards}
+              collectedDecorations={collectedDecorations}
+              inventory={inventory}
+              onStartMission={handleStartMission}
+              onShowLeaderboard={() => navigateTo(Screen.LEADERBOARD)}
+              onToggleChatbot={() => setShowChatbot(!showChatbot)}
+              theme={theme}
+              onToggleTheme={toggleTheme}
+              isPremium={isPremium}
+              onShowPremium={() => navigateTo(Screen.PREMIUM_SCREEN)}
+              onShowItemDetails={(item) => setItemForDetailModal(item)}
+              onShowSandbox={() => navigateTo(Screen.SANDBOX)}
+              onShowCustomization={() => navigateTo(Screen.CUSTOMIZATION)}
+              onShowCrafting={() => navigateTo(Screen.CRAFTING_SCREEN)}
+              onShowAchievements={() => navigateTo(Screen.ACHIEVEMENTS)}
+              isSoundEnabled={isSoundEnabled}
+              onToggleSound={handleToggleSound}
+            />
+            {activeTutorial && (
+              <TutorialOverlay 
+                tutorialData={TUTORIAL_DATA[activeTutorial.id]} 
+                stepIndex={activeTutorial.stepIndex} 
+                onNext={() => {
+                  const tutorial = TUTORIAL_DATA[activeTutorial.id];
+                  if(activeTutorial.stepIndex < tutorial.steps.length - 1){
+                    setActiveTutorial(prev => prev ? {...prev, stepIndex: prev.stepIndex + 1} : null);
+                  } else {
+                    setTutorialsSeen(prev => [...prev, activeTutorial.id]);
+                    setActiveTutorial(null);
                   }
-              }
-              return null;
-          case Screen.TACTICAL_MAP_MISSION_SCREEN:
-              if (activeMission?.type === 'tacticalMap') return <TacticalMapScreen missionData={activeMission as TacticalMapMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.DEFENSE_MISSION_SCREEN:
-              if (activeMission?.type === 'defense') return <DefenseScreen missionData={activeMission as DefenseMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.STRATEGY_MAP_MISSION_SCREEN:
-              if (activeMission?.type === 'strategyMap') return <StrategyMapScreen missionData={activeMission as StrategyMapMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.COIN_MINTING_MISSION_SCREEN:
-              if (activeMission?.type === 'coinMinting') return <CoinMintingScreen missionData={activeMission as CoinMintingMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.CITY_PLANNING_MISSION_SCREEN:
-              if (activeMission?.type === 'cityPlanning') return <CityPlanningScreen missionData={activeMission as CityPlanningMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.TYPESETTING_MISSION_SCREEN:
-              if (activeMission?.type === 'typesetting') return <TypesettingScreen missionData={activeMission as TypesettingMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.ADVENTURE_PUZZLE_SCREEN:
-              if (activeMission?.type === 'adventurePuzzle') return <AdventurePuzzleScreen missionData={activeMission as AdventurePuzzleMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
-              return null;
-          case Screen.STRATEGIC_PATH_MISSION_SCREEN:
-              if (activeMission?.type === 'strategicPath') return <StrategicPathScreen missionData={activeMission as StrategicPathMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} unlockedNotebookPages={unlockedNotebookPages} onUnlockNotebookPage={handleUnlockNotebookPage} onTriggerDialogue={handleTriggerDialogue} activeSideQuest={activeSideQuest} onCompleteSideQuestStage={handleCompleteSideQuestStage} />;
-              return null;
-          default:
-              return <p>Lỗi: Không tìm thấy màn hình!</p>;
-      }
+                }}
+                onSkip={() => {
+                    setTutorialsSeen(prev => [...prev, activeTutorial.id]);
+                    setActiveTutorial(null);
+                }}
+              />
+            )}
+            <Chatbot 
+                isOpen={showChatbot} 
+                onClose={() => setShowChatbot(false)} 
+                unlockedCharacterIds={unlockedCharacterIds}
+                isPremium={isPremium}
+                dailyChatCount={dailyChatCount}
+                onIncrementChatCount={() => setDailyChatCount(prev => prev + 1)}
+                onUpgradePrompt={() => navigateTo(Screen.PREMIUM_SCREEN)}
+            />
+            <AchievementToast 
+              notification={achievementNotification} 
+              onDismiss={() => setAchievementNotification(null)} 
+            />
+          </>
+        );
+      case Screen.MISSION_SCREEN:
+        if (activeMission && activeMission.type === 'puzzle') {
+          return <MissionScreen mission={activeMission as PuzzleMissionData} onReturnToMuseum={handleReturnToMuseum} onMissionComplete={completeMissionLogic} onGrantBonusSupplies={handleGrantBonusSupplies} />;
+        }
+        break;
+      case Screen.NARRATIVE_MISSION_SCREEN:
+        if (activeMission && activeMission.type === 'narrative') {
+          return <NarrativeMissionScreen missionData={activeMission as NarrativeMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.TIMELINE_MISSION_SCREEN:
+        if (activeMission && activeMission.type === 'timeline') {
+          return <TimelineMissionScreen missionData={activeMission as TimelineMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.LEADERBOARD:
+        return <LeaderboardScreen currentUserName={userName} onReturnToMuseum={handleReturnToMuseum} />;
+      case Screen.AR_MISSION_SCREEN:
+        if(activeMission && activeMission.type === 'ar'){
+            return <ArScreenComponent missionData={activeMission as ARMissionData} onReturnAndClaimReward={() => completeMissionLogic(activeMission.reward)} onMarkerActuallyFound={handleMarkerFound} arRewardMessage={arRewardMessage} />;
+        }
+        break;
+      case Screen.PREMIUM_SCREEN:
+        return <PremiumScreen onClose={handleReturnToMuseum} onUpgrade={handleUpgradeToPremium} />;
+      case Screen.SANDBOX:
+        return <SandboxScreen collectedArtifacts={collectedArtifacts} collectedDecorations={collectedDecorations} unlockedBackgroundIds={unlockedBackgroundIds} sandboxState={sandboxState} onUpdateSandboxState={setSandboxState} onReturnToMuseum={handleReturnToMuseum} />;
+      case Screen.HIDDEN_OBJECT_SCREEN:
+        if (activeMission && activeMission.type === 'hiddenObject') {
+            return <HiddenObjectScreen missionData={activeMission as HiddenObjectMissionData} onReturnToMuseum={handleReturnToMuseum} onMissionComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.QUIZ_MISSION_SCREEN:
+        if(activeMission && activeMission.type === 'quiz') {
+            return <QuizScreen missionData={activeMission as QuizMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.CONSTRUCTION_MISSION_SCREEN:
+        if(activeMission && activeMission.type === 'construction') {
+            return <ConstructionScreen missionData={activeMission as ConstructionMissionData} onReturnToMuseum={handleReturnToMuseum} onMissionComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.DIPLOMACY_MISSION_SCREEN:
+        if(activeMission && activeMission.type === 'diplomacy') {
+            return <DiplomacyScreen missionData={activeMission as DiplomacyMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.CUSTOMIZATION:
+        return <CustomizationScreen onReturnToMuseum={handleReturnToMuseum} currentAvatar={avatarCustomization} unlockedItemIds={unlockedCustomizationItemIds} onAvatarChange={handleAvatarChange} gender={gender} />;
+      case Screen.CRAFTING_SCREEN:
+        return <CraftingScreen onReturnToMuseum={handleReturnToMuseum} inventory={inventory} collectedArtifactIds={collectedArtifactIds} onCraftItem={handleCraftItem} />;
+      case Screen.TRADING_SCREEN:
+        if(activeMission && activeMission.type === 'trading') {
+            return <TradingScreen missionData={activeMission as TradingMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.COLORING_MISSION_SCREEN:
+        if(activeMission && activeMission.type === 'coloring') {
+            return <ColoringScreen missionData={activeMission as ColoringMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.RHYTHM_MISSION_SCREEN:
+        if(activeMission && activeMission.type === 'rhythm') {
+            return <RhythmScreen missionData={activeMission as RhythmMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.ACHIEVEMENTS:
+        return <AchievementsScreen onReturnToMuseum={handleReturnToMuseum} unlockedAchievementIds={unlockedAchievementIds} />;
+      case Screen.RALLY_CALL_MISSION_SCREEN:
+        if(activeMission && activeMission.type === 'rallyCall') {
+            return <RallyCallScreen 
+                missionData={activeMission as RallyCallMissionData} 
+                onReturnToMuseum={handleReturnToMuseum} 
+                onComplete={completeMissionLogic}
+                inventory={inventory}
+                setInventory={setInventory}
+            />;
+        }
+        break;
+      case Screen.FORGING_MISSION_SCREEN:
+        if(activeMission && activeMission.type === 'forging') {
+            return <ForgingScreen missionData={activeMission as ForgingMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.QUEST_CHAIN_SCREEN:
+        if (activeQuestChainId && ALL_QUEST_CHAINS[activeQuestChainId]) {
+          const chain = ALL_QUEST_CHAINS[activeQuestChainId];
+          const progress = questProgress[activeQuestChainId] || 0;
+          return <QuestChainScreen questChain={chain} progress={progress} onStartStep={(missionId) => {
+              const missionInfo = chain.steps.find(s => s.missionId === missionId);
+              if (missionInfo) handleStartMission({
+                  id: `chain_${chain.id}_${missionId}`,
+                  title: missionInfo.title,
+                  imageUrl: missionInfo.iconUrl,
+                  description: missionInfo.description,
+                  missionId: missionId
+              })
+          }} onReturnToMuseum={handleReturnToMuseum} />;
+        }
+        break;
+      case Screen.TACTICAL_MAP_MISSION_SCREEN:
+        if (activeMission && activeMission.type === 'tacticalMap') {
+            return <TacticalMapScreen missionData={activeMission as TacticalMapMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.DEFENSE_MISSION_SCREEN:
+        if (activeMission && activeMission.type === 'defense') {
+            return <DefenseScreen missionData={activeMission as DefenseMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.STRATEGY_MAP_MISSION_SCREEN:
+        if (activeMission && activeMission.type === 'strategyMap') {
+            return <StrategyMapScreen missionData={activeMission as StrategyMapMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.COIN_MINTING_MISSION_SCREEN:
+        if (activeMission && activeMission.type === 'coinMinting') {
+            return <CoinMintingScreen missionData={activeMission as CoinMintingMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.CITY_PLANNING_MISSION_SCREEN:
+        if (activeMission && activeMission.type === 'cityPlanning') {
+            return <CityPlanningScreen missionData={activeMission as CityPlanningMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.TYPESETTING_MISSION_SCREEN:
+        if (activeMission && activeMission.type === 'typesetting') {
+            return <TypesettingScreen missionData={activeMission as TypesettingMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.ADVENTURE_PUZZLE_SCREEN:
+        if (activeMission && activeMission.type === 'adventurePuzzle') {
+            return <AdventurePuzzleScreen missionData={activeMission as AdventurePuzzleMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.STRATEGIC_PATH_MISSION_SCREEN:
+        if (activeMission && activeMission.type === 'strategicPath') {
+            return <StrategicPathScreen 
+                missionData={activeMission as StrategicPathMissionData} 
+                onReturnToMuseum={handleReturnToMuseum} 
+                onComplete={completeMissionLogic} 
+                unlockedNotebookPages={unlockedNotebookPages}
+                onUnlockNotebookPage={onUnlockNotebookPage}
+                onTriggerDialogue={(key) => { setActiveScriptKey(key); setIsDialogueOpen(true); }}
+                activeSideQuest={activeSideQuest}
+                onCompleteSideQuestStage={onCompleteSideQuestStage}
+            />;
+        }
+        break;
+      case Screen.CONSTRUCTION_PUZZLE_SCREEN:
+        if (activeMission && activeMission.type === 'constructionPuzzle') {
+            return <ConstructionPuzzleScreen missionData={activeMission as ConstructionPuzzleMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      case Screen.NAVAL_BATTLE_TIMING_SCREEN:
+        if (activeMission && activeMission.type === 'navalBattle') {
+            return <NavalBattleScreen missionData={activeMission as NavalBattleMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
+      default:
+        // Fallback to main interface if no screen matches
+        return <MainInterface
+              userName={userName}
+              gender={gender}
+              avatarCustomization={avatarCustomization}
+              hois={HOI_DATA}
+              collectedArtifacts={collectedArtifacts}
+              collectedHeroCards={collectedHeroCards}
+              collectedDecorations={collectedDecorations}
+              inventory={inventory}
+              onStartMission={handleStartMission}
+              onShowLeaderboard={() => navigateTo(Screen.LEADERBOARD)}
+              onToggleChatbot={() => setShowChatbot(!showChatbot)}
+              theme={theme}
+              onToggleTheme={toggleTheme}
+              isPremium={isPremium}
+              onShowPremium={() => navigateTo(Screen.PREMIUM_SCREEN)}
+              onShowItemDetails={(item) => setItemForDetailModal(item)}
+              onShowSandbox={() => navigateTo(Screen.SANDBOX)}
+              onShowCustomization={() => navigateTo(Screen.CUSTOMIZATION)}
+              onShowCrafting={() => navigateTo(Screen.CRAFTING_SCREEN)}
+              onShowAchievements={() => navigateTo(Screen.ACHIEVEMENTS)}
+              isSoundEnabled={isSoundEnabled}
+              onToggleSound={handleToggleSound}
+            />;
+    }
+    // Default break handler
+    navigateTo(Screen.MAIN_INTERFACE);
+    return null;
   };
 
   return (
-    <div className={`app-container ${theme} font-sans`}>
+    <>
       <div className={`screen-transition-container ${transitionClass}`}>
-        {renderCurrentScreen()}
+        {renderScreen()}
       </div>
-      
-      {/* Modals and Overlays */}
-      <ArtifactInfoModal 
-        isOpen={showSharedArtifactInfoModal}
-        item={rewardItemForModal as (Artifact | MemoryFragment)}
-        onClose={() => setShowSharedArtifactInfoModal(false)}
-      />
-      <ItemDetailModal 
-        item={itemForDetailModal as (Artifact | HeroCard | Decoration)}
-        isOpen={itemForDetailModal !== null}
-        onClose={() => setItemForDetailModal(null)}
-      />
-      <Chatbot 
-        isOpen={showChatbot}
-        onClose={() => setShowChatbot(false)}
-        unlockedCharacterIds={unlockedCharacterIds}
-        isPremium={isPremium}
-        dailyChatCount={dailyChatCount}
-        onIncrementChatCount={handleIncrementChatCount}
-        onUpgradePrompt={() => navigateTo(Screen.PREMIUM_SCREEN)}
-      />
-      <PremiumWelcomeModal
-        isOpen={showPremiumWelcomeModal}
-        onClose={() => setShowPremiumWelcomeModal(false)}
-      />
-      {activeTutorial && (
-        <TutorialOverlay
-          tutorialData={TUTORIAL_DATA[activeTutorial.id]}
-          stepIndex={activeTutorial.stepIndex}
-          onNext={handleNextTutorialStep}
-          onSkip={handleSkipTutorial}
+      {showSharedArtifactInfoModal && rewardItemForModal && (
+        <ArtifactInfoModal 
+          item={rewardItemForModal} 
+          isOpen={showSharedArtifactInfoModal} 
+          onClose={() => {
+            setShowSharedArtifactInfoModal(false);
+            setRewardItemForModal(null);
+          }} 
         />
       )}
-      <InstructionModal
+      {showPremiumWelcomeModal && (
+        <PremiumWelcomeModal
+          isOpen={showPremiumWelcomeModal}
+          onClose={() => setShowPremiumWelcomeModal(false)}
+        />
+      )}
+      {itemForDetailModal && (
+          <ItemDetailModal 
+            item={itemForDetailModal} 
+            isOpen={!!itemForDetailModal} 
+            onClose={() => setItemForDetailModal(null)} 
+          />
+      )}
+      {instructionModalState.isOpen && instructionModalState.gameType && (
+        <InstructionModal
           isOpen={instructionModalState.isOpen}
-          gameType={instructionModalState.gameType || ''}
-          onClose={handleCloseInstructionModal}
-      />
-       <AchievementToast
-          notification={achievementNotification}
-          onDismiss={() => setAchievementNotification(null)}
-       />
-       {pageUnlockNotification && (
-          <div id="page-unlock-notification" className="animate-fadeInOut">{pageUnlockNotification}</div>
-       )}
-       <DialogueModal
-        isOpen={isDialogueOpen}
-        script={activeScriptKey ? HOI_6_SCRIPT[activeScriptKey] : []}
-        speakers={SPEAKER_DATA}
-        playerAvatar={avatarCustomization}
-        gender={gender}
-        onClose={handleDialogueClose}
-        onEvent={handleDialogueEvent}
-        onOptionClick={handleDialogueOptionClick}
-      />
-    </div>
+          gameType={instructionModalState.gameType}
+          onClose={(gameType, shouldRemember) => {
+            if (shouldRemember) {
+              setSeenInstructions(prev => [...prev, gameType]);
+            }
+            if (instructionModalState.onConfirm) {
+              instructionModalState.onConfirm();
+            }
+            setInstructionModalState({ isOpen: false, gameType: null, onConfirm: null });
+          }}
+        />
+      )}
+      {isDialogueOpen && activeScriptKey && HOI_6_SCRIPT[activeScriptKey] && (
+        <DialogueModal
+          isOpen={isDialogueOpen}
+          script={HOI_6_SCRIPT[activeScriptKey]}
+          speakers={SPEAKER_DATA}
+          playerAvatar={avatarCustomization}
+          gender={gender}
+          onClose={handleDialogueClose}
+          onEvent={handleDialogueEvent}
+          onOptionClick={handleDialogueOptionClick}
+        />
+      )}
+    </>
   );
 };

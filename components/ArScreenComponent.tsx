@@ -1,10 +1,8 @@
-
+/// <reference path="../aframe.d.ts" />
 import React, { useEffect } from 'react';
 
 import { ARMissionData, Reward } from '../types';
 import { playSound } from '../utils/audio';
-
-// A-Frame types are declared globally in aframe.d.ts
 
 interface ArScreenComponentProps {
   missionData: ARMissionData;

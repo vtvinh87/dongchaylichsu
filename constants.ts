@@ -7,7 +7,7 @@
 
 
 
-import { MissionInfo, Hoi, Artifact, PuzzlePieceItem, HeroCard, PuzzleMissionData, NarrativeMissionData, TimelineEventItem, TimelineMissionData, MissionData, NarrativeNode, ARMissionData, AiCharacter, Decoration, HiddenObjectMissionData, HiddenObjectItem, QuizMissionData, ConstructionMissionData, Tutorial, CustomizationItem, DiplomacyMissionData, DiplomacyRound, MemoryFragment, Reward, TradingMissionData, TradingGood, TradingEvent, RhythmMissionData, RhythmNote, ColoringMissionData, SandboxBackground, Achievement, SavedGameState, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, MapCellType, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, BuildingPlacement, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData, NotebookPage, DialogueEntry, SpeakerKey, Speaker, SideQuest, NotebookUnlockEvent } from './types';
+import { MissionInfo, Hoi, Artifact, PuzzlePieceItem, HeroCard, PuzzleMissionData, NarrativeMissionData, TimelineEventItem, TimelineMissionData, MissionData, NarrativeNode, ARMissionData, AiCharacter, Decoration, HiddenObjectMissionData, HiddenObjectItem, QuizMissionData, ConstructionMissionData, Tutorial, CustomizationItem, DiplomacyMissionData, DiplomacyRound, MemoryFragment, Reward, TradingMissionData, TradingGood, TradingEvent, RhythmMissionData, RhythmNote, ColoringMissionData, SandboxBackground, Achievement, SavedGameState, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, MapCellType, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, BuildingPlacement, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData, NotebookPage, DialogueEntry, SpeakerKey, Speaker, SideQuest, NotebookUnlockEvent, ConstructionPuzzleMissionData, ConstructionPuzzlePiece, NavalBattleMissionData } from './types';
 import * as ImageUrls from './imageUrls';
 
 export const APP_NAME = "Dòng Chảy Lịch Sử";
@@ -70,7 +70,7 @@ export const GOLDEN_TURTLE_MODEL_ARTIFACT: Artifact = {
   name: "Mô Hình Rùa Vàng (AR)",
   imageUrl: ImageUrls.GOLDEN_TURTLE_MODEL_IMAGE_URL,
   description: "Chiêm ngưỡng Rùa Vàng thần thoại qua công nghệ AR.",
-  detailedDescription: "Rùa Vàng (Kim Quy) là một hình tượng linh thiêng trong truyền thuyết Việt Nam, gắn liền với sự tích vua An Dương Vương xây thành Cổ Loa và nỏ thần Kim Quy. Việc khám phá mô hình Rùa Vàng qua thực tế ảo tăng cường (AR) mang đến một trải nghiệm độc đáo, kết nối quá khứ huyền thoại với công nghệ hiện đại, giúp bạn hình dung rõ hơn về một biểu tượng quan trọng trong văn hóa dân tộc."
+  detailedDescription: "Rùa Vàng (Kim Quy) là một hình tượng linh thiêng trong truyền thuyết Việt Nam, gắn liền với sự tích vua An Dương Vương xây dựng thành Cổ Loa và nỏ thần Kim Quy. Việc khám phá mô hình Rùa Vàng qua thực tế ảo tăng cường (AR) mang đến một trải nghiệm độc đáo, kết nối quá khứ huyền thoại với công nghệ hiện đại, giúp bạn hình dung rõ hơn về một biểu tượng quan trọng trong văn hóa dân tộc."
 };
 
 export const LY_DYNASTY_COIN_ARTIFACT_ID = "ly_dynasty_coin";
@@ -217,6 +217,42 @@ export const DIEN_DAI_TRINH_SAT_ARTIFACT: Artifact = {
     detailedDescription: "Trong điều kiện chiến đấu gian khổ, thông tin liên lạc là mạch máu của trận đánh. Chiếc điện đài này đã giúp các chiến sĩ trinh sát truyền đi những thông tin tình báo quý giá, góp phần vào thắng lợi chung. Nó là biểu tượng của sự mưu trí, dũng cảm và thầm lặng của người lính thông tin."
 };
 
+export const BA_TRIEU_CLOGS_ARTIFACT_ID = "ba_trieu_ivory_clogs";
+export const BA_TRIEU_CLOGS_ARTIFACT: Artifact = {
+  id: BA_TRIEU_CLOGS_ARTIFACT_ID,
+  name: "Guốc ngà của Bà Triệu",
+  imageUrl: ImageUrls.BA_TRIEU_CLOGS_ARTIFACT_ID,
+  description: "Đôi guốc ngà mà Vua Bà đã mang khi ra trận, thể hiện khí phách hiên ngang.",
+  detailedDescription: "Truyền thuyết kể rằng, Triệu Thị Trinh (Bà Triệu) thường đi guốc ngà, mặc áo giáp vàng, cài trâm vàng, cưỡi voi trắng một ngà ra trận. Đôi guốc này không chỉ là vật trang sức mà còn là biểu tượng cho khí phách phi thường, hiên ngang, không chịu cúi đầu làm nô lệ của vị nữ tướng anh hùng."
+};
+
+export const BA_TRIEU_PHOENIX_HAIRPIN_ARTIFACT_ID = "ba_trieu_phoenix_hairpin";
+export const BA_TRIEU_PHOENIX_HAIRPIN_ARTIFACT: Artifact = {
+  id: BA_TRIEU_PHOENIX_HAIRPIN_ARTIFACT_ID,
+  name: "Trâm cài tóc vàng hình phượng",
+  imageUrl: ImageUrls.BA_TRIEU_PHOENIX_HAIRPIN_URL,
+  description: "Chiếc trâm cài thể hiện vẻ đẹp và uy quyền của Vua Bà.",
+  detailedDescription: "Truyền thuyết kể rằng, ngoài áo giáp vàng và guốc ngà, Bà Triệu còn dùng trâm vàng cài tóc khi ra trận. Chiếc trâm hình phượng hoàng này không chỉ là một món trang sức quý giá mà còn là biểu tượng cho sự cao quý, khí phách và ý chí không chịu khuất phục của nữ tướng."
+};
+
+export const MO_HINH_CHUA_VAN_XUAN_ARTIFACT_ID = 'mo-hinh-chua-van-xuan';
+export const MO_HINH_CHUA_VAN_XUAN_ARTIFACT: Artifact = {
+    id: MO_HINH_CHUA_VAN_XUAN_ARTIFACT_ID,
+    name: "Mô hình Chùa Vạn Xuân",
+    imageUrl: ImageUrls.MO_HINH_CHUA_VAN_XUAN_URL,
+    description: "Mô hình ngôi chùa do Lý Bí cho xây dựng sau khi lập nên nước Vạn Xuân.",
+    detailedDescription: "Sau khi đánh đuổi quân Lương và lên ngôi vua (Lý Nam Đế), Lý Bí đã cho dựng chùa Khai Quốc (sau đổi tên thành Trấn Quốc) ở gần bờ sông Hồng. Ngôi chùa này, cùng với nước Vạn Xuân, là biểu tượng cho nền độc lập, tự chủ và sự phát triển của Phật giáo thời kỳ đó.",
+};
+
+export const COC_GO_BACH_DANG_ARTIFACT_ID = "coc-go-bach-dang";
+export const COC_GO_BACH_DANG_ARTIFACT: Artifact = {
+    id: COC_GO_BACH_DANG_ARTIFACT_ID,
+    name: "Cọc gỗ Bạch Đằng",
+    imageUrl: ImageUrls.COC_GO_BACH_DANG_URL,
+    description: "Vũ khí bí mật làm nên chiến thắng lịch sử trên sông Bạch Đằng.",
+    detailedDescription: "Cọc gỗ lim bịt đầu sắt là một sáng kiến quân sự thiên tài của Ngô Quyền. Hàng ngàn chiếc cọc được đóng xuống lòng sông Bạch Đằng, tạo thành một bãi chướng ngại vật chết người. Khi thủy triều lên, bãi cọc bị che khuất, quân ta nhử thuyền địch vào. Khi triều rút, thuyền địch bị cọc đâm thủng, vỡ tan, tạo nên chiến thắng vĩ đại chấm dứt hơn 1000 năm Bắc thuộc."
+};
+
 
 export const ALL_ARTIFACTS_MAP: Record<string, Artifact> = {
   [BRONZE_DRUM_ARTIFACT_ID]: BRONZE_DRUM_ARTIFACT,
@@ -240,6 +276,10 @@ export const ALL_ARTIFACTS_MAP: Record<string, Artifact> = {
   [VALI_DONG_DU_ARTIFACT_ID]: VALI_DONG_DU_ARTIFACT,
   [TRUONG_SON_COMPASS_ARTIFACT_ID]: TRUONG_SON_COMPASS_ARTIFACT,
   [DIEN_DAI_TRINH_SAT_ARTIFACT_ID]: DIEN_DAI_TRINH_SAT_ARTIFACT,
+  [BA_TRIEU_CLOGS_ARTIFACT_ID]: BA_TRIEU_CLOGS_ARTIFACT,
+  [BA_TRIEU_PHOENIX_HAIRPIN_ARTIFACT_ID]: BA_TRIEU_PHOENIX_HAIRPIN_ARTIFACT,
+  [MO_HINH_CHUA_VAN_XUAN_ARTIFACT_ID]: MO_HINH_CHUA_VAN_XUAN_ARTIFACT,
+  [COC_GO_BACH_DANG_ARTIFACT_ID]: COC_GO_BACH_DANG_ARTIFACT,
 };
 
 // --- Memory Fragments ---
@@ -285,7 +325,7 @@ export const ALL_FRAGMENTS_MAP: Record<string, MemoryFragment> = {
     name: 'Mảnh Cọc gỗ Bạch Đằng',
     imageUrl: ImageUrls.BACH_DANG_STAKE_ICON_URL,
     description: 'Một mảnh cọc gỗ lim bịt sắt, vũ khí bí mật đã làm nên chiến thắng lịch sử trên sông Bạch Đằng.',
-    belongsToArtifactId: GIAO_DONG_DONG_SON_ARTIFACT_ID, // Assign to an existing artifact for now
+    belongsToArtifactId: COC_GO_BACH_DANG_ARTIFACT_ID,
   }
 };
 
@@ -406,14 +446,34 @@ export const MISSION_RALLY_CALL_HBT_ID = "mission_rally_call_hbt";
 const MISSION_RALLY_CALL_HBT: RallyCallMissionData = {
     type: 'rallyCall',
     id: MISSION_RALLY_CALL_HBT_ID,
-    title: "Lời Hiệu Triệu",
+    title: "Lời thề Sông Hát",
+    reward: { type: 'fragment', id: SEAL_FRAGMENT_HICH_ID },
     rounds: [
-      { prefix: "", options: ["Một xin rửa sạch nước thù,", "Hỡi đồng bào yêu dấu,", "Vì món nợ riêng của ta,"] },
-      { prefix: "", options: ["Hai xin dựng lại nghiệp xưa họ Hùng.", "Hãy cùng nhau đứng lên!", "Hãy vùng lên vì vinh quang!"] },
-      { prefix: "", options: ["Ba kêu oan ức lòng chồng,", "Quét sạch lũ giặc tham tàn,", "Giành lại những gì đã mất,"] },
-      { prefix: "", options: ["Bốn xin vẻn vẹn sở công lênh này.", "Để non sông được thái bình.", "Để cái tên Trưng Nữ Vương được lưu danh!"] }
+        {
+            prompt: "Trước toàn thể quân sĩ, Trưng Trắc dõng dạc hô vang lời thề đầu tiên. Để tăng sĩ khí, bạn sẽ:",
+            choices: [
+                { id: 'raise_flag', text: 'Giương cao ngọn cờ', moralePoints: 25, iconUrl: ImageUrls.ICON_RAISE_FLAG_URL },
+                { id: 'beat_drum', text: 'Đánh một hồi trống trận', moralePoints: 15, iconUrl: ImageUrls.ICON_BEAT_DRUM_URL },
+                { id: 'pour_wine', text: 'Rót rượu thề', moralePoints: 10, iconUrl: ImageUrls.ICON_POUR_WINE_URL }
+            ]
+        },
+        {
+            prompt: "Khí thế dâng cao! Lời thề thứ hai cần phải thể hiện quyết tâm sắt đá. Bạn chọn:",
+            choices: [
+                { id: 'point_sword', text: 'Chĩa gươm về phía quân thù', moralePoints: 25, iconUrl: ImageUrls.ICON_POINT_SWORD_URL },
+                { id: 'shout_slogan', text: 'Hô vang khẩu hiệu', moralePoints: 15, iconUrl: ImageUrls.ICON_SHOUT_SLOGAN_URL },
+                { id: 'stomp_foot', text: 'Dậm chân thị uy', moralePoints: 5, iconUrl: ImageUrls.ICON_STOMP_FOOT_URL }
+            ]
+        },
+        {
+            prompt: "Quân sĩ hưởng ứng rầm rộ! Lời hiệu triệu cuối cùng phải khơi dậy lòng yêu nước và căm thù giặc!",
+            choices: [
+                { id: 'vow_nation', text: 'Thề rửa sạch nước thù', moralePoints: 30, iconUrl: ImageUrls.ICON_VOW_NATION_URL },
+                { id: 'vow_personal', text: 'Thề trả nợ riêng', moralePoints: 10, iconUrl: ImageUrls.ICON_VOW_PERSONAL_URL },
+                { id: 'vow_wealth', text: 'Hứa hẹn ban thưởng', moralePoints: 5, iconUrl: ImageUrls.ICON_VOW_WEALTH_URL }
+            ]
+        }
     ],
-    reward: { type: 'fragment', id: SEAL_FRAGMENT_HICH_ID }
 };
 
 export const MISSION_HICH_TUONG_SI_ID = "mission_hich_tuong_si";
@@ -421,12 +481,11 @@ const MISSION_HICH_TUONG_SI: RallyCallMissionData = {
     type: 'rallyCall',
     id: MISSION_HICH_TUONG_SI_ID,
     title: "Soạn Hịch Tướng Sĩ",
-    rounds: [
-      { prefix: "Ta thường tới bữa quên ăn, nửa đêm vỗ gối, ruột đau như cắt, nước mắt đầm đìa; chỉ", options: ["căm tức chưa", "vui mừng vì", "buồn bã vì"] },
-      { prefix: "xả thịt lột da, nuốt gan uống máu", options: ["quân thù.", "đồng bào.", "kẻ yếu."] },
-      { prefix: "Dẫu cho trăm thân này phơi ngoài nội cỏ, nghìn xác này gói trong", options: ["da ngựa,", "gấm vóc,", "chiếu hoa,"] },
-      { prefix: "ta cũng vui lòng.", options: ["Các ngươi có muốn như vậy không?", "Đó là điều ta mong muốn.", "Các ngươi nên biết điều đó."] }
-    ],
+    // Use the raw, full text for Gemini to process.
+    fullText: "Huống chi ta cùng các ngươi sinh phải thời nhiễu loạn, lớn gặp buổi gian nan. Ngó thấy sứ giặc đi lại nghênh ngang ngoài đường, uốn lưỡi cú diều mà sỉ mắng triều đình, đem thân dê chó mà bắt nạt tể phụ, thác mệnh Hốt Tất Liệt mà đòi ngọc lụa, để thỏa lòng tham không cùng, giả hiệu Vân Nam Vương mà thu bạc vàng, để vét của kho có hạn. Thật khác nào như đem thịt mà nuôi hổ đói, sao cho khỏi để tai vạ về sau! Ta thường tới bữa quên ăn, nửa đêm vỗ gối, ruột đau như cắt, nước mắt đầm đìa; chỉ căm tức chưa xả thịt lột da, nuốt gan uống máu quân thù. Dẫu cho trăm thân này phơi ngoài nội cỏ, nghìn xác này gói trong da ngựa, ta cũng vui lòng.",
+    possibleBlanks: [],
+    // `definitions` will now be provided by the AI and managed in the component's state.
+    definitions: {},
     reward: { type: 'artifact', id: HICH_TUONG_SI_ARTIFACT_ID }
 };
 
@@ -545,6 +604,66 @@ const MISSION_CRAFTING_FRAGMENTS_HBT: TimelineMissionData = {
     reward: { type: 'fragment', id: SEAL_FRAGMENT_1_ID },
 };
 
+// --- Narrative Mission: Bà Triệu ---
+export const MISSION_BA_TRIEU_ID = "mission_ba_trieu_adventure";
+const MISSION_BA_TRIEU_ADVENTURE: NarrativeMissionData = {
+    type: 'narrative',
+    id: MISSION_BA_TRIEU_ID,
+    title: "Cưỡi voi đánh giặc",
+    startNodeId: 'bt_start',
+    reward: { type: 'artifact', id: BA_TRIEU_PHOENIX_HAIRPIN_ARTIFACT_ID },
+    nodes: {
+        'bt_start': {
+            id: 'bt_start',
+            title: 'Phá vây',
+            text: 'Quân Ngô vây chặt. Tình thế nguy cấp. Vua Bà Triệu phải đưa ra quyết định để phá vây.',
+            choices: [
+                { text: 'Dẫn quân tiên phong, trực tiếp tấn công vào trung quân địch.', targetNodeId: 'bt_direct_charge' },
+                { text: 'Chia quân, đánh lạc hướng và tập kích vào sườn trại địch.', targetNodeId: 'bt_flank_attack' },
+            ],
+        },
+        'bt_direct_charge': {
+            id: 'bt_direct_charge',
+            text: 'Khí thế quân ta dâng cao, nhưng quân địch đông và có phòng bị. Cuộc chiến vô cùng ác liệt.',
+            choices: [
+                { text: 'Thúc voi xông lên, quyết một trận tử chiến.', targetNodeId: 'bt_loss_overwhelmed' },
+                { text: 'Ra lệnh lui quân, tìm cách khác.', targetNodeId: 'bt_flank_attack' },
+            ],
+        },
+        'bt_flank_attack': {
+            id: 'bt_flank_attack',
+            text: 'Kế sách có hiệu quả! Quân địch bị bất ngờ, đội hình rối loạn.',
+            choices: [
+                { text: 'Thừa thắng xông lên, tiêu diệt toàn bộ quân địch!', targetNodeId: 'bt_win' },
+                { text: 'Mở đường máu, phá vây thành công.', targetNodeId: 'bt_win_minor' },
+            ],
+        },
+        'bt_win': {
+            id: 'bt_win',
+            text: 'Bạn đã chỉ huy một trận đánh xuất sắc, phá tan vòng vây của quân Ngô, thể hiện mưu lược và dũng khí của Bà Triệu. Quân sĩ reo hò mừng chiến thắng!',
+            choices: [],
+            isTerminal: true,
+            isSuccessOutcome: true,
+            grantsMissionReward: true,
+        },
+        'bt_win_minor': {
+            id: 'bt_win_minor',
+            text: 'Bạn đã phá vây thành công, bảo toàn lực lượng. Dù không tiêu diệt được toàn bộ quân địch, đây vẫn là một thắng lợi chiến lược quan trọng.',
+            choices: [],
+            isTerminal: true,
+            isSuccessOutcome: true,
+            grantsMissionReward: true,
+        },
+        'bt_loss_overwhelmed': {
+            id: 'bt_loss_overwhelmed',
+            text: 'Dù rất dũng cảm, nhưng quân địch quá đông. Nghĩa quân bị tổn thất nặng nề và không thể phá vây. Hãy thử lại với một chiến thuật khác.',
+            choices: [],
+            isTerminal: true,
+            isSuccessOutcome: false,
+        }
+    }
+};
+
 // --- Premium "What If" Mission ---
 export const MISSION_WHAT_IF_QUANG_TRUNG_ID = 'mission_what_if_quang_trung';
 const MISSION_WHAT_IF_QUANG_TRUNG: NarrativeMissionData = {
@@ -661,7 +780,8 @@ const MISSION_COLORING_DONG_HO: ColoringMissionData = {
 // --- Quest Chain: Bach Dang ---
 const MISSION_BACH_DANG_DO_THAM_ID = 'mission_bach_dang_do_tham';
 const MISSION_BACH_DANG_CAM_COC_ID = 'mission_bach_dang_cam_coc';
-const MISSION_BACH_DANG_CHUNG_KIEN_ID = 'mission_bach_dang_chung_kien';
+const MISSION_BACH_DANG_QUYET_CHIEN_ID = 'mission_bach_dang_quyet_chien';
+
 
 const MISSION_BACH_DANG_DO_THAM: HiddenObjectMissionData = {
     type: 'hiddenObject',
@@ -670,9 +790,10 @@ const MISSION_BACH_DANG_DO_THAM: HiddenObjectMissionData = {
     backgroundImageUrl: ImageUrls.SANDBOX_BG_BACH_DANG_URL,
     objectsToFind: [
         { id: 'bd_stake', name: 'Vị trí cắm cọc', iconUrl: ImageUrls.BACH_DANG_STAKE_ICON_URL, coords: { x: 55, y: 75, width: 15, height: 15 } },
-        { id: 'bd_boat', name: 'Thuyền địch', iconUrl: ImageUrls.TRADING_SPICES_ICON_URL, coords: { x: 80, y: 30, width: 10, height: 10 } },
+        { id: 'bd_boat', name: 'Thuyền địch', iconUrl: ImageUrls.ENEMY_SHIP_ICON_URL, coords: { x: 80, y: 30, width: 10, height: 10 } },
         { id: 'bd_tide', name: 'Dấu hiệu thủy triều', iconUrl: 'https://i.ibb.co/VMyXpgr/avatar-outfit-nhatbinh.png', coords: { x: 10, y: 85, width: 20, height: 8 } },
     ],
+    // No reward for intermediate steps
 };
 
 const MISSION_BACH_DANG_CAM_COC: TacticalMapMissionData = {
@@ -682,25 +803,19 @@ const MISSION_BACH_DANG_CAM_COC: TacticalMapMissionData = {
     backgroundUrl: ImageUrls.SANDBOX_BG_BACH_DANG_URL,
     stakeImageUrl: ImageUrls.BACH_DANG_STAKE_ICON_URL,
     targetStakes: 10
+    // No reward for intermediate steps
 };
 
-const MISSION_BACH_DANG_CHUNG_KIEN: NarrativeMissionData = {
-    type: 'narrative',
-    id: MISSION_BACH_DANG_CHUNG_KIEN_ID,
-    title: 'Chứng kiến Lịch sử',
-    startNodeId: 'bd_victory',
-    nodes: {
-        'bd_victory': {
-            id: 'bd_victory',
-            title: 'Chiến Thắng Vang Dội',
-            text: 'Nhờ kế sách cắm cọc gỗ của Ngô Quyền, quân ta đã nhử địch vào trận địa khi thủy triều lên. Khi nước rút, thuyền địch vỡ tan, quân Nam Hán đại bại. Chiến thắng Bạch Đằng năm 938 đã chấm dứt hơn 1000 năm Bắc thuộc, mở ra một kỷ nguyên độc lập tự chủ cho dân tộc.',
-            choices: [],
-            isTerminal: true,
-            isSuccessOutcome: true,
-            grantsMissionReward: true,
-        }
-    },
-    reward: { type: 'fragment', id: BACH_DANG_STAKE_FRAGMENT_ID },
+const MISSION_BACH_DANG_QUYET_CHIEN: NavalBattleMissionData = {
+    type: 'navalBattle',
+    id: MISSION_BACH_DANG_QUYET_CHIEN_ID,
+    title: 'Quyết chiến Bạch Đằng',
+    backgroundUrl: ImageUrls.SANDBOX_BG_BACH_DANG_URL,
+    enemyShipIconUrl: ImageUrls.ENEMY_SHIP_ICON_URL,
+    trapZone: { start: 50, end: 70 }, // 50% to 70% of the width
+    shipSpeed: 60, // pixels per second
+    tideDuration: 20, // 20 seconds for one full cycle
+    reward: { type: 'artifact', id: COC_GO_BACH_DANG_ARTIFACT_ID },
 };
 
 // --- Defense Mission ---
@@ -709,7 +824,8 @@ const MISSION_DEFENSE_GAME: DefenseMissionData = {
     type: 'defense',
     id: MISSION_DEFENSE_ID,
     title: "Vườn không nhà trống",
-    timeLimit: 60,
+    turnLimit: 20, // 20 action points
+    enemyProgressBarSegments: 5,
     reward: { type: 'artifact', id: MU_TRU_NHA_TRAN_ARTIFACT_ID },
     mapLayout: [
         ['village', 'village', 'empty', 'empty', 'empty', 'empty', 'empty', 'forest', 'forest', 'forest'],
@@ -723,12 +839,12 @@ const MISSION_DEFENSE_GAME: DefenseMissionData = {
         ['forest', 'forest', 'road', 'road', 'empty', 'village', 'village', 'empty', 'empty', 'empty'],
         ['forest', 'forest', 'forest', 'road', 'empty', 'village', 'village', 'empty', 'empty', 'empty'],
     ],
-    initialItems: [
-        { type: 'person', gridIndex: 2 },   // Top left
-        { type: 'person', gridIndex: 11 },  // Top left
-        { type: 'food', gridIndex: 53 },   // Middle
-        { type: 'food', gridIndex: 95 },   // Bottom right
-        { type: 'person', gridIndex: 96 },  // Bottom right
+    units: [
+        { id: 'civ1', type: 'civilian', gridIndex: 2, evacuationCost: 1 },
+        { id: 'civ2', type: 'civilian', gridIndex: 11, evacuationCost: 1 },
+        { id: 'sup1', type: 'supplies', gridIndex: 53, evacuationCost: 2 },
+        { id: 'wou1', type: 'wounded', gridIndex: 95, evacuationCost: 2 },
+        { id: 'civ3', type: 'civilian', gridIndex: 96, evacuationCost: 1 },
     ]
 };
 
@@ -941,6 +1057,29 @@ const MISSION_SEBANGHIENG_PATH: StrategicPathMissionData = {
     ],
 };
 
+// --- Construction Puzzle Mission ---
+export const MISSION_CONSTRUCTION_PUZZLE_ID = 'mission_construction_puzzle_chua_van_xuan';
+const MISSION_CONSTRUCTION_PUZZLE_CHUA_VAN_XUAN: ConstructionPuzzleMissionData = {
+    type: 'constructionPuzzle',
+    id: MISSION_CONSTRUCTION_PUZZLE_ID,
+    title: "Xây dựng Chùa Vạn Xuân",
+    reward: { type: 'artifact', id: MO_HINH_CHUA_VAN_XUAN_ARTIFACT_ID },
+    gridSize: { rows: 8, cols: 8 },
+    pieces: [
+        { id: 'square', shape: [[1, 1], [1, 1]], color: '#ef4444' }, // red-500
+        { id: 'l-shape', shape: [[1, 0], [1, 0], [1, 1]], color: '#3b82f6' }, // blue-600
+        { id: 't-shape', shape: [[1, 1, 1], [0, 1, 0]], color: '#22c55e' }, // green-500
+        { id: 'i-shape', shape: [[1], [1], [1], [1]], color: '#eab308' }, // yellow-500
+        { id: 'z-shape', shape: [[1, 1, 0], [0, 1, 1]], color: '#8b5cf6' }, // violet-500
+    ],
+    solution: {
+        'square': { x: 3, y: 0, rotationIndex: 0 },
+        'l-shape': { x: 0, y: 0, rotationIndex: 0 },
+        't-shape': { x: 1, y: 3, rotationIndex: 0 },
+        'i-shape': { x: 6, y: 2, rotationIndex: 1 }, // rotated
+        'z-shape': { x: 3, y: 5, rotationIndex: 0 },
+    }
+};
 
 
 // --- ALL MISSIONS MAP ---
@@ -963,7 +1102,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
   [MISSION_COLORING_DONG_HO_ID]: MISSION_COLORING_DONG_HO,
   [MISSION_BACH_DANG_DO_THAM_ID]: MISSION_BACH_DANG_DO_THAM,
   [MISSION_BACH_DANG_CAM_COC_ID]: MISSION_BACH_DANG_CAM_COC,
-  [MISSION_BACH_DANG_CHUNG_KIEN_ID]: MISSION_BACH_DANG_CHUNG_KIEN,
+  [MISSION_BACH_DANG_QUYET_CHIEN_ID]: MISSION_BACH_DANG_QUYET_CHIEN,
   [MISSION_DEFENSE_ID]: MISSION_DEFENSE_GAME,
   [MISSION_STRATEGY_MAP_NGOC_HOI_ID]: MISSION_STRATEGY_MAP_NGOC_HOI,
   [MISSION_COIN_MINTING_ID]: MISSION_COIN_MINTING_TAY_SON,
@@ -974,6 +1113,8 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
   [MISSION_TRUONG_SON_PATH_ID]: MISSION_TRUONG_SON_PATH,
   [MISSION_CUA_CHUA_PATH_ID]: MISSION_CUA_CHUA_PATH,
   [MISSION_SEBANGHIENG_PATH_ID]: MISSION_SEBANGHIENG_PATH,
+  [MISSION_BA_TRIEU_ID]: MISSION_BA_TRIEU_ADVENTURE,
+  [MISSION_CONSTRUCTION_PUZZLE_ID]: MISSION_CONSTRUCTION_PUZZLE_CHUA_VAN_XUAN,
 };
 
 // --- Quest Chains ---
@@ -984,8 +1125,8 @@ export const ALL_QUEST_CHAINS: Record<string, QuestChain> = {
     description: 'Một chuỗi nhiệm vụ tái hiện lại trận Bạch Đằng lịch sử năm 938.',
     steps: [
       { id: 'step1_dotham', title: 'Do Thám Địa Hình', description: 'Tìm những vị trí chiến lược trên bản đồ.', missionId: MISSION_BACH_DANG_DO_THAM_ID, iconUrl: ImageUrls.BACH_DANG_DO_THAM_ICON_URL },
-      { id: 'step2_camcoc', title: 'Cắm Cọc Gỗ', description: 'Bố trí bãi cọc để chặn đường lui của địch.', missionId: MISSION_BACH_DANG_CAM_COC_ID, iconUrl: ImageUrls.BACH_DANG_CAM_COC_ICON_URL },
-      { id: 'step3_chungkien', title: 'Chứng Kiến Lịch Sử', description: 'Xem kết quả của trận đánh và nhận phần thưởng.', missionId: MISSION_BACH_DANG_CHUNG_KIEN_ID, iconUrl: ImageUrls.BACH_DANG_VICTORY_ICON_URL },
+      { id: 'step2_camcoc', title: 'Bố Trí Trận Địa Cọc', description: 'Bố trí bãi cọc để chặn đường lui của địch.', missionId: MISSION_BACH_DANG_CAM_COC_ID, iconUrl: ImageUrls.BACH_DANG_CAM_COC_ICON_URL },
+      { id: 'step3_quyet_chien', title: 'Quyết chiến', description: 'Chỉ huy trận thủy chiến và đánh tan quân Nam Hán.', missionId: MISSION_BACH_DANG_QUYET_CHIEN_ID, iconUrl: ImageUrls.BACH_DANG_VICTORY_ICON_URL },
     ]
   }
 };
@@ -1005,14 +1146,16 @@ const HOI_1_DUNG_NUOC: Hoi = {
 };
 
 // Hồi 2
-const MISSION_INFO_RALLY_CALL: MissionInfo = { id: 'card_2_1', title: 'Lời Hiệu Triệu', imageUrl: ImageUrls.SAGA_BAT_KHUAT_URL, description: "Soạn một bài hịch đanh thép để kêu gọi lòng dân cùng Hai Bà Trưng.", missionId: MISSION_RALLY_CALL_HBT_ID };
+const MISSION_INFO_LOI_THE_SONG_HAT: MissionInfo = { id: 'card_2_1', title: 'Lời thề Sông Hát', imageUrl: ImageUrls.SAGA_LOI_THE_SONG_HAT_URL, description: "Chọn lời thề đanh thép để hiệu triệu quân sĩ cùng Hai Bà Trưng khởi nghĩa.", missionId: MISSION_RALLY_CALL_HBT_ID };
 const MISSION_INFO_FORGING: MissionInfo = { id: 'card_2_2', title: 'Rèn vũ khí', imageUrl: ImageUrls.SAGA_FORGING_URL, description: 'Rèn những mũi giáo sắc bén để trang bị cho nghĩa quân.', missionId: MISSION_FORGING_ID, dependsOnMissionId: MISSION_RALLY_CALL_HBT_ID };
-const MISSION_INFO_BACH_DANG_CHAIN: MissionInfo = { id: 'card_2_3', title: 'Chiến Dịch Bạch Đằng', imageUrl: ImageUrls.BACH_DANG_DO_THAM_ICON_URL, description: 'Chỉ huy trận đánh lịch sử, đánh tan quân Nam Hán.', missionId: 'quest_chain_bach_dang', questChainId: 'bach-dang-chien', isOptionalForProgression: true };
+const MISSION_INFO_BA_TRIEU: MissionInfo = { id: 'card_2_3', title: 'Cưỡi voi đánh giặc', imageUrl: ImageUrls.SAGA_CUOI_VOI_DANH_GIAC_URL, description: "Giúp Bà Triệu đưa ra các quyết định chiến thuật để phá vỡ vòng vây của quân Ngô.", missionId: MISSION_BA_TRIEU_ID, dependsOnMissionId: MISSION_FORGING_ID };
+const MISSION_INFO_LY_BI: MissionInfo = { id: 'card_2_4', title: 'Lý Bí và Nước Vạn Xuân', imageUrl: ImageUrls.SAGA_LY_BI_VAN_XUAN_URL, description: 'Xây dựng Chùa Vạn Xuân bằng cách lắp ghép các khối kiến trúc.', missionId: MISSION_CONSTRUCTION_PUZZLE_ID, dependsOnMissionId: MISSION_BA_TRIEU_ID };
+const MISSION_INFO_BACH_DANG_CHAIN: MissionInfo = { id: 'card_2_5', title: 'Đại phá quân Nam Hán', imageUrl: ImageUrls.QUEST_CHAIN_BACH_DANG_BANNER_URL, description: 'Chỉ huy trận đánh lịch sử, đánh tan quân Nam Hán.', missionId: 'quest_chain_bach_dang', questChainId: 'bach-dang-chien', dependsOnMissionId: MISSION_INFO_LY_BI.missionId };
 const HOI_2_BAT_KHUAT: Hoi = {
   id: 'hoi_2_bat_khuat',
   title: "Hồi 2: Nghìn Năm Bất Khuất",
   description: "Sống lại những khoảnh khắc hào hùng của dân tộc trong các cuộc đấu tranh chống ngoại xâm đầu tiên, từ An Dương Vương đến Hai Bà Trưng.",
-  missions: [MISSION_INFO_RALLY_CALL, MISSION_INFO_FORGING, MISSION_INFO_BACH_DANG_CHAIN],
+  missions: [MISSION_INFO_LOI_THE_SONG_HAT, MISSION_INFO_FORGING, MISSION_INFO_BA_TRIEU, MISSION_INFO_LY_BI, MISSION_INFO_BACH_DANG_CHAIN],
 };
 
 // Hồi 3
@@ -1193,6 +1336,10 @@ export const INSTRUCTION_DATA: Record<string, { title: string, text: string }> =
         title: 'Hướng dẫn: Xây dựng',
         text: 'Đầu tiên, thu thập đủ tài nguyên cần thiết. Sau đó, dùng tài nguyên để xây dựng các công trình theo yêu cầu trên bản đồ. Hoàn thành mục tiêu xây dựng để chiến thắng.'
     },
+    'constructionPuzzle': {
+        title: 'Hướng dẫn: Xây dựng Giải đố',
+        text: 'Kéo các khối kiến trúc từ bảng bên dưới và thả vào lưới. Nhấp vào một khối để xoay nó. Lấp đầy bản thiết kế một cách chính xác để hoàn thành công trình!'
+    },
     'diplomacy': {
         title: 'Hướng dẫn: Đối thoại Ngoại giao',
         text: 'Lựa chọn các câu trả lời để tăng thanh "Thiện chí" với nhân vật lịch sử. Đạt được mục tiêu thiện chí để giành chiến thắng. Lựa chọn sai có thể làm giảm thiện chí!'
@@ -1210,8 +1357,8 @@ export const INSTRUCTION_DATA: Record<string, { title: string, text: string }> =
         text: 'Chọn một màu từ bảng màu bên dưới, sau đó nhấn vào một vùng trên bức tranh để tô màu. Hãy tô đúng tất cả các vùng theo màu sắc truyền thống để hoàn thành tác phẩm!'
     },
     'rallyCall': {
-        title: 'Hướng dẫn: Lời Hiệu Triệu',
-        text: 'Chọn những câu từ hào hùng nhất để soạn nên một bài hịch hoàn chỉnh, kêu gọi lòng dân. Mỗi lựa chọn sẽ góp phần tạo nên một áng văn bất hủ.'
+        title: 'Hướng dẫn: Soạn Hịch',
+        text: 'Kéo các cụm từ từ khay bên dưới và thả vào ô trống để hoàn thành bài hịch. Di chuột qua các từ gạch chân để xem giải nghĩa. Sử dụng gợi ý nếu bạn gặp khó khăn!'
     },
     'forging': {
         title: 'Hướng dẫn: Rèn Vũ Khí',
@@ -1223,7 +1370,7 @@ export const INSTRUCTION_DATA: Record<string, { title: string, text: string }> =
     },
     'defense': {
         title: 'Hướng dẫn: Vườn không nhà trống',
-        text: 'Kéo và thả người dân và xe lương thực từ các làng mạc vào khu vực rừng rậm an toàn trước khi hết giờ. Bảo vệ tất cả mọi người và tài sản để chiến thắng!'
+        text: 'Kéo và thả người dân và tài sản từ làng mạc vào khu vực rừng an toàn. Mỗi hành động sẽ tốn một số Lượt đi nhất định. Hãy di tản tất cả trước khi hết lượt hoặc quân địch đến!'
     },
     'strategyMap': {
         title: 'Hướng dẫn: Hành quân thần tốc',

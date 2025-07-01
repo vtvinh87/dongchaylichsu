@@ -1,7 +1,5 @@
 // types.ts
 
-
-
 export enum Screen {
   LOGIN,
   MAIN_INTERFACE,
@@ -34,6 +32,8 @@ export enum Screen {
   TYPESETTING_MISSION_SCREEN, // New screen for the typesetting game
   ADVENTURE_PUZZLE_SCREEN,
   STRATEGIC_PATH_MISSION_SCREEN,
+  CONSTRUCTION_PUZZLE_SCREEN, // New screen for the block puzzle game
+  NAVAL_BATTLE_TIMING_SCREEN, // New screen for the naval battle timing game
 }
 
 export interface Point {
@@ -296,19 +296,44 @@ export interface ColoringMissionData {
   reward: Reward;
 }
 
-// --- Rally Call Game Types ---
-export interface RallyCallRound {
-    prefix: string;
-    options: string[];
+// --- Rally Call Game Types (UPDATED) ---
+// This type is now a discriminated union to clearly separate the two game modes.
+
+// For Morale/Icon-based choices
+export interface RallyCallChoice {
+    id: string;
+    text: string;
+    moralePoints: number;
+    iconUrl: string;
 }
 
-export interface RallyCallMissionData {
+export interface RallyCallRound {
+    prompt: string;
+    choices: RallyCallChoice[];
+}
+
+interface RallyCallMoraleData {
+    rounds: RallyCallRound[];
+    fullText?: never;
+    possibleBlanks?: never;
+    definitions?: never;
+}
+
+// For Fill-in-the-blank game
+interface RallyCallFillBlankData {
+    fullText: string;
+    possibleBlanks: string[];
+    definitions?: Record<string, string>;
+    rounds?: never;
+}
+
+export type RallyCallMissionData = {
     type: 'rallyCall';
     id: string;
     title: string;
-    rounds: RallyCallRound[];
     reward: Reward;
-}
+} & (RallyCallMoraleData | RallyCallFillBlankData);
+
 
 // --- Forging Game Types ---
 export interface ForgingMissionData {
@@ -330,19 +355,25 @@ export interface TacticalMapMissionData {
     reward?: Reward;
 }
 
-// --- Defense Game Types ---
+// --- Defense Game Types (Updated for turn-based mechanics) ---
 export type MapCellType = 'village' | 'forest' | 'road' | 'empty';
+export type EvacuationUnitType = 'civilian' | 'supplies' | 'wounded';
+
+export interface EvacuationUnit {
+  id: string;
+  type: EvacuationUnitType;
+  gridIndex: number;
+  evacuationCost: number; // Number of turns/action points required
+}
 
 export interface DefenseMissionData {
     type: 'defense';
     id:string;
     title: string;
     mapLayout: MapCellType[][];
-    initialItems: {
-        type: 'person' | 'food';
-        gridIndex: number; 
-    }[];
-    timeLimit: number; // in seconds
+    units: EvacuationUnit[];
+    turnLimit: number; // Replaces timeLimit
+    enemyProgressBarSegments: number; // Number of steps for enemy advance
     reward: Reward;
 }
 
@@ -450,8 +481,38 @@ export interface StrategicPathMissionData {
   convoyPath?: { x: number, y: number }[];
 }
 
+// --- Construction Puzzle Game Types ---
+export interface ConstructionPuzzlePiece {
+    id: string;
+    shape: number[][];
+    color: string;
+}
 
-export type MissionData = PuzzleMissionData | NarrativeMissionData | TimelineMissionData | ARMissionData | HiddenObjectMissionData | QuizMissionData | ConstructionMissionData | DiplomacyMissionData | TradingMissionData | RhythmMissionData | ColoringMissionData | RallyCallMissionData | ForgingMissionData | TacticalMapMissionData | DefenseMissionData | StrategyMapMissionData | CoinMintingMissionData | CityPlanningMissionData | TypesettingMissionData | AdventurePuzzleMissionData | StrategicPathMissionData;
+export interface ConstructionPuzzleMissionData {
+    type: 'constructionPuzzle';
+    id: string;
+    title: string;
+    gridSize: { rows: number; cols: number };
+    pieces: ConstructionPuzzlePiece[];
+    solution: Record<string, { x: number; y: number; rotationIndex: number }>;
+    reward: Reward;
+}
+
+// --- Naval Battle Timing Game Types ---
+export interface NavalBattleMissionData {
+    type: 'navalBattle';
+    id: string;
+    title: string;
+    backgroundUrl: string;
+    enemyShipIconUrl: string;
+    trapZone: { start: number; end: number }; // Percentage of width
+    shipSpeed: number; // pixels per second
+    tideDuration: number; // seconds for one full cycle (rise -> fall)
+    reward?: Reward;
+}
+
+
+export type MissionData = PuzzleMissionData | NarrativeMissionData | TimelineMissionData | ARMissionData | HiddenObjectMissionData | QuizMissionData | ConstructionMissionData | DiplomacyMissionData | TradingMissionData | RhythmMissionData | ColoringMissionData | RallyCallMissionData | ForgingMissionData | TacticalMapMissionData | DefenseMissionData | StrategyMapMissionData | CoinMintingMissionData | CityPlanningMissionData | TypesettingMissionData | AdventurePuzzleMissionData | StrategicPathMissionData | ConstructionPuzzleMissionData | NavalBattleMissionData;
 
 // --- Quest Chain Types ---
 export interface QuestChainStep {

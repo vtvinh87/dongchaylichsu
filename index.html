@@ -1134,7 +1134,7 @@
       animation: lightUp 0.5s forwards;
     }
     #puzzle-container {
-        background-image: url('https://i.ibb.co/2YM7bfkB/trong-dong.png');
+        background-image: url('https://lh3.googleusercontent.com/pw/AP1GczNcItQtNleM-QCkrTSz_HJ981XrtkJzZ-nI0gn2P9UGvOh0fb-o4cdp1ovSLGnEjM7bAxA-fVeNiVGarwQIHiDTqxMaDo3l3dgmdZhBv-Y1jB-eqPW8fuiP5yGMNi8wyUV2h08a7Wg9yyI89QIBbX8QlawVH9l2FXSwu16NDrHy79naAYZiMhBRA9dnkqfrh04ADU8baNZE1LE71WIY7J8hlQkkis-brVJI9gr82ZTdZn1fk86bp9hSj7kt732mnDtn7Pcpr8vtqhHgpNgcxkuPfVCbRhCW08bscrQozRbhw3GpQcnm7TPnXR1WfpJv7PGVfubL6kFVobVr7Gv32HRE7gzEEJ4TTErx8jSrVgYfhQ9d8-L8mdQZYhvG1ffUL9XAlWxI4n66WroS3-LrJhX_mfiiwnUXy22IhSMOWkCI4pHqRdbn2lT2jKHZlvl5C8qznOjLL0lxBVxcCpjkY2IGhXCIS4L3spUycnTZMIWTUtQxopelxsU6E3cqQCWCLtSr3Cxr5a9QEoHNLGFC1c0aG-BURDC3Wfqmc14v-zaJabrJ0c-iOTYWWBcMsRjw8Z1_Ix7fqLCYjwtmlM9uEtTyIzUpVN3sRV57WeL0hf99qFm43SDYSTtSEtLNbAA9nbZ7r7oLPoYktHM3AU4GM4yBqkBEOMFu6lBiBCs2HUrItz-FAdjPlkZTygDZucP3dkkOmUz8ArlaoImzgWpmDtQHXMJB6kDWrPE0Li5cfCcKkglHnps80B8B-itiXGun0v-bg_unjvmrQ8bzPUN3VfS4u6gS8hRPre1wJ9ktzgjtRKY8zg5qV2nWwxUaZ1OR8roRky7-AV-oD9mZ5jOpMo67oce0iKVZYEB8twEvY5HjwWYJEdT2udagGorpW81I8XoJ-L_HAP6gff8lA7kLPDQYv8ixfVluyhqIHpGo58DEZkU0cPWcEdyXEsqbmTsWBwb0m6CbJ6LjL2EVw7v9SAry884IApHMcCg0MzI9iw=w745-h745-s-no?authuser=0');
         background-size: contain;
         background-position: center;
         background-repeat: no-repeat;
@@ -1227,6 +1227,375 @@
         border-radius: 0.5rem;
         margin-bottom: 1rem;
     }
+
+    /* --- CSS cho Rally Call / Oath Screen --- */
+    .rally-call-screen {
+        position: relative;
+        background-size: cover;
+        background-position: center;
+        color: white;
+        transition: background-image 0.8s ease-in-out;
+    }
+    .rally-call-screen.screen-shaking {
+      animation: screenShake 0.4s ease-in-out;
+    }
+    @keyframes screenShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+    }
+    .rally-call-screen::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.9) 20%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0.9) 100%);
+        border-radius: 0.5rem; /* Match parent */
+    }
+    .rally-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 1.5rem;
+        box-sizing: border-box;
+    }
+    .morale-bar-container {
+        width: 100%;
+        background-color: rgba(0,0,0,0.5);
+        border: 2px solid #fcd34d;
+        border-radius: 10px;
+        padding: 4px;
+        margin-bottom: 1rem;
+    }
+    .morale-bar-fill {
+        height: 20px;
+        border-radius: 6px;
+        transition: width 0.5s ease-out, background-color 0.5s ease-out;
+        box-shadow: 0 0 10px rgba(252, 211, 77, 0.5);
+    }
+    .oath-prompt {
+        font-family: 'Special Elite', cursive;
+        font-size: 1.5rem;
+        text-shadow: 0 2px 5px black;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0,0,0,0.3);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .oath-choices-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        margin-top: auto;
+    }
+    .oath-choice-button {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem; /* 12px */
+        background: linear-gradient(145deg, #d97706, #92400e);
+        color: white;
+        border: 2px solid #fcd34d;
+        font-weight: bold;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        transition: all 0.2s ease-out;
+        text-align: left;
+    }
+    .oath-choice-button img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        background-color: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        padding: 4px;
+    }
+    .oath-choice-button:not(:disabled):hover {
+        background: linear-gradient(145deg, #f59e0b, #b45309);
+        transform: scale(1.03);
+    }
+    .oath-choice-button.correct {
+        background: linear-gradient(145deg, #22c55e, #15803d);
+        border-color: #86efac;
+        box-shadow: 0 0 15px #86efac;
+    }
+    .oath-choice-button.incorrect {
+        background: linear-gradient(145deg, #ef4444, #b91c1c);
+        border-color: #fca5a5;
+        opacity: 0.7;
+    }
+    .oath-choice-button:disabled {
+        cursor: not-allowed;
+    }
+
+    /* Naval Battle Screen */
+    .naval-battle-area {
+      position: relative;
+      width: 100%;
+      height: 250px;
+      background-size: cover;
+      background-position: center;
+      border: 2px solid #4a2c13; /* Dark brown border */
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+    .trap-zone-indicator {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      background-color: rgba(239, 68, 68, 0.2);
+      border-left: 2px dashed rgba(239, 68, 68, 0.8);
+      border-right: 2px dashed rgba(239, 68, 68, 0.8);
+      z-index: 1;
+    }
+    .enemy-ship-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 80px; /* Adjust size */
+      height: auto;
+      transition: left 0.1s linear; /* Smooth movement */
+      z-index: 2;
+    }
+    .tide-bar-container {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      bottom: 10px;
+      width: 30px;
+      background-color: rgba(0, 0, 0, 0.5);
+      border: 1px solid white;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column-reverse; /* Fill from bottom */
+      z-index: 3;
+    }
+    .tide-bar-fill {
+      width: 100%;
+      background: linear-gradient(to top, #0ea5e9, #67e8f9); /* sky-500 to cyan-200 */
+      border-radius: 9px;
+      transition: height 0.5s ease-in-out;
+    }
+    .naval-battle-controls {
+      margin-top: 1rem;
+    }
+    .attack-button {
+      padding: 1rem 2.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(145deg, #ef4444, #b91c1c); /* red-500 to red-800 */
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 5px 20px rgba(239, 68, 68, 0.4);
+      transition: all 0.3s ease-out;
+    }
+    .attack-button:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+    }
+    .attack-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* --- CSS for Defense Mission --- */
+    .evacuation-unit {
+      width: 10%; /* Fit in a 10x10 grid */
+      height: 10%;
+      position: absolute;
+      transition: all 0.3s ease-in-out;
+      cursor: grab;
+    }
+    .evacuation-unit.dragging {
+      opacity: 0.5;
+      transform: scale(1.2);
+    }
+    .unit-icon {
+        width: 100%;
+        height: 100%;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    .unit-civilian .unit-icon { background-image: url('https://i.ibb.co/wJ1Fj89/person-icon.png'); }
+    .unit-supplies .unit-icon { background-image: url('https://i.ibb.co/51v518h/food-cart-icon.png'); }
+    .unit-wounded .unit-icon { background-image: url('https://i.ibb.co/pW9B3Yf/icon-thuong-binh.png'); }
+
+    #rain-overlay {
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(to bottom, rgba(100, 116, 139, 0.4), rgba(100, 116, 139, 0.6));
+        pointer-events: none;
+        z-index: 10;
+        animation: rain 0.5s linear infinite;
+    }
+    @keyframes rain {
+        0% { background-position: 0% 0%; }
+        100% { background-position: 20% 100%; }
+    }
+    
+    #enemy-progress-bar {
+      display: flex;
+      width: 100%;
+      height: 20px;
+      background-color: #44403c;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    #enemy-progress-bar-fill {
+        height: 100%;
+        background-color: #ef4444;
+        transition: width 0.5s ease-out;
+    }
+    #enemy-progress-bar.intel-active .progress-segment.attack-path {
+        background-color: #fde047; /* yellow-200 */
+        box-shadow: inset 0 0 5px #facc15; /* amber-400 */
+    }
+
+    /* --- NEW CSS for Rally Call Screen v2 (Fill-in-the-blank) --- */
+    #hich-content {
+      font-family: 'Special Elite', cursive;
+      line-height: 2.5;
+      background-color: rgba(253, 230, 138, 0.4); /* amber-200 with alpha */
+      border: 1px solid #fcd34d; /* amber-300 */
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+    }
+    .dark #hich-content {
+      background-color: rgba(68, 64, 60, 0.4); /* stone-700 with alpha */
+      border-color: #a16207; /* amber-700 */
+    }
+    .blank-slot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: bottom;
+      width: 150px;
+      min-height: 40px;
+      margin: 0 0.25rem;
+      background-color: rgba(0, 0, 0, 0.1);
+      border-bottom: 2px solid #a16207; /* amber-700 */
+      border-radius: 4px;
+      padding: 2px;
+    }
+    .draggable-phrase {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background-color: #fde68a; /* amber-200 */
+      color: #78350f; /* amber-800 */
+      border-radius: 6px;
+      border: 1px solid #fcd34d; /* amber-300 */
+      cursor: grab;
+      font-weight: bold;
+      user-select: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .dark .draggable-phrase {
+      background-color: #b45309; /* amber-700 */
+      color: #fefce8; /* amber-50 */
+      border-color: #f59e0b; /* amber-500 */
+    }
+    .blank-slot .draggable-phrase {
+      margin: auto;
+    }
+    .difficult-word {
+      border-bottom: 1px dotted #a16207; /* amber-700 */
+      cursor: help;
+      position: relative;
+    }
+    .dark .difficult-word {
+      border-bottom-color: #fcd34d; /* amber-300 */
+    }
+    #tooltip {
+      position: fixed; /* Use fixed positioning for tooltip */
+      visibility: hidden;
+      opacity: 0;
+      background-color: #1f2937; /* gray-800 */
+      color: #f9fafb; /* gray-50 */
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      z-index: 100;
+      max-width: 250px;
+      font-size: 0.875rem;
+      transition: opacity 0.2s ease-in-out;
+      pointer-events: none;
+      font-family: 'Nunito', sans-serif; /* Use standard font for readability */
+    }
+    #tooltip.visible {
+      visibility: visible;
+      opacity: 1;
+    }
+    .highlight-hint {
+      animation: highlight-hint-anim 2.5s ease-out;
+    }
+    @keyframes highlight-hint-anim {
+      0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+      50% { box-shadow: 0 0 15px 5px rgba(59, 130, 246, 0.7); }
+      100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+    }
+
+    /* --- NEW CSS for Chatbot Character Selection --- */
+    #character-selection {
+        padding: 0.5rem;
+        background-color: #fef3c7; /* amber-100 */
+        border-bottom: 1px solid #fde68a; /* amber-200 */
+        text-align: center;
+        flex-shrink: 0; /* Prevent this section from shrinking */
+    }
+    .dark #character-selection {
+        background-color: #44403c; /* stone-700 */
+        border-bottom-color: #57534e; /* stone-600 */
+    }
+    #character-selection-scroll {
+        display: flex;
+        gap: 0.75rem; /* 12px */
+        overflow-x: auto;
+        padding-bottom: 0.5rem; /* For scrollbar spacing */
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+    #character-selection-scroll::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, and Opera */
+    }
+    .character-avatar-button {
+        flex-shrink: 0;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        padding: 2px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+    .character-avatar-button img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+    .character-avatar-button.avatar-locked {
+        filter: grayscale(1);
+        cursor: not-allowed;
+    }
+    .character-avatar-button.avatar-selected {
+        border-color: #3b82f6; /* blue-500 */
+        transform: scale(1.1);
+        box-shadow: 0 0 10px #3b82f6;
+    }
+    .character-avatar-button:not(.avatar-selected):not(.avatar-locked):hover {
+        transform: scale(1.05);
+        border-color: #9ca3af; /* gray-400 */
+    }
+
 
   </style>
 <link rel="stylesheet" href="/index.css">
