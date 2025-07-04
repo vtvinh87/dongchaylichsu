@@ -353,14 +353,23 @@ export interface ForgingMissionData {
 }
 
 // --- Tactical Map Game Types ---
+export interface TacticalMapDropZone {
+  id: string; // matches hidden object ID
+  x: number; // percent
+  y: number; // percent
+  width: number; // percent
+  height: number; // percent
+}
+
 export interface TacticalMapMissionData {
     type: 'tacticalMap';
     id: string;
     title: string;
     backgroundUrl: string;
     stakeImageUrl: string;
-    targetStakes: number;
+    targetStakes?: number; // Made optional as it's now zone-based
     reward?: Reward;
+    dropZones?: TacticalMapDropZone[]; // New field
 }
 
 // --- Defense Game Types (Updated for turn-based mechanics) ---
@@ -719,6 +728,13 @@ export interface ActiveSideQuestState {
   currentStage: number;
 }
 
+// --- Campaign-specific State ---
+export interface BachDangCampaignState {
+  scoutedLocations: string[]; // list of hidden object IDs found
+  unlockedStage: number; // 1: scout, 2: place stakes, 3: battle
+  stakesPlacedCorrectly: number;
+}
+
 
 // --- Game State Type ---
 export interface SavedGameState {
@@ -742,4 +758,5 @@ export interface SavedGameState {
   unlockedAchievementIds?: string[]; // New property for achievements
   unlockedNotebookPages?: number[]; // New property for the soldier's notebook
   activeSideQuest?: ActiveSideQuestState | null; // New property for side quests
+  bachDangCampaign?: BachDangCampaignState; // New property for this campaign
 }

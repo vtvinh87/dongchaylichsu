@@ -1,5 +1,3 @@
-
-
 body {
       font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0; /* Ensure no default margin */
@@ -1206,6 +1204,7 @@ body {
         object-fit: cover;
         border-radius: 0.5rem;
         margin-bottom: 1rem;
+        aspect-ratio: 1 / 1;
     }
 
     /* --- CSS cho Rally Call / Oath Screen --- */
@@ -1338,8 +1337,8 @@ body {
       transform: translateY(-50%);
       width: 80px; /* Adjust size */
       height: auto;
-      transition: left 0.1s linear; /* Smooth movement */
       z-index: 2;
+      animation: ship-bob 3s ease-in-out infinite; /* Add bobbing animation */
     }
     .tide-bar-container {
       position: absolute;
@@ -1385,16 +1384,27 @@ body {
     }
 
     /* --- CSS for Defense Mission --- */
-    .evacuation-unit {
-      width: 10%; /* Fit in a 10x10 grid */
-      height: 10%;
-      position: absolute;
-      transition: all 0.3s ease-in-out;
-      cursor: grab;
+    #defense-map-grid {
+        background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-chien-dich-thang-long.png');
+        background-size: cover;
+        background-position: center;
+        border: 4px solid #4a2c13;
+        box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
     }
-    .evacuation-unit.dragging {
-      opacity: 0.5;
-      transform: scale(1.2);
+    .map-cell {
+        position: relative;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .cell-village { background-color: rgba(161, 98, 7, 0.5); }
+    .cell-road { background-color: rgba(120, 53, 15, 0.5); }
+    .cell-empty { background-color: transparent; }
+    .cell-forest { /* This is the safe zone */
+        background-color: rgba(22, 101, 52, 0.5);
+        background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-khu-vuc-an-toan.png');
+        background-size: 50%;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0.8;
     }
     .unit-icon {
         width: 100%;
@@ -1402,41 +1412,91 @@ body {
         background-size: contain;
         background-position: center;
         background-repeat: no-repeat;
+        cursor: grab;
+        transition: transform 0.2s;
     }
-    .unit-civilian .unit-icon { background-image: url('https://i.ibb.co/wJ1Fj89/person-icon.png'); }
-    .unit-supplies .unit-icon { background-image: url('https://i.ibb.co/51v518h/food-cart-icon.png'); }
-    .unit-wounded .unit-icon { background-image: url('https://i.ibb.co/pW9B3Yf/icon-thuong-binh.png'); }
+    .unit-icon:active {
+        cursor: grabbing;
+        transform: scale(1.1);
+        z-index: 10;
+    }
+    .unit-civilian { background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-dan-thuong.png'); }
+    .unit-supplies { background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-quan-nhu.png'); }
+    .unit-wounded { background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-thuong-binh.png'); }
 
     #rain-overlay {
         position: absolute;
         inset: 0;
-        background-image: linear-gradient(to bottom, rgba(100, 116, 139, 0.4), rgba(100, 116, 139, 0.6));
+        background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Effects/Effect-mua-rung.png');
         pointer-events: none;
         z-index: 10;
-        animation: rain 0.5s linear infinite;
+        opacity: 0.5;
+        animation: rain-fall 0.5s linear infinite;
     }
-    @keyframes rain {
-        0% { background-position: 0% 0%; }
-        100% { background-position: 20% 100%; }
+    @keyframes rain-fall {
+        from { background-position: 0px 0px; }
+        to { background-position: 100px 100px; }
     }
-    
-    #enemy-progress-bar {
+
+    #enemy-threat-meter {
+        display: flex;
+        width: 100%;
+        height: 20px;
+        background: linear-gradient(to right, #4b5563 50%, #7f1d1d);
+        border-radius: 10px;
+        overflow: hidden;
+        border: 2px solid #1f2937;
+        position: relative;
+    }
+    #enemy-threat-meter-progress {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        background: linear-gradient(to right, #facc15, #f97316, #ef4444);
+        transition: width 0.5s ease-in-out;
+        box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+    }
+    #defense-hud-panel {
       display: flex;
+      justify-content: space-between;
       width: 100%;
-      height: 20px;
-      background-color: #44403c;
-      border-radius: 5px;
-      overflow: hidden;
+      gap: 1rem;
     }
-    #enemy-progress-bar-fill {
-        height: 100%;
-        background-color: #ef4444;
-        transition: width 0.5s ease-out;
+    .hud-section {
+      flex: 1;
+      background: rgba(0,0,0,0.4);
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(255,255,255,0.2);
     }
-    #enemy-progress-bar.intel-active .progress-segment.attack-path {
-        background-color: #fde047; /* yellow-200 */
-        box-shadow: inset 0 0 5px #facc15; /* amber-400 */
+    #event-log {
+      flex: 2; /* Make event log wider */
     }
+    #event-log ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      height: 100px; /* fixed height */
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    #event-log li {
+        font-size: 0.875rem;
+        padding-bottom: 0.25rem;
+        margin-top: 0.25rem;
+        border-bottom: 1px dashed rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: fadeInDown 0.5s forwards;
+    }
+    #event-log li img {
+        width: 16px;
+        height: 16px;
+    }
+
 
     /* --- NEW CSS for Rally Call Screen v2 (Fill-in-the-blank) --- */
     #hich-content {
@@ -1577,6 +1637,12 @@ body {
     }
 
     /* --- CSS for Forging Mission --- */
+    #forging-screen {
+        width: 90vw;
+        max-width: 1000px;
+        height: 85vh;
+        max-height: 700px;
+    }
     .force-bar-container {
         width: 100%;
         height: 30px;
@@ -1616,21 +1682,33 @@ body {
     }
     .sparks-effect {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -60%);
-        width: 200px;
-        height: 200px;
+        transform: translate(-50%, -75%); /* Lowered from -100% to be closer to the bar */
+        width: 150px;
+        height: 150px;
         pointer-events: none;
         z-index: 5;
         opacity: 0;
         transition: opacity 0.3s ease-out;
     }
-    .sparks-effect.show {
-        opacity: 1;
+
+    #forging-timer {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0,0,0,0.7);
+      color: white;
+      padding: 0.5rem 1.5rem;
+      border-radius: 20px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      border: 2px solid #fcd34d; /* amber-300 */
+      z-index: 20;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      animation: fadeInDown 0.5s ease-out;
     }
 
-/* --- NEW CSS for Typesetting Mission --- */
+    /* --- CSS for Typesetting Mission --- */
 #typesetting-screen {
   background: #3a2e20; /* dark wood color */
   background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
@@ -1878,6 +1956,7 @@ body {
     justify-content: center;
     border: 2px solid rgba(161, 98, 7, 0.4);
     font-family: 'Special Elite', cursive;
+    font-size: 1.25rem;
 }
 .dark .quiz-question-box {
     background-color: rgba(68, 64, 60, 0.6);
@@ -2103,183 +2182,459 @@ body {
 #goodwill-bar {
     height: 100%;
     border-radius: 8px;
-    transition: width 0.5s ease-out, background-color 0.5s ease-out;
+    transition: width 0.5s ease-in-out, background-color 0.5s ease-in-out;
+    box-shadow: 0 0 5px rgba(255,255,255,0.5);
 }
-
 #npc-dialogue-box {
     width: 100%;
-    background-color: rgba(250, 235, 215, 0.6);
+    background-color: rgba(255,255,255,0.4);
     padding: 1.5rem;
-    margin: 1rem 0;
     border-radius: 0.75rem;
-    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
-    min-height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid rgba(161, 98, 7, 0.4);
-    font-family: 'Special Elite', cursive;
-    font-size: 1.25rem;
+    border-left: 5px solid #d97706;
 }
 .dark #npc-dialogue-box {
-    background-color: rgba(68, 64, 60, 0.6);
-    border-color: rgba(217, 119, 6, 0.5);
+    background-color: rgba(75, 85, 99, 0.4);
+    border-left-color: #f59e0b;
 }
 
 .diplomacy-choice-button {
     width: 100%;
     padding: 1rem;
-    border-radius: 0.75rem;
-    border: 1px solid rgba(255,255,255,0.7);
-    font-weight: 700;
     font-size: 1.125rem;
-    text-align: left;
+    font-weight: 600;
+    border-radius: 0.75rem;
     transition: all 0.2s ease-in-out;
-    background-color: rgba(255, 255, 255, 0.5);
-    color: #374151;
+    background-color: rgba(255,255,255,0.7);
+    color: #44403c;
+    border: 1px solid rgba(255,255,255,1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 .dark .diplomacy-choice-button {
-    background-color: rgba(75, 85, 99, 0.5);
-    border-color: rgba(255,255,255,0.1);
-    color: #f3f4f6;
+    background-color: rgba(55, 65, 81, 0.7);
+    color: #e7e5e4;
+    border-color: rgba(255,255,255,0.2);
 }
-.diplomacy-choice-button:not(:disabled):hover {
-    background-color: rgba(255, 255, 255, 0.8);
-    border-color: rgba(255,255,255, 1);
+.diplomacy-choice-button:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
-.dark .diplomacy-choice-button:not(:disabled):hover {
-    background-color: rgba(107, 114, 128, 0.7);
-    border-color: rgba(255,255,255,0.3);
+.diplomacy-choice-button.selected-correct {
+    background-color: #16a34a; /* green-700 */
+    color: white;
+    transform: scale(1.02);
 }
-
+.diplomacy-choice-button.selected-wrong {
+    background-color: #b91c1c; /* red-800 */
+    color: white;
+    transform: scale(0.98);
+}
 .diplomacy-choice-button:disabled {
     cursor: not-allowed;
 }
 
-.diplomacy-choice-button.selected-correct {
-    background-color: #22c55e;
-    border-color: #16a34a;
-    color: white;
-    transform: scale(1.02);
-    animation: pulse-green 0.5s;
-}
-.dark .diplomacy-choice-button.selected-correct {
-    background-color: #16a34a;
-}
-.diplomacy-choice-button.selected-wrong {
-    background-color: #ef4444;
-    border-color: #dc2626;
-    color: white;
-    animation: shake-horizontal 0.4s;
-}
-.dark .diplomacy-choice-button.selected-wrong {
-    background-color: #b91c1c;
+/* --- ConstructionScreen.tsx specific styles --- */
+#construction-site {
+  border: 4px solid #854d0e; /* amber-800 */
+  box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
 }
 
-@keyframes shake-horizontal {
+#control-panel {
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+/* --- Tactical Map Screen --- */
+.valid-stake-location {
+    position: absolute;
+    background-color: rgba(52, 211, 153, 0.3); /* emerald-400 with alpha */
+    border: 2px dashed #10b981; /* emerald-500 */
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    animation: pulse-green-area 2.5s infinite;
+}
+
+.valid-stake-location:hover {
+    background-color: rgba(52, 211, 153, 0.5);
+    border-style: solid;
+}
+
+@keyframes pulse-green-area {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+    70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.placed-stake-in-zone {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: place-stake-anim 0.3s ease-out forwards;
+}
+
+@keyframes place-stake-anim {
+    from { transform: translate(-50%, -100%) scale(1.5); opacity: 0; }
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.tactical-map-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding-top: 1rem;
+}
+
+.complete-button {
+    background: linear-gradient(to right, #16a34a, #15803d); /* green-600 to green-700 */
+    color: white;
+    font-weight: bold;
+    font-size: 1.25rem;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 9999px;
+    box-shadow: 0 4px 15px rgba(22, 163, 74, 0.4);
+    transition: all 0.2s ease;
+}
+
+.complete-button:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(22, 163, 74, 0.5);
+}
+
+.complete-button:disabled {
+    background: #6b7280; /* gray-500 */
+    cursor: not-allowed;
+    opacity: 0.7;
+    box-shadow: none;
+}
+
+/* --- Lane Battle Screen --- */
+#lane-battle-screen {
+    width: 100%;
+    max-width: 500px;
+    height: 90vh;
+    max-height: 800px;
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-chien-truong-ba-trieu.png');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    overflow: hidden;
+    border: 4px solid #4a2c13;
+    border-radius: 0.75rem;
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes lane-battle-shake-anim {
   0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-  20%, 40%, 60%, 80% { transform: translateX(5px); }
+  25% { transform: translateX(-8px); }
+  50% { transform: translateX(8px); }
+  75% { transform: translateX(-8px); }
+}
+.lane-battle-shake {
+  animation: lane-battle-shake-anim 0.3s ease-in-out;
 }
 
-/* --- CSS for Construction Puzzle --- */
+#battlefield {
+    flex-grow: 1;
+    display: flex;
+    position: relative;
+}
+
+.lane {
+    flex: 1;
+    border-left: 2px dashed rgba(255, 255, 255, 0.2);
+    border-right: 2px dashed rgba(255, 255, 255, 0.2);
+    position: relative;
+    cursor: pointer;
+}
+.lane:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#player-character {
+    position: absolute;
+    bottom: 50px;
+    width: 33.33%;
+    height: 120px;
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Character/C-ba-trieu-tren-voi-chien.png');
+    background-size: contain;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    transition: left 0.2s ease-out;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.enemy-unit {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 80px;
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Character/C-linh-dich.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    will-change: top;
+    transition: filter 0.3s;
+}
+
+.enemy-unit.stunned {
+  animation: stun-wobble 0.5s infinite;
+  filter: sepia(0.8);
+}
+@keyframes stun-wobble {
+  0%, 100% { transform: translateX(-50%) rotate(-2deg); }
+  50% { transform: translateX(-50%) rotate(2deg); }
+}
+
+.ally-unit {
+    position: absolute;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 58px;
+    height: 58px;
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-binh-linh.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 5;
+    transition: transform 0.2s, box-shadow 0.5s ease-in-out;
+    border-radius: 50%;
+    animation: pulse-aura 2s infinite alternate;
+}
+
+@keyframes pulse-aura {
+  from {
+    box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fef08a, 0 0 20px #fef08a;
+  }
+  to {
+    box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fde047, 0 0 40px #fde047;
+  }
+}
+
+.ally-unit.ally-hit {
+  animation: hit-flash 0.3s;
+}
+@keyframes hit-flash {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.1) rotate(-5deg); filter: brightness(2); }
+}
+
+.collision-effect {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 80px;
+  z-index: 20;
+}
+.collision-effect img {
+  width: 100%;
+  height: 100%;
+}
+
+
+#battle-skill-bar {
+    display: flex;
+    justify-content: space-around;
+    padding: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-top: 2px solid #4a2c13;
+    flex-shrink: 0;
+}
+
+.skill-button {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 3px solid #fcd34d;
+    background-size: 60%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #78350f;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.skill-button:not(:disabled):hover {
+    border-color: #fefce8;
+    transform: scale(1.1);
+}
+.skill-button:disabled {
+    filter: grayscale(1);
+    cursor: not-allowed;
+}
+.cooldown-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    transition: height 0.2s linear;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.cooldown-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 3px black;
+  z-index: 2;
+  pointer-events: none;
+}
+
+
+.charge-visual {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  animation: charge-anim 0.4s forwards;
+}
+@keyframes charge-anim {
+  from { background: linear-gradient(to top, rgba(255, 237, 213, 0.8), transparent 50%); }
+  to { background: linear-gradient(to top, transparent, transparent); }
+}
+
+.roar-visual {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.75rem;
+  animation: roar-anim 0.5s forwards;
+  z-index: 30;
+  pointer-events: none;
+}
+@keyframes roar-anim {
+  from { box-shadow: inset 0 0 0 0px rgba(251, 191, 36, 0.8); }
+  to { box-shadow: inset 0 0 0 1000px rgba(251, 191, 36, 0); }
+}
+
+.key-hint {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid white;
+  border-radius: 0.25rem;
+}
+/* Health bar for lane battle */
+.health-bar-container {
+  width: 100px;
+  height: 12px;
+  background-color: #4b5563; /* gray-600 */
+  border: 1px solid #9ca3af; /* gray-400 */
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.health-bar-fill {
+  height: 100%;
+  background-color: #22c55e; /* green-500 */
+  border-radius: 4px;
+  transition: width 0.3s ease-in-out;
+}
+/* --- NEW CSS for Construction Puzzle --- */
 #construction-puzzle-screen {
-  background-color: #d6d3d1; /* stone-300 */
+  width: 100%;
+  background-color: #fefce8; /* amber-50 */
+  color: #3f3f46; /* stone-700 */
 }
 .dark #construction-puzzle-screen {
-  background-color: #292524; /* stone-800 */
-}
-
-#construction-puzzle-screen h2 {
-    color: #a16207; /* amber-700 */
-}
-.dark #construction-puzzle-screen h2 {
-    color: #fcd34d; /* amber-300 */
+  background-color: #1c1917; /* stone-900 */
+  color: #e7e5e4; /* stone-200 */
 }
 
 #building-grid {
-  position: relative; /* For absolute positioning of pieces */
-  background-color: #fefce8; /* amber-50 */
+  background-color: rgba(0,0,0,0.1);
   border: 2px solid #a16207; /* amber-700 */
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
-  padding: 2px;
-  gap: 2px;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.4);
+  position: relative; /* For absolute positioning of pieces */
 }
-.dark #building-grid {
-    background-color: #292524; /* stone-800 */
-    border-color: #78350f; /* amber-800 */
-}
+
 .grid-cell {
-  background-color: #fef3c7; /* amber-100 */
-  border-radius: 2px;
-}
-.dark .grid-cell {
-  background-color: #44403c; /* stone-700 */
+  border: 1px solid rgba(0,0,0,0.2);
 }
 
 .placed-puzzle-piece {
-    cursor: grab;
-    transition: all 0.2s ease-in-out;
+  cursor: grab;
+  transition: all 0.2s ease-out;
 }
 .placed-puzzle-piece:active {
-    cursor: grabbing;
-    filter: brightness(1.1);
+  cursor: grabbing;
+  transform: scale(1.05);
+  z-index: 999 !important; /* Bring to front when dragging */
 }
 .placed-puzzle-piece img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    pointer-events: none; /* Make image non-draggable */
-    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.4));
-}
-.hinted-piece {
-    animation: pulse-yellow 1.5s ease-out;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This makes sure the image covers the div */
+  pointer-events: none; /* Important for drag and drop to work on the parent div */
 }
 
+
 #building-pieces-palette {
-    background-color: #f5f5f4; /* stone-100 */
-    border: 2px solid #a8a29e; /* stone-400 */
+  background-color: rgba(255,255,255,0.4);
+  border: 1px solid #d6d3d1; /* stone-300 */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 .dark #building-pieces-palette {
-    background-color: #44403c; /* stone-700 */
-    border-color: #57534e; /* stone-600 */
+    background-color: rgba(0,0,0,0.3);
+    border-color: #44403c; /* stone-700 */
 }
+
 .palette-inner {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
+  gap: 0.75rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0.25rem;
 }
+
 .palette-piece-container {
   padding: 0.5rem;
-  background-color: #fff;
+  background-color: #f5f5f4; /* stone-100 */
   border-radius: 0.375rem;
-  border: 1px solid #d6d3d1;
   cursor: pointer;
-  transition: background-color 0.2s;
+  border: 2px solid transparent;
+  transition: all 0.2s;
 }
 .dark .palette-piece-container {
-    background-color: #57534e;
-    border-color: #78716c;
+  background-color: #44403c; /* stone-700 */
 }
 .palette-piece-container:hover {
-  background-color: #fef3c7; /* amber-100 */
+  border-color: #f59e0b; /* amber-500 */
+  transform: scale(1.05);
 }
-.dark .palette-piece-container:hover {
-  background-color: #78716c;
-}
+
 .palette-piece-image {
   width: 100%;
   height: auto;
-  aspect-ratio: 1/1;
+  aspect-ratio: 1;
   object-fit: contain;
+  transition: transform 0.3s ease-in-out;
   cursor: grab;
-  transition: transform 0.3s ease;
 }
 .palette-piece-image:active {
   cursor: grabbing;
 }
+
+
 .highlight-overlay {
     position: absolute;
     pointer-events: none;
@@ -2287,217 +2642,131 @@ body {
     transition: all 0.1s;
 }
 .highlight-overlay.valid {
-    background-color: rgba(74, 222, 128, 0.4); /* green-400 with alpha */
+    background-color: rgba(34, 197, 94, 0.4); /* green-500 with alpha */
     border: 2px solid #22c55e; /* green-500 */
 }
 .highlight-overlay.invalid {
-    background-color: rgba(248, 113, 113, 0.4); /* red-400 with alpha */
+    background-color: rgba(239, 68, 68, 0.4); /* red-500 with alpha */
     border: 2px solid #ef4444; /* red-500 */
 }
 
-/* --- Lane Battle Screen --- */
-#lane-battle-screen {
-  width: 100%;
-  max-width: 500px;
-  aspect-ratio: 9 / 16;
-  background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-chien-truong-bach-dang.png');
-  background-size: cover;
-  background-position: center;
-  position: relative;
-  overflow: hidden;
-  border-radius: 1rem;
-  border: 4px solid #4a2c13;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+.hinted-piece {
+    animation: hinted-piece-flash 1.5s ease-out;
 }
-.lane-battle-shake {
-  animation: screenShake 0.4s ease-in-out;
-}
-#battlefield {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: space-around;
-}
-.lane {
-  width: 33.33%;
-  height: 100%;
-  position: relative;
-  border-left: 1px dashed rgba(255, 255, 255, 0.2);
-  border-right: 1px dashed rgba(255, 255, 255, 0.2);
-}
-#player-character {
-  position: absolute;
-  bottom: 5%;
-  width: 33.33%;
-  height: 20%;
-  background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Character/C-ba-trieu-tren-voi-chien.png');
-  background-size: contain;
-  background-position: center bottom;
-  background-repeat: no-repeat;
-  transition: left 0.2s ease-out;
-  z-index: 10;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-}
-.enemy-unit {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 70%;
-  height: 10%;
-  background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Character/C-linh-dich.png');
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-.enemy-unit.stunned {
-  animation: spin-stun 1s infinite;
-}
-@keyframes spin-stun {
-  from { transform: translateX(-50%) rotate(0deg); }
-  to { transform: translateX(-50%) rotate(360deg); }
-}
-.ally-unit {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
-  height: 15%;
-  background-image: url('https://i.ibb.co/18yG74W/Avt-cong-binh.png');
-  background-size: contain;
-  background-position: center bottom;
-  background-repeat: no-repeat;
-  z-index: 5;
-}
-.ally-unit.ally-hit {
-  animation: flash-red-hit 0.3s;
-}
-@keyframes flash-red-hit {
-  0%, 100% { filter: brightness(1); }
-  50% { filter: brightness(3) contrast(2) saturate(0); }
-}
-#battle-skill-bar {
-  position: absolute;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 1rem;
-  padding: 0.5rem;
-  background-color: rgba(0, 0, 0, 0.6);
-  border-radius: 0.75rem;
-  border: 1px solid rgba(255,255,255,0.3);
-  z-index: 20;
-}
-.skill-button {
-  width: 60px;
-  height: 60px;
-  background-color: #57534e;
-  border: 2px solid #a8a29e;
-  border-radius: 50%;
-  background-size: 60%;
-  background-position: center;
-  background-repeat: no-repeat;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-  transition: all 0.2s;
-}
-.skill-button:hover:not(:disabled) {
-  border-color: #facc15;
-  transform: scale(1.1);
-}
-.skill-button:disabled {
-  filter: grayscale(1);
-  cursor: not-allowed;
-}
-.cooldown-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: rgba(0,0,0,0.7);
-  pointer-events: none;
-  transition: height 0.5s linear;
-}
-.charge-visual {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: -25%;
-  width: 150%;
-  background: linear-gradient(to top, rgba(255, 224, 130, 0), rgba(255, 236, 179, 0.8), rgba(255, 224, 130, 0));
-  animation: charge-anim 0.4s ease-out forwards;
-  pointer-events: none;
-  z-index: 15;
-}
-@keyframes charge-anim {
-  from { transform: scaleY(0); }
-  to { transform: scaleY(1); opacity: 0; }
-}
-.roar-visual {
-  position: absolute;
-  top: 15%;
-  left: 50%;
-  width: 200%;
-  height: 150px;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  border: 5px solid rgba(255, 193, 7, 0.8);
-  animation: roar-anim 0.5s ease-out forwards;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 15;
-}
-@keyframes roar-anim {
-  from { transform: translateX(-50%) scale(0.1); opacity: 1; }
-  to { transform: translateX(-50%) scale(1.5); opacity: 0; }
-}
-.key-hint {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border: 1px solid white;
-  border-radius: 0.25rem;
-  font-weight: bold;
+@keyframes hinted-piece-flash {
+    0%, 100% {
+        box-shadow: 0 0 0px 0px rgba(59, 130, 246, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 20px 5px rgba(59, 130, 246, 0.7);
+    }
 }
 
-/* --- Achievement Toast Notification --- */
-#achievement-toast {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2000; /* High z-index to appear on top */
-  width: 90%;
-  max-width: 400px;
-  pointer-events: none; /* Allow clicks to pass through to elements behind it */
-  animation: slideInAndOut 4s ease-in-out forwards;
+@keyframes ship-bob {
+  0% { transform: translateY(-50%); }
+  50% { transform: translateY(-53%); }
+  100% { transform: translateY(-50%); }
 }
 
-#achievement-toast > div {
-  pointer-events: all; /* Make the toast content itself clickable if needed */
+/* Coin Minting Screen */
+.selection-group h3 {
+  color: #a16207; /* amber-700 */
+}
+.dark .selection-group h3 {
+  color: #fcd34d; /* amber-300 */
 }
 
-@keyframes slideInAndOut {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -150%);
-  }
-  10%, 90% {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -150%);
-  }
+.selection-card {
+  transition: all 0.2s ease-in-out;
 }
-@keyframes pulse-yellow-glow {
-  from {
-    text-shadow: 0 0 4px #fefce8, 0 0 8px #fde047, 0 0 12px #facc15;
-  }
-  to {
-    text-shadow: 0 0 6px #fefce8, 0 0 12px #fde047, 0 0 18px #facc15, 0 0 24px #fbbf24;
-  }
+.selection-card.selected {
+  border: 2px solid #2563eb; /* blue-600 */
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+}
+
+/* City Planning Screen */
+#citadel-map-container {
+    width: 100%;
+    aspect-ratio: 1/1;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    border-radius: 0.5rem;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+.building-drop-zone {
+    position: absolute;
+    width: 20%; /* Adjust as needed */
+    height: 20%;
+    background-color: rgba(59, 130, 246, 0.3);
+    border: 2px dashed #60a5fa;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.building-drop-zone.drag-over {
+    background-color: rgba(59, 130, 246, 0.6);
+    border-style: solid;
+}
+.placed-building-icon {
+    position: absolute;
+    width: 20%;
+    height: 20%;
+    object-fit: contain;
+    pointer-events: none; /* Make sure it doesn't block drop zones */
+    animation: place-stake-anim 0.4s ease-out forwards;
+}
+
+#construction-palette {
+    height: 80vh; /* Make sure it's scrollable */
+    overflow-y: auto;
+}
+
+/* Sandbox Screen */
+.sandbox-container {
+    height: 100%;
+}
+.dialogue-mode {
+    cursor: copy !important;
+}
+
+.placed-item {
+    -webkit-user-drag: element; /* Allow dragging */
+}
+.speech-bubble {
+    position: absolute;
+    background-color: white;
+    color: black;
+    padding: 10px 15px;
+    border-radius: 20px;
+    border-bottom-left-radius: 2px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    max-width: 180px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    cursor: move;
+}
+.speech-bubble.loading::after {
+    content: "...";
+    animation: loading-dots 1.5s infinite;
+}
+@keyframes loading-dots {
+    0%, 20% { content: "."; }
+    40% { content: ".."; }
+    60% { content: "..."; }
+    80%, 100% { content: ""; }
+}
+
+.item-locked {
+    filter: grayscale(1);
+}
+.item-locked .absolute.inset-0 {
+    display: flex;
+}
+.item-locked:not(.item-locked) .absolute.inset-0 {
+    display: none;
 }

@@ -9,7 +9,7 @@ import EventDetailModal from './EventDetailModal';
 interface HiddenObjectScreenProps {
   missionData: HiddenObjectMissionData;
   onReturnToMuseum: () => void;
-  onMissionComplete: (reward?: Reward) => void;
+  onMissionComplete: (reward?: Reward, data?: { foundItemIds: string[] }) => void;
 }
 
 const HiddenObjectScreen: React.FC<HiddenObjectScreenProps> = ({
@@ -56,7 +56,7 @@ const HiddenObjectScreen: React.FC<HiddenObjectScreenProps> = ({
     if (newFoundItems.length === missionData.objectsToFind.length) {
       setIsComplete(true);
       setTimeout(() => {
-        onMissionComplete(missionData.reward);
+        onMissionComplete(missionData.reward, { foundItemIds: newFoundItems });
       }, 1500); // Wait for the completion animation/message
     }
   };

@@ -9,9 +9,9 @@ export const ALL_QUEST_CHAINS: Record<string, QuestChain> = {
     title: 'Đại Phá Quân Nam Hán',
     description: 'Một chuỗi nhiệm vụ tái hiện lại trận Bạch Đằng lịch sử của Ngô Quyền, từ việc chuẩn bị trận địa đến lúc quyết chiến.',
     steps: [
-      { id: 'step0_bachdang', title: 'Khảo Sát Địa Hình', description: 'Tìm ra vị trí mai phục lý tưởng trên sông Bạch Đằng.', missionId: 'find-bach-dang-ambush-spot', iconUrl: ImageUrls.BG_ADVENTURE_PUZZLE_URL },
-      { id: 'step1_bachdang', title: 'Bố Trí Trận Địa', description: 'Đóng cọc xuống lòng sông Bạch Đằng để chuẩn bị bẫy quân địch.', missionId: 'bach-dang-tactical-map', iconUrl: ImageUrls.BACH_DANG_STAKE_ICON_URL },
-      { id: 'step2_bachdang', title: 'Quyết Chiến', description: 'Nhử địch vào trận địa và tổng tấn công khi thủy triều rút.', missionId: 'bach-dang-naval-battle', iconUrl: ImageUrls.BACH_DANG_VICTORY_ICON_URL },
+      { id: 'step0_bachdang', title: 'Khảo Sát Địa Hình', description: 'Tìm ra vị trí mai phục lý tưởng trên sông Bạch Đằng.', missionId: 'find-bach-dang-ambush-spot', iconUrl: ImageUrls.QUEST_KHAO_SAT_DIA_HINH_ICON_URL },
+      { id: 'step1_bachdang', title: 'Bố Trí Trận Địa', description: 'Đóng cọc xuống lòng sông Bạch Đằng để chuẩn bị bẫy quân địch.', missionId: 'bach-dang-tactical-map', iconUrl: ImageUrls.QUEST_BO_TRI_TRAN_DIA_ICON_URL },
+      { id: 'step2_bachdang', title: 'Quyết Chiến', description: 'Nhử địch vào trận địa và tổng tấn công khi thủy triều rút.', missionId: 'bach-dang-naval-battle', iconUrl: ImageUrls.QUEST_QUYET_CHIEN_ICON_URL },
     ]
   },
 };

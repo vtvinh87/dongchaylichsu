@@ -1,5 +1,5 @@
 // constants/missions.ts
-import { MissionData, PuzzlePieceItem, TradingGood, TradingEvent, TimelineEventItem, HiddenObjectItem, QuizQuestion, DiplomacyRound, DiplomacyChoice, RallyCallRound, RallyCallChoice, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingTask, CityPlanningMissionData, TypesettingMissionData, AdventurePuzzleRiddle, StrategicPathMissionData, ConstructionPuzzlePiece, ConstructionPuzzleMissionData, NavalBattleMissionData, LaneBattleMissionData, CoinMintingMissionData, AdventurePuzzleMissionData, TradingMissionData } from '../types';
+import { MissionData, PuzzlePieceItem, TradingGood, TradingEvent, TimelineEventItem, HiddenObjectItem, QuizQuestion, DiplomacyRound, DiplomacyChoice, RallyCallRound, RallyCallChoice, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingTask, CityPlanningMissionData, TypesettingMissionData, AdventurePuzzleRiddle, StrategicPathMissionData, ConstructionPuzzlePiece, ConstructionPuzzleMissionData, NavalBattleMissionData, LaneBattleMissionData, CoinMintingMissionData, AdventurePuzzleMissionData, TradingMissionData, HiddenObjectMissionData } from '../types';
 import * as Items from './items';
 import * as ImageUrls from '../imageUrls';
 
@@ -77,7 +77,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         { id: 'event_anduongvuong', text: 'An Dương Vương và Nỏ thần', correctOrder: 5, imageUrl: ImageUrls.EVENT_AN_DUONG_VUONG_NO_THAN_URL, details: 'Sau khi kết thúc thời đại Hùng Vương, Thục Phán An Dương Vương lập nên nước Âu Lạc, xây thành Cổ Loa và chế tạo Nỏ thần để bảo vệ đất nước khỏi quân xâm lược.' }
     ],
     reward: { id: Items.NHA_SAN_ARTIFACT_ID, type: 'artifact' },
-    timeLimit: 180,
+    timeLimit: 60,
   },
    'loi-the-song-hat': {
     type: 'rallyCall',
@@ -496,11 +496,15 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
   'bach-dang-tactical-map': {
       type: 'tacticalMap',
       id: 'bach-dang-tactical-map',
-      title: 'Bố Trí Trận Địa Cọc',
+      title: 'Bố Trí Trận Địa',
       backgroundUrl: ImageUrls.BG_LANE_BATTLE_URL,
       stakeImageUrl: ImageUrls.BACH_DANG_STAKE_ICON_URL,
-      targetStakes: 15,
       reward: { id: Items.BACH_DANG_STAKE_FRAGMENT_ID, type: 'fragment' },
+      dropZones: [
+        { id: 'narrow_estuary', x: 45, y: 30, width: 10, height: 25 },
+        { id: 'reed_bank', x: 10, y: 40, width: 25, height: 40 },
+        { id: 'whirlpool', x: 65, y: 60, width: 15, height: 20 },
+      ],
   } as TacticalMapMissionData,
   'bach-dang-naval-battle': {
       type: 'navalBattle',
@@ -514,31 +518,15 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
       reward: { id: Items.COC_GO_BACH_DANG_ARTIFACT_ID, type: 'artifact' },
   } as NavalBattleMissionData,
   'find-bach-dang-ambush-spot': {
-    type: 'strategicPath',
+    type: 'hiddenObject',
     id: 'find-bach-dang-ambush-spot',
     title: 'Khảo Sát Địa Hình Bạch Đằng',
+    backgroundImageUrl: ImageUrls.BG_LANE_BATTLE_URL,
+    objectsToFind: [
+        { id: 'narrow_estuary', name: 'Cửa Sông Hẹp', iconUrl: ImageUrls.ICON_CUA_SONG_HEP_URL, details: 'Nơi cửa sông thu hẹp, dễ dàng cho việc bố trí trận địa và ngăn chặn đường lui của địch.', coords: { x: 45, y: 30, width: 10, height: 25 } },
+        { id: 'reed_bank', name: 'Bờ Lau Sậy', iconUrl: ImageUrls.ICON_BAI_LAU_SAY_URL, details: 'Các bờ lau sậy um tùm là nơi lý tưởng để mai phục quân, tạo yếu tố bất ngờ.', coords: { x: 10, y: 40, width: 25, height: 40 } },
+        { id: 'whirlpool', name: 'Vùng Nước Xoáy', iconUrl: ImageUrls.ICON_VUNG_NUOC_XOAY_URL, details: 'Vùng nước chảy xiết và có xoáy sẽ gây khó khăn cho thuyền lớn của địch khi di chuyển.', coords: { x: 65, y: 60, width: 15, height: 20 } },
+    ],
     // No reward, this mission is just a step in a quest.
-    start: { x: 1, y: 13 },
-    end: { x: 4, y: 3 }, // The ambush spot
-    initialSupplies: 20, // Some supplies for the scout
-    mapLayout: [
-        // 15 rows, 10 cols
-        // 0: jungle, 1: mountain, 2: river (deep, impassable), 8: path/shallows
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 0, 0, 2, 2, 2, 0, 0, 0, 1],
-        [1, 0, 8, 8, 2, 2, 8, 8, 0, 1], // river path
-        [0, 0, 8, 8, 8, 8, 8, 8, 0, 0], // river path, end is here
-        [0, 8, 8, 2, 2, 2, 8, 8, 8, 0], // river path
-        [0, 8, 2, 2, 2, 2, 2, 8, 8, 0],
-        [0, 8, 2, 0, 0, 0, 2, 8, 8, 0],
-        [0, 8, 2, 0, 1, 1, 0, 2, 8, 0],
-        [0, 8, 2, 0, 1, 1, 0, 2, 8, 0],
-        [0, 8, 2, 0, 0, 0, 2, 8, 8, 0],
-        [0, 8, 8, 2, 2, 2, 8, 8, 8, 0],
-        [0, 0, 8, 8, 8, 8, 8, 8, 0, 0],
-        [1, 0, 0, 8, 8, 8, 8, 0, 0, 1],
-        [1, 8, 0, 0, 0, 0, 0, 0, 0, 1], // start is here
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    ]
-  } as StrategicPathMissionData,
+  } as HiddenObjectMissionData,
 };

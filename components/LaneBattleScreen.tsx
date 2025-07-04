@@ -17,6 +17,11 @@ interface Ally {
   health: number; // how many enemies it can block
 }
 
+interface CollisionEffect {
+  id: number;
+  lane: number;
+}
+
 // --- Constants ---
 const ENEMY_SPEED_PERCENT_PER_SEC = 12.5; // 100% in 8 seconds
 const ALLY_HEALTH = 3; // Blocks 3 enemies
@@ -32,6 +37,9 @@ const LaneBattleScreen: React.FC<{
   const [allies, setAllies] = useState<Ally[]>([]);
   const [defensePoints, setDefensePoints] = useState(missionData.defensePoints);
   const [gameTimer, setGameTimer] = useState(missionData.duration);
+  const [enemiesDefeated, setEnemiesDefeated] = useState(0);
+  const [enemiesSlipped, setEnemiesSlipped] = useState(0);
+  const initialDefensePoints = missionData.defensePoints;
   
   const [chargeCooldown, setChargeCooldown] = useState(0);
   const [roarCooldown, setRoarCooldown] = useState(0);
@@ -41,6 +49,7 @@ const LaneBattleScreen: React.FC<{
   const [roarEffect, setRoarEffect] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
   const [hitAllyId, setHitAllyId] = useState<number | null>(null);
+  const [collisionEffects, setCollisionEffects] = useState<CollisionEffect[]>([]);
 
   const gameLoopRef = useRef<number | null>(null);
   const timersRef = useRef<number[]>([]);
@@ -75,6 +84,7 @@ const LaneBattleScreen: React.FC<{
       lastFrameTimeRef.current = currentTime;
 
       let pointsWereLost = false;
+      let slippedCount = 0;
       setEnemies(prevEnemies => {
         let currentDefensePoints = defensePointsRef.current;
         const updatedEnemies = prevEnemies.map(enemy => {
@@ -85,6 +95,7 @@ const LaneBattleScreen: React.FC<{
           if (newTop >= 100) {
             currentDefensePoints--;
             pointsWereLost = true;
+            slippedCount++;
             return null;
           }
           return { ...enemy, top: newTop };
@@ -93,6 +104,7 @@ const LaneBattleScreen: React.FC<{
         if (pointsWereLost) {
             playSound('sfx_fail');
             setIsShaking(true);
+            setEnemiesSlipped(prev => prev + slippedCount);
             setTimeout(() => setIsShaking(false), 400);
         }
 
@@ -197,7 +209,11 @@ const LaneBattleScreen: React.FC<{
     setChargeCooldown(10);
     setChargeEffect(playerLane);
     setTimeout(() => setChargeEffect(null), 400);
-    setEnemies(prev => prev.filter(e => e.lane !== playerLane));
+    setEnemies(prev => {
+        const enemiesInLane = prev.filter(e => e.lane === playerLane);
+        setEnemiesDefeated(prevCount => prevCount + enemiesInLane.length);
+        return prev.filter(e => e.lane !== playerLane)
+    });
   };
 
   const handleRoar = () => {
@@ -226,6 +242,7 @@ const LaneBattleScreen: React.FC<{
 
     let newAllies = [...alliesRef.current];
     const enemiesToRemove = new Set<number>();
+    const newEffects: CollisionEffect[] = [];
 
     enemies.forEach(enemy => {
         if (enemy.top > 80) { // Check when near the bottom
@@ -235,6 +252,13 @@ const LaneBattleScreen: React.FC<{
                 newAllies[allyInLaneIndex].health--;
                 playSound('sfx_fail');
                 setHitAllyId(newAllies[allyInLaneIndex].id);
+                
+                const effect: CollisionEffect = { id: Date.now() + enemy.id, lane: enemy.lane };
+                newEffects.push(effect);
+                setTimeout(() => {
+                  setCollisionEffects(prev => prev.filter(e => e.id !== effect.id));
+                }, 600); // Duration for the GIF animation
+
                 setTimeout(() => setHitAllyId(null), 300);
                 if (newAllies[allyInLaneIndex].health <= 0) {
                     newAllies.splice(allyInLaneIndex, 1);
@@ -243,7 +267,12 @@ const LaneBattleScreen: React.FC<{
         }
     });
 
+    if (newEffects.length > 0) {
+      setCollisionEffects(prev => [...prev, ...newEffects]);
+    }
+
     if (enemiesToRemove.size > 0) {
+        setEnemiesDefeated(prevCount => prevCount + enemiesToRemove.size);
         setAllies(newAllies);
         setEnemies(prev => prev.filter(e => !enemiesToRemove.has(e.id)));
     }
@@ -280,10 +309,30 @@ const LaneBattleScreen: React.FC<{
   return (
     <div id="lane-battle-screen" className={isShaking ? 'lane-battle-shake' : ''}>
       {renderOverlay()}
-      <div className="absolute top-2 left-2 p-2 bg-black/50 text-white rounded-md z-20 text-sm">
-          <div>Phòng thủ: <span className="font-bold text-green-400">{defensePoints}</span></div>
+      <div className="absolute top-2 left-2 p-2 bg-black/50 text-white rounded-md z-20 text-sm space-y-1">
+          <div>
+            <span className="font-bold">Máu:</span>
+            <div className="health-bar-container">
+              <div 
+                className="health-bar-fill" 
+                style={{ width: `${(defensePoints / initialDefensePoints) * 100}%` }}
+              ></div>
+            </div>
+          </div>
+          <div>Địch bị diệt: <span className="font-bold text-green-400">{enemiesDefeated}</span></div>
+          <div>Địch lọt lưới: <span className="font-bold text-red-400">{enemiesSlipped}</span></div>
           <div>Thời gian: <span className="font-bold text-amber-400">{gameTimer}s</span></div>
       </div>
+       {gameState === 'playing' && (
+          <button 
+            onClick={onReturnToMuseum}
+            className="absolute top-2 right-2 bg-amber-700 hover:bg-amber-800 text-white rounded-full z-20 w-8 h-8 flex items-center justify-center font-bold text-lg"
+            aria-label="Quay về Bảo tàng"
+            title="Quay về Bảo tàng"
+          >
+            &times;
+          </button>
+       )}
       <div id="battlefield">
         {[0, 1, 2].map(laneIndex => (
           <div key={laneIndex} className="lane" onClick={() => handleLaneClick(laneIndex)}>
@@ -293,6 +342,11 @@ const LaneBattleScreen: React.FC<{
             {allies.filter(a => a.lane === laneIndex).map(ally => (
               <div key={ally.id} className={`ally-unit ${hitAllyId === ally.id ? 'ally-hit' : ''}`} />
             ))}
+            {collisionEffects.filter(e => e.lane === laneIndex).map(effect => (
+              <div key={effect.id} className="collision-effect">
+                <img src="https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Gif/linh-va-cham.gif" alt="" />
+              </div>
+            ))}
             {chargeEffect === laneIndex && <div className="charge-visual" />}
           </div>
         ))}
@@ -300,14 +354,17 @@ const LaneBattleScreen: React.FC<{
       {roarEffect && <div className="roar-visual" />}
       <div id="player-character" style={{ left: `${playerLane * 33.33}%` }} />
       <div id="battle-skill-bar">
-        <button id="skill-charge" className="skill-button" style={{backgroundImage: `url(${ImageUrls.ICON_CHARGE_URL})`}} onClick={handleCharge} disabled={chargeCooldown > 0} title="Xung Phong">
+        <button id="skill-charge" className={`skill-button ${chargeCooldown === 0 ? 'skill-ready' : ''}`} style={{backgroundImage: `url(${ImageUrls.ICON_CHARGE_URL})`}} onClick={handleCharge} disabled={chargeCooldown > 0} title="Xung Phong">
             {chargeCooldown > 0 && <div className="cooldown-overlay" style={{ height: `${(chargeCooldown / 10) * 100}%` }} />}
+            {chargeCooldown > 0 && <span className="cooldown-text">{chargeCooldown}</span>}
         </button>
-        <button id="skill-roar" className="skill-button" style={{backgroundImage: `url(${ImageUrls.ICON_ROAR_URL})`}} onClick={handleRoar} disabled={roarCooldown > 0} title="Hò Reo">
+        <button id="skill-roar" className={`skill-button ${roarCooldown === 0 ? 'skill-ready' : ''}`} style={{backgroundImage: `url(${ImageUrls.ICON_ROAR_URL})`}} onClick={handleRoar} disabled={roarCooldown > 0} title="Hò Reo">
             {roarCooldown > 0 && <div className="cooldown-overlay" style={{ height: `${(roarCooldown / 20) * 100}%` }} />}
+            {roarCooldown > 0 && <span className="cooldown-text">{roarCooldown}</span>}
         </button>
-        <button id="skill-call-soldiers" className="skill-button" style={{backgroundImage: `url(${ImageUrls.ICON_CALL_SOLDIERS_URL})`}} onClick={handleCallSoldiers} disabled={callSoldiersCooldown > 0} title="Gọi Lính">
+        <button id="skill-call-soldiers" className={`skill-button ${callSoldiersCooldown === 0 ? 'skill-ready' : ''}`} style={{backgroundImage: `url(${ImageUrls.ICON_CALL_SOLDIERS_URL})`}} onClick={handleCallSoldiers} disabled={callSoldiersCooldown > 0} title="Gọi Lính">
             {callSoldiersCooldown > 0 && <div className="cooldown-overlay" style={{ height: `${(callSoldiersCooldown / 10) * 100}%` }} />}
+            {callSoldiersCooldown > 0 && <span className="cooldown-text">{callSoldiersCooldown}</span>}
         </button>
       </div>
     </div>
