@@ -1,9 +1,10 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { HiddenObjectMissionData, Reward } from '../types';
+import { HiddenObjectMissionData, Reward, HiddenObjectItem } from '../types';
 import { ALL_ARTIFACTS_MAP, ALL_FRAGMENTS_MAP } from '../constants';
 import { playSound } from '../utils/audio';
+import EventDetailModal from './EventDetailModal';
 
 interface HiddenObjectScreenProps {
   missionData: HiddenObjectMissionData;
@@ -19,11 +20,13 @@ const HiddenObjectScreen: React.FC<HiddenObjectScreenProps> = ({
   const [foundItems, setFoundItems] = useState<string[]>([]);
   const [isComplete, setIsComplete] = useState(false);
   const [rewardImageUrl, setRewardImageUrl] = useState('');
+  const [selectedItemForModal, setSelectedItemForModal] = useState<HiddenObjectItem | null>(null);
 
   useEffect(() => {
     // Reset state when mission changes
     setFoundItems([]);
     setIsComplete(false);
+    setSelectedItemForModal(null);
     
     let url = '';
     if (missionData.reward?.type === 'artifact') {
@@ -35,13 +38,20 @@ const HiddenObjectScreen: React.FC<HiddenObjectScreenProps> = ({
 
   }, [missionData]);
 
-  const handleItemClick = (itemId: string) => {
-    if (foundItems.includes(itemId) || isComplete) {
+  const handleItemClick = (item: HiddenObjectItem) => {
+    if (foundItems.includes(item.id) || isComplete) {
       return;
     }
     playSound('sfx-success');
-    const newFoundItems = [...foundItems, itemId];
+    setSelectedItemForModal(item);
+  };
+  
+  const handleModalClose = () => {
+    if (!selectedItemForModal) return;
+
+    const newFoundItems = [...foundItems, selectedItemForModal.id];
     setFoundItems(newFoundItems);
+    setSelectedItemForModal(null);
 
     if (newFoundItems.length === missionData.objectsToFind.length) {
       setIsComplete(true);
@@ -76,7 +86,7 @@ const HiddenObjectScreen: React.FC<HiddenObjectScreenProps> = ({
               width: `${item.coords.width}%`,
               height: `${item.coords.height}%`,
             }}
-            onClick={() => handleItemClick(item.id)}
+            onClick={() => handleItemClick(item)}
             title={`Tìm: ${item.name}`}
             aria-label={`Tìm: ${item.name}`}
           />
@@ -101,6 +111,17 @@ const HiddenObjectScreen: React.FC<HiddenObjectScreenProps> = ({
           </div>
         ))}
       </div>
+
+      <EventDetailModal
+        eventItem={selectedItemForModal ? {
+            id: selectedItemForModal.id,
+            text: selectedItemForModal.name,
+            details: selectedItemForModal.details,
+            imageUrl: selectedItemForModal.iconUrl,
+            correctOrder: 0, // Dummy data
+        } : null}
+        onClose={handleModalClose}
+      />
     </div>
   );
 };

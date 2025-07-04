@@ -35,6 +35,12 @@ const TradingScreen: React.FC<TradingScreenProps> = ({ missionData, onReturnToMu
 
   useEffect(() => {
     // Initial setup
+    setCapital(missionData.initialCapital);
+    setCurrentDay(1);
+    setInventory({});
+    setIsMissionOver(false);
+    setGameOutcome(null);
+
     const initialPrices: Record<string, number> = {};
     missionData.goods.forEach(good => {
       initialPrices[good.id] = good.basePrice;
@@ -49,6 +55,7 @@ const TradingScreen: React.FC<TradingScreenProps> = ({ missionData, onReturnToMu
   }, [missionData]);
 
   const handleBuy = (goodId: string, amount: number) => {
+    if (isMissionOver) return;
     const price = marketPrices[goodId] * amount;
     if (capital >= price) {
       playSound('sfx_click');
@@ -61,6 +68,7 @@ const TradingScreen: React.FC<TradingScreenProps> = ({ missionData, onReturnToMu
   };
 
   const handleSell = (goodId: string, amount: number) => {
+    if (isMissionOver) return;
     if ((inventory[goodId] || 0) >= amount) {
       playSound('sfx_click');
       const price = marketPrices[goodId] * amount;
@@ -76,9 +84,7 @@ const TradingScreen: React.FC<TradingScreenProps> = ({ missionData, onReturnToMu
     if (isMissionOver) return;
 
     playSound('sfx_click');
-    const newDay = currentDay + 1;
 
-    // Check win/loss condition BEFORE advancing day
     if (capital >= missionData.targetCapital) {
       setGameOutcome('win');
       setIsMissionOver(true);
@@ -87,6 +93,7 @@ const TradingScreen: React.FC<TradingScreenProps> = ({ missionData, onReturnToMu
       return;
     }
 
+    const newDay = currentDay + 1;
     if (newDay > missionData.daysLimit) {
       setGameOutcome('loss');
       setIsMissionOver(true);
@@ -119,9 +126,9 @@ const TradingScreen: React.FC<TradingScreenProps> = ({ missionData, onReturnToMu
       message = "Rất tiếc, bạn đã không thể đạt được mục tiêu. Con đường tơ lụa vẫn còn nhiều thử thách.";
     }
     return (
-      <div className="absolute inset-0 bg-black/70 flex flex-col justify-center items-center text-white z-20 animate-fadeInScaleUp p-4">
+      <div className="absolute inset-0 bg-black/70 flex flex-col justify-center items-center text-white z-20 animate-fadeInScaleUp p-4 text-center">
         <h3 className="text-4xl font-bold text-amber-300 mb-4">{title}</h3>
-        <p className="text-xl text-center mb-4">{message}</p>
+        <p className="text-xl mb-4">{message}</p>
         {gameOutcome === 'win' && rewardImageUrl && <img src={rewardImageUrl} alt="Phần thưởng" className="w-32 h-32 object-contain my-4 rounded-lg" />}
         {gameOutcome === 'loss' && (
           <button onClick={onReturnToMuseum} className="mt-6 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg">
@@ -158,7 +165,7 @@ const TradingScreen: React.FC<TradingScreenProps> = ({ missionData, onReturnToMu
                 <img src={good.iconUrl} alt={good.name} className="w-12 h-12 object-contain mx-auto mb-2" />
                 <h4 className="font-bold">{good.name}</h4>
                 <p>Giá: <span className="text-yellow-700 dark:text-yellow-500 font-semibold">{marketPrices[good.id]?.toLocaleString()}</span></p>
-                <button onClick={() => handleBuy(good.id, 1)} className="trade-button buy-button">Mua</button>
+                <button onClick={() => handleBuy(good.id, 1)} className="trade-button buy-button" disabled={isMissionOver}>Mua</button>
               </div>
             ))}
           </div>
@@ -169,14 +176,14 @@ const TradingScreen: React.FC<TradingScreenProps> = ({ missionData, onReturnToMu
           <div id="warehouse-area" className="p-4 bg-white/70 dark:bg-stone-900/40 rounded-lg shadow-inner flex-grow">
             <h3 className="text-xl font-semibold text-center mb-3">Kho hàng</h3>
              <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-              {Object.keys(inventory).length > 0 ? missionData.goods.filter(g => inventory[g.id] > 0).map(good => (
+              {Object.values(inventory).some(qty => qty > 0) ? missionData.goods.filter(g => (inventory[g.id] || 0) > 0).map(good => (
                   <div key={good.id} className="trading-card small">
                     <img src={good.iconUrl} alt={good.name} className="w-8 h-8 object-contain" />
                     <div className="flex-grow">
                         <h4 className="font-bold text-sm">{good.name}</h4>
                         <p className="text-xs">Số lượng: {inventory[good.id]}</p>
                     </div>
-                    <button onClick={() => handleSell(good.id, 1)} className="trade-button sell-button">Bán</button>
+                    <button onClick={() => handleSell(good.id, 1)} className="trade-button sell-button" disabled={isMissionOver}>Bán</button>
                   </div>
               )) : <p className="text-sm text-center italic text-stone-500 dark:text-stone-400 p-4">Kho hàng trống.</p>}
             </div>

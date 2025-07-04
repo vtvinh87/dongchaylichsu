@@ -63,7 +63,7 @@ const AdventurePuzzleScreen: React.FC<{
                 }, 2000);
             }
         } else {
-            playSound('sfx_click'); // Or a failure sound
+            playSound('sfx_fail');
             setFeedback(currentRiddle.hint || 'Câu trả lời không đúng. Hãy thử lại!');
         }
     };

@@ -48,26 +48,30 @@ const CityPlanningScreen: React.FC<CityPlanningScreenProps> = ({
     e.preventDefault();
     setDragOverZone(null);
     if (draggedBuilding && draggedBuilding.id === targetBuildingId) {
-      playSound('sfx-success');
+      playSound('sfx_success');
       const newPlacedBuildings = { ...placedBuildings, [targetBuildingId]: true };
       setPlacedBuildings(newPlacedBuildings);
 
       // Check for mission completion
       if (Object.keys(newPlacedBuildings).length === missionData.buildings.length) {
         setIsComplete(true);
-        playSound('sfx-unlock');
+        playSound('sfx_unlock');
         setTimeout(() => {
           onComplete(missionData.reward);
         }, 2000);
       }
     } else {
-      // Optional: Add feedback for wrong drop
+      if(draggedBuilding) {
+        playSound('sfx_fail');
+      }
     }
     setDraggedBuilding(null);
   };
 
+  const unplacedBuildings = missionData.buildings.filter(b => !placedBuildings[b.id]);
+
   return (
-    <div className="screen-container w-full max-w-6xl p-4 bg-amber-100 dark:bg-stone-800 rounded-lg shadow-xl flex flex-col items-center">
+    <div className="screen-container w-full max-w-6xl p-4 bg-amber-100 dark:bg-stone-800 rounded-lg shadow-xl flex flex-col items-center flex-grow">
       <button
         onClick={onReturnToMuseum}
         className="absolute top-6 left-6 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-stone-900 font-semibold py-2 px-4 rounded-lg shadow-md transition-colors duration-300 z-20"
@@ -118,30 +122,21 @@ const CityPlanningScreen: React.FC<CityPlanningScreenProps> = ({
         <div id="construction-palette" className="w-full md:w-64 flex-shrink-0 bg-white/70 dark:bg-stone-700/70 p-4 rounded-lg shadow-inner">
           <h3 className="text-xl font-semibold text-center mb-3 text-amber-800 dark:text-amber-300">Công trình cần đặt</h3>
           <div className="space-y-4">
-            {missionData.buildings.map(building => {
-              if (placedBuildings[building.id]) {
-                return (
-                  <div key={building.id} className="p-2 rounded-lg bg-green-200 dark:bg-green-800/60 flex items-center gap-3 opacity-50">
+            {unplacedBuildings.length > 0 ? (
+                unplacedBuildings.map(building => (
+                  <div
+                    key={building.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, building)}
+                    className="p-2 rounded-lg bg-white dark:bg-stone-600 flex items-center gap-3 cursor-grab hover:bg-amber-100 dark:hover:bg-stone-500 shadow-md"
+                  >
                     <img src={building.iconUrl} alt={building.name} className="w-12 h-12 object-contain flex-shrink-0" />
-                    <div>
-                      <p className="font-bold text-green-800 dark:text-green-200 line-through">{building.name}</p>
-                      <p className="text-xs text-green-600 dark:text-green-300">Đã đặt</p>
-                    </div>
+                    <span className="font-semibold text-stone-800 dark:text-stone-100">{building.name}</span>
                   </div>
-                );
-              }
-              return (
-                <div
-                  key={building.id}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, building)}
-                  className="building-palette-item p-2 rounded-lg bg-amber-50 dark:bg-stone-600 flex items-center gap-3 shadow-sm border-2 border-amber-200 dark:border-stone-500"
-                >
-                  <img src={building.iconUrl} alt={building.name} className="w-12 h-12 object-contain flex-shrink-0" />
-                  <p className="font-bold text-stone-700 dark:text-stone-200">{building.name}</p>
-                </div>
-              );
-            })}
+                ))
+            ) : (
+                <p className="text-center italic text-stone-500 dark:text-stone-400">Tất cả công trình đã được đặt!</p>
+            )}
           </div>
         </div>
       </div>

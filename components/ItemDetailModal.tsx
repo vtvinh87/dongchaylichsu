@@ -3,6 +3,7 @@ import { Artifact, HeroCard, Decoration } from '../types';
 import { playSound } from '../utils/audio';
 import { BRONZE_DRUM_ARTIFACT_ID } from '../constants';
 import { SKETCHFAB_BRONZE_DRUM_EMBED_URL } from '../imageUrls';
+import { GoogleGenAI } from "@google/genai";
 
 type DisplayableItem = Artifact | HeroCard | Decoration;
 
@@ -27,24 +28,15 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, isOpen, onClose
 
     const fetchAiInfo = async () => {
       try {
+        const ai = new GoogleGenAI({apiKey: process.env.API_KEY as string});
         const prompt = `Bạn là một nhà sử học chuyên nghiệp. Cung cấp thông tin chi tiết, ngắn gọn và súc tích về chủ đề sau: '${item.name}'. Viết bằng tiếng Việt. Tập trung vào các khía cạnh quan trọng, ý nghĩa văn hóa hoặc lịch sử của nó. Không cần viết lời chào hay câu kết.`;
 
-        const apiResponse = await fetch('/.netlify/functions/gemini-proxy', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                type: 'generate',
-                prompt: prompt,
-            }),
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash-preview-04-17",
+          contents: prompt,
         });
-        
-        if (!apiResponse.ok) {
-            const errorData = await apiResponse.json();
-            throw new Error(errorData.error || `Lỗi máy chủ: ${apiResponse.status}`);
-        }
 
-        const data = await apiResponse.json();
-        setAiContent(data.text);
+        setAiContent(response.text);
 
       } catch (e: any) {
         console.error("Error fetching AI details:", e);
@@ -112,37 +104,42 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, isOpen, onClose
         </button>
         <h2 id="item-detail-title" className="text-3xl font-bold text-amber-700 dark:text-amber-400 mb-4 font-serif">{item.name}</h2>
         
-        <div className="overflow-y-auto pr-2">
-            {item.id === BRONZE_DRUM_ARTIFACT_ID ? (
-                <div className="mb-5">
-                    <iframe 
-                        title="Trống Đồng Đông Sơn ( Dong Son bronze drum)" 
-                        frameBorder="0" 
-                        allowFullScreen 
-                        allow="autoplay; fullscreen; xr-spatial-tracking" 
-                        src={SKETCHFAB_BRONZE_DRUM_EMBED_URL}
-                        className="w-full h-80 rounded-lg border-2 border-amber-300 dark:border-amber-700 bg-stone-200 dark:bg-stone-900"
-                    >
-                    </iframe>
-                     <p className="text-xs text-stone-500 dark:text-stone-400 mt-2 text-center">
-                        Mô hình 3D <a href="https://sketchfab.com/3d-models/trong-ong-ong-son-dong-son-bronze-drum-c91e55f6db8742f09ad2d5815ca6b749" target="_blank" rel="noopener noreferrer" className="underline font-bold text-sky-600 dark:text-sky-400">Trống Đồng Đông Sơn</a> của <a href="https://sketchfab.com/Aaannnn" target="_blank" rel="noopener noreferrer" className="underline font-bold text-sky-600 dark:text-sky-400">Aaannnn</a> trên <a href="https://sketchfab.com" target="_blank" rel="noopener noreferrer" className="underline font-bold text-sky-600 dark:text-sky-400">Sketchfab</a>.
-                    </p>
-                </div>
-            ) : (
-                <img
-                    src={item.imageUrl}
-                    alt={`Hình ảnh ${item.name}`}
-                    className="max-w-xs h-auto max-h-64 object-contain mx-auto mb-5 rounded-lg border-2 border-amber-300 dark:border-amber-700 p-1 bg-white dark:bg-stone-700"
-                />
-            )}
-            {renderContent()}
+        <div className="overflow-y-auto pr-4 -mr-4 flex-grow">
+          {item.id === BRONZE_DRUM_ARTIFACT_ID ? (
+             <div className="aspect-video mb-4">
+               <iframe title="Trong Dong Dong Son 3D Model" width="100%" height="100%" src={SKETCHFAB_BRONZE_DRUM_EMBED_URL} allowFullScreen allow="autoplay; fullscreen; xr-spatial-tracking"></iframe>
+             </div>
+          ) : (
+            <img 
+              src={item.imageUrl} 
+              alt={`Hình ảnh ${item.name}`} 
+              className="max-w-xs h-auto mx-auto mb-5 rounded-lg border-2 border-amber-300 dark:border-amber-700 p-1 bg-white dark:bg-stone-700"
+            />
+          )}
+
+          <hr className="my-4 border-amber-200 dark:border-stone-600"/>
+
+          <div className="mb-4">
+              <h3 className="text-xl font-semibold text-amber-600 dark:text-amber-400 mb-2">Thông tin từ Bảo tàng</h3>
+              <p className="text-stone-700 dark:text-stone-200 text-base text-left leading-relaxed">
+                  {'description' in item && item.description}
+                  {('detailedDescription' in item) && item.detailedDescription}
+              </p>
+          </div>
+
+          <hr className="my-4 border-amber-200 dark:border-stone-600"/>
+
+          <div>
+              <h3 className="text-xl font-semibold text-amber-600 dark:text-amber-400 mb-2">Thông tin Chi tiết</h3>
+              {renderContent()}
+          </div>
         </div>
 
         <button
-          onClick={handleCloseAction}
-          className="mt-6 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-stone-900 font-semibold py-2 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:ring-opacity-50 flex-shrink-0"
+            onClick={handleCloseAction}
+            className="mt-6 flex-shrink-0 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-stone-900 font-semibold py-2 px-6 rounded-lg shadow-md hover:shadow-lg transition-all"
         >
-          Đã hiểu
+            Đóng
         </button>
       </div>
     </div>

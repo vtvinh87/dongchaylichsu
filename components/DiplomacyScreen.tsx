@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { DiplomacyMissionData, Reward } from '../types';
 import { ALL_ARTIFACTS_MAP } from '../constants';
@@ -121,13 +122,13 @@ const DiplomacyScreen: React.FC<DiplomacyScreenProps> = ({
   };
 
   return (
-    <div className="screen-container w-full max-w-2xl p-6 bg-amber-100 dark:bg-stone-800 rounded-lg shadow-xl text-center relative overflow-hidden">
+    <div className="frosted-glass-container max-w-2xl">
       <button
         onClick={onReturnToMuseum}
-        className="absolute top-4 left-4 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-stone-900 font-semibold py-2 px-4 rounded-lg shadow-md transition-colors duration-300 z-10"
+        className="absolute top-4 left-4 bg-amber-600/50 hover:bg-amber-700/50 text-white font-semibold py-2 px-4 rounded-full shadow-md transition-colors duration-300 z-10"
         aria-label="Quay về Bảo tàng"
       >
-        Quay về Bảo tàng
+        Quay về
       </button>
 
       {renderOutcome()}
@@ -145,7 +146,7 @@ const DiplomacyScreen: React.FC<DiplomacyScreenProps> = ({
       </div>
 
       {/* Goodwill Bar */}
-      <div id="goodwill-container" className="mb-6">
+      <div id="goodwill-container" className="mb-6 w-full max-w-sm">
         <label htmlFor="goodwill-bar" className="block text-sm font-medium text-stone-600 dark:text-stone-300 mb-1">Thiện chí</label>
         <div id="goodwill-bar-container">
             <div id="goodwill-bar" className={getGoodwillBarColor()} style={{ width: `${(goodwill / missionData.targetGoodwill) * 100}%` }}></div>
@@ -153,7 +154,7 @@ const DiplomacyScreen: React.FC<DiplomacyScreenProps> = ({
       </div>
 
       {/* Dialogue and Choices */}
-      <div className="space-y-6">
+      <div className="space-y-6 w-full">
         <div id="npc-dialogue-box">
             <p className="text-lg italic text-stone-700 dark:text-stone-200">
                 "{currentRound.npc_dialogue}"
@@ -166,7 +167,7 @@ const DiplomacyScreen: React.FC<DiplomacyScreenProps> = ({
                     key={index}
                     onClick={() => handleSelectChoice(choice.points)}
                     disabled={isChoiceMade}
-                    className={`diplomacy-choice-button w-full text-left p-4 rounded-lg shadow-sm text-stone-800 dark:text-stone-100 font-medium disabled:cursor-not-allowed ${getChoiceButtonClass(choice.points)}`}
+                    className={`diplomacy-choice-button ${getChoiceButtonClass(choice.points)}`}
                 >
                     {choice.text}
                 </button>

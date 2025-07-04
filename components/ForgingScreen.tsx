@@ -52,12 +52,13 @@ const ForgingScreen: React.FC<ForgingScreenProps> = ({
     let progressIncrease = 0;
     if (positionPercent >= 45 && positionPercent <= 55) { // Perfect zone (45% to 55%)
       progressIncrease = 20;
-      playSound('sfx-success');
+      playSound('sfx_success');
     } else if (positionPercent >= 25 && positionPercent <= 75) { // Good zone (25% to 75%)
       progressIncrease = 10;
-      playSound('sfx-click');
+      playSound('sfx_click');
     } else { // Miss
       progressIncrease = -5;
+      playSound('sfx_fail');
     }
     
     // Trigger sparks effect
@@ -78,7 +79,7 @@ const ForgingScreen: React.FC<ForgingScreenProps> = ({
   useEffect(() => {
       if (progress >= missionData.targetProgress) {
           setIsComplete(true);
-          playSound('sfx-unlock');
+          playSound('sfx_unlock');
           setTimeout(() => {
               onComplete(missionData.reward);
           }, 2000);

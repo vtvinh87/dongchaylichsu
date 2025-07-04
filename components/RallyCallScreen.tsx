@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { RallyCallMissionData, Reward } from '../types';
+import { RallyCallMissionData, Reward, HichPuzzleData } from '../types';
 import { playSound } from '../utils/audio';
-import { ALL_FRAGMENTS_MAP, ALL_ARTIFACTS_MAP } from '../constants';
+import { ALL_FRAGMENTS_MAP, ALL_ARTIFACTS_MAP, HICH_TUONG_SI_EXTRA_DEFINITIONS } from '../constants';
 import * as ImageUrls from '../imageUrls';
 
 type ParsedPart = { type: 'blank'; index: number } | { type: 'word'; text: string } | { type: 'text'; text: string };
@@ -12,6 +12,7 @@ interface RallyCallScreenProps {
     onComplete: (reward?: Reward) => void;
     inventory: Record<string, number>;
     setInventory: React.Dispatch<React.SetStateAction<Record<string, number>>>;
+    prefetchedPuzzlePromise: Promise<HichPuzzleData> | null;
 }
 
 // Helper to shuffle an array
@@ -30,6 +31,7 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
     onComplete,
     inventory,
     setInventory,
+    prefetchedPuzzlePromise,
 }) => {
     // --- Common State ---
     const [isComplete, setIsComplete] = useState(false);
@@ -44,7 +46,7 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
     const [isShaking, setIsShaking] = useState(false);
 
     // --- State for Fill-in-the-Blank Game ---
-    const [isLoadingPuzzle, setIsLoadingPuzzle] = useState(false);
+    const [isLoadingPuzzle, setIsLoadingPuzzle] = useState(true);
     const [puzzleError, setPuzzleError] = useState<string | null>(null);
     const [generatedText, setGeneratedText] = useState(''); // Text with _BLANK_ from Gemini
     const [definitions, setDefinitions] = useState<Record<string, string>>({}); // Definitions from Gemini
@@ -99,52 +101,42 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
         setHighlightedElements(null);
 
         if (isFillBlankGame) {
-            const generatePuzzle = async () => {
-                setIsLoadingPuzzle(true);
-                setPuzzleError(null);
-                try {
-                    const response = await fetch('/.netlify/functions/gemini-proxy', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            type: 'generate_hich_puzzle',
-                            hichText: missionData.fullText,
-                        }),
-                    });
+            if (!prefetchedPuzzlePromise) {
+                setPuzzleError("Lỗi: Không tìm thấy dữ liệu thử thách. Vui lòng thử lại từ giao diện chính.");
+                setIsLoadingPuzzle(false);
+                return;
+            }
 
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error || `Lỗi máy chủ: ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
+            setIsLoadingPuzzle(true);
+            setPuzzleError(null);
 
+            prefetchedPuzzlePromise
+                .then(data => {
                     if (!data.modifiedText || !Array.isArray(data.answers) || typeof data.definitions !== 'object') {
                         throw new Error("Dữ liệu nhận về từ AI không hợp lệ.");
                     }
-                    
+                    const combinedDefinitions = { ...data.definitions, ...HICH_TUONG_SI_EXTRA_DEFINITIONS };
                     setGeneratedText(data.modifiedText);
                     setBlanks(data.answers);
                     setWordBank(shuffleArray(data.answers));
                     setFilledSlots(Array(data.answers.length).fill(null));
-                    setDefinitions(data.definitions);
-
-                } catch (e: any) {
-                    console.error("Failed to generate puzzle:", e);
-                    setPuzzleError(e.message || "Không thể tạo thử thách. Vui lòng thử lại.");
-                } finally {
+                    setDefinitions(combinedDefinitions);
+                })
+                .catch(e => {
+                    console.error("Failed to resolve pre-fetched puzzle:", e);
+                    setPuzzleError(e.message || "Không thể tải thử thách. Vui lòng thử lại.");
+                })
+                .finally(() => {
                     setIsLoadingPuzzle(false);
-                }
-            };
-
-            generatePuzzle();
+                });
 
         } else {
             // Setup for morale game
             setCurrentRoundIndex(0);
             setMorale(0);
+            setIsLoadingPuzzle(false);
         }
-    }, [missionData, isFillBlankGame]);
+    }, [missionData, isFillBlankGame, prefetchedPuzzlePromise]);
 
     // --- Morale Game Handlers ---
     const handleMoraleChoiceClick = (points: number) => {
@@ -233,7 +225,7 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
             return;
         }
 
-        playSound('sfx-click');
+        playSound('sfx_click');
         setInventory(prev => ({ ...prev, 'vat-tu': prev['vat-tu'] - 10 }));
         
         const correctWord = blanks[firstEmptySlot];
@@ -246,11 +238,11 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
         const isCorrect = filledSlots.every((word, i) => word === blanks[i]);
         setIsComplete(true);
         if (isCorrect) {
-            playSound('sfx-unlock');
+            playSound('sfx_unlock');
             setOutcome('win');
             setTimeout(() => onComplete(missionData.reward), 2000);
         } else {
-            playSound('sfx-fail');
+            playSound('sfx_fail');
             setOutcome('loss');
         }
     };
@@ -314,7 +306,7 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
         return (
             <div className="screen-container w-full max-w-4xl p-6 bg-amber-100 dark:bg-stone-800 rounded-lg shadow-xl flex flex-col items-center justify-center min-h-[300px]">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-amber-500 mb-4"></div>
-                <p className="text-xl text-amber-600 dark:text-amber-400">Đang tạo thử thách mới...</p>
+                <p className="text-xl text-amber-600 dark:text-amber-400">Đang chuẩn bị thử thách...</p>
             </div>
         );
     }
@@ -369,7 +361,10 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
                     {wordBank.length === 0 && <p className="text-center text-stone-500 italic">Tất cả các từ đã được sử dụng.</p>}
                 </div>
 
-                <div className="flex-shrink-0 flex flex-col gap-2">
+                <div className="flex-shrink-0 flex flex-col gap-2 bg-white/50 dark:bg-stone-700/50 p-3 rounded-lg">
+                    <div className="text-center font-semibold text-amber-800 dark:text-amber-200">
+                        Vật tư: {inventory['vat-tu'] || 0}
+                    </div>
                      <button onClick={handleHint} className="action-button bg-blue-500 hover:bg-blue-600 text-white" disabled={(inventory['vat-tu'] || 0) < 10}>Gợi ý (10 Vật tư)</button>
                      <button onClick={checkHichAnswers} className="action-button bg-green-600 hover:bg-green-700 text-white">Kiểm tra Đáp án</button>
                 </div>

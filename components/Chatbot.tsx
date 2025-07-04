@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ChatMessage, AiCharacter, Content } from '../types';
+import { GoogleGenAI, Chat } from "@google/genai";
+import { ChatMessage, AiCharacter } from '../types';
 import { playSound } from '../utils/audio';
 import { AI_CHARACTERS, FREE_DAILY_CHAT_LIMIT } from '../constants';
 import { AVATAR_PLACEHOLDER_URL } from '../imageUrls';
@@ -24,17 +25,25 @@ const Chatbot: React.FC<ChatbotProps> = ({
   onUpgradePrompt
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [geminiHistory, setGeminiHistory] = useState<Content[]>([]);
+  const [chatSession, setChatSession] = useState<Chat | null>(null);
   const [inputValue, setInputValue] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [activeCharacterId, setActiveCharacterId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const aiRef = useRef<GoogleGenAI | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+  
+  // Initialize the GenAI instance once
+  useEffect(() => {
+    if (!aiRef.current) {
+      aiRef.current = new GoogleGenAI({apiKey: process.env.API_KEY as string});
+    }
+  }, []);
 
   useEffect(scrollToBottom, [messages]);
   
@@ -42,15 +51,15 @@ const Chatbot: React.FC<ChatbotProps> = ({
   const isChatLimitReached = !isPremium && dailyChatCount >= FREE_DAILY_CHAT_LIMIT;
 
   const initializeChat = useCallback(async (characterId: string | null) => {
-    if (!characterId || !AI_CHARACTERS[characterId]) {
-        setError("Nhân vật không hợp lệ.");
+    if (!characterId || !AI_CHARACTERS[characterId] || !aiRef.current) {
+        setError("Nhân vật không hợp lệ hoặc AI chưa sẵn sàng.");
         setMessages([{
             id: 'char-error-system',
             sender: 'system',
             text: "Vui lòng chọn một nhân vật để bắt đầu trò chuyện.",
             timestamp: new Date()
         }]);
-        setGeminiHistory([]);
+        setChatSession(null);
         return;
     }
 
@@ -63,13 +72,19 @@ const Chatbot: React.FC<ChatbotProps> = ({
       text: `Xin chào! Ta là ${character.name}. Ngươi có điều gì muốn hỏi ta không?`,
       timestamp: new Date()
     }]);
-    setGeminiHistory([]);
+
+    const newChat = aiRef.current.chats.create({
+      model: 'gemini-2.5-flash-preview-04-17',
+      config: { systemInstruction: character.systemInstruction },
+      history: [],
+    });
+    setChatSession(newChat);
   }, []);
 
   // Effect to initialize or update active character and chat
   useEffect(() => {
     if (isOpen) {
-      const unlockedChars = Object.values(AI_CHARACTERS).filter(c => unlockedCharacterIds.includes(c.id));
+      const unlockedChars = (Object.values(AI_CHARACTERS) as AiCharacter[]).filter(c => unlockedCharacterIds.includes(c.id));
       
       if (unlockedChars.length > 0) {
         if (!activeCharacterId || !unlockedCharacterIds.includes(activeCharacterId)) {
@@ -88,7 +103,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
       }
     } else {
       setMessages([]);
-      setGeminiHistory([]);
+      setChatSession(null);
     }
   }, [isOpen, unlockedCharacterIds, activeCharacterId, initializeChat, error, isLoading, messages.length]);
 
@@ -110,7 +125,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
   };
 
   const handleSendMessage = async () => {
-    if (inputValue.trim() === '' || isLoading || !currentCharacter) return;
+    if (inputValue.trim() === '' || isLoading || !currentCharacter || !chatSession) return;
 
     if (isChatLimitReached) {
         setMessages(prev => [...prev, {
@@ -142,31 +157,13 @@ const Chatbot: React.FC<ChatbotProps> = ({
     setError(null);
     playSound('sfx_click');
 
-    const historyForAPI = [...geminiHistory];
-
     try {
       if (!isPremium) {
           onIncrementChatCount();
       }
       
-      const response = await fetch('/.netlify/functions/gemini-proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'chat',
-          prompt: userMessageText,
-          systemInstruction: currentCharacter.systemInstruction,
-          history: historyForAPI,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Lỗi máy chủ: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      const botMessageText = data.text;
+      const response = await chatSession.sendMessage({ message: userMessageText });
+      const botMessageText = response.text;
       
       setMessages(prevMessages => [...prevMessages, {
         id: 'bot-' + Date.now(),
@@ -175,14 +172,8 @@ const Chatbot: React.FC<ChatbotProps> = ({
         timestamp: new Date()
       }]);
 
-      setGeminiHistory([
-        ...historyForAPI,
-        { role: 'user', parts: [{ text: userMessageText }] },
-        { role: 'model', parts: [{ text: botMessageText }] },
-      ]);
-
     } catch (e: any) {
-      console.error(`Error sending message via proxy (character: ${currentCharacter.name}):`, e);
+      console.error(`Error sending message (character: ${currentCharacter.name}):`, e);
       const displayError = e.message || `Xin lỗi, ${currentCharacter.name} không thể trả lời ngay lúc này. Hãy thử lại sau.`;
       
       setError(displayError);
@@ -207,7 +198,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
     return null;
   }
 
-  const allCharacters = Object.values(AI_CHARACTERS);
+  const allCharacters = Object.values(AI_CHARACTERS) as AiCharacter[];
 
   return (
     <div 
@@ -273,60 +264,51 @@ const Chatbot: React.FC<ChatbotProps> = ({
                   : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 w-full text-center py-2' 
               }`}
             >
-              <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
-              {msg.sender !== 'system' && (
-                <p className={`text-xs mt-1 ${
-                  msg.sender === 'user' ? 'text-sky-200 dark:text-sky-300' : 'text-stone-500 dark:text-stone-400' 
-                  }`}>
-                  {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </p>
-              )}
+              {msg.text}
             </div>
           </div>
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="max-w-[80%] p-3 rounded-lg shadow bg-stone-200 dark:bg-stone-700 text-stone-800 dark:text-stone-100 rounded-bl-none">
-              <p className="text-sm italic">Đang suy nghĩ...</p>
+            <div className="max-w-[80%] p-3 rounded-lg shadow bg-stone-200 dark:bg-stone-700 rounded-bl-none">
+              <div className="flex items-center space-x-1">
+                <span className="typing-dot"></span>
+                <span className="typing-dot" style={{ animationDelay: '0.2s' }}></span>
+                <span className="typing-dot" style={{ animationDelay: '0.4s' }}></span>
+              </div>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-3 border-t border-amber-200 dark:border-stone-700 bg-white dark:bg-stone-800 rounded-b-lg">
-        {isChatLimitReached ? (
-             <button
-                onClick={onUpgradePrompt}
-                className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg"
-            >
-                ⭐ Nâng cấp Premium để trò chuyện không giới hạn
-            </button>
-        ) : (
-            <div className="flex items-center space-x-2">
-            <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder={
-                    unlockedCharacterIds.length === 0 ? "Chiêu mộ nhân vật để chat..."
-                    : isLoading ? "Đang chờ phản hồi..."
-                    : "Nhập tin nhắn..."
-                }
-                className="flex-grow bg-white dark:bg-stone-700 text-stone-800 dark:text-stone-100 border border-amber-300 dark:border-stone-600 rounded-lg p-2 focus:ring-1 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-amber-500 dark:focus:border-amber-400 outline-none transition-shadow"
-                aria-label="Tin nhắn"
-                disabled={isLoading || !currentCharacter || unlockedCharacterIds.length === 0}
-            />
-            <button
-                onClick={handleSendMessage}
-                disabled={isLoading || !currentCharacter || inputValue.trim() === '' || unlockedCharacterIds.length === 0}
-                className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-stone-900 font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-                Gửi
-            </button>
-            </div>
-        )}
+      <div className="p-3 border-t border-amber-200 dark:border-stone-700 bg-white dark:bg-stone-800">
+        <div className="flex items-center space-x-2">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder={
+                currentCharacter 
+                ? (isChatLimitReached ? 'Đã hết lượt trò chuyện miễn phí.' : 'Nhập câu hỏi của bạn...')
+                : 'Vui lòng chọn một nhân vật.'
+            }
+            className="flex-grow w-full px-4 py-2 bg-amber-50 dark:bg-stone-700 text-stone-800 dark:text-stone-100 border border-amber-300 dark:border-stone-600 rounded-full focus:ring-2 focus:ring-amber-500 outline-none transition-all"
+            disabled={isLoading || !currentCharacter || isChatLimitReached}
+            aria-label="Nhập câu hỏi"
+          />
+          <button
+            onClick={handleSendMessage}
+            disabled={isLoading || inputValue.trim() === '' || !currentCharacter || isChatLimitReached}
+            className="bg-amber-600 hover:bg-amber-700 text-white dark:text-stone-900 rounded-full p-2.5 shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Gửi tin nhắn"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   );

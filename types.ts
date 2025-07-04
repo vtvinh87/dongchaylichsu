@@ -34,6 +34,7 @@ export enum Screen {
   STRATEGIC_PATH_MISSION_SCREEN,
   CONSTRUCTION_PUZZLE_SCREEN, // New screen for the block puzzle game
   NAVAL_BATTLE_TIMING_SCREEN, // New screen for the naval battle timing game
+  LANE_BATTLE_MISSION_SCREEN, // New screen for the lane battle game
 }
 
 export interface Point {
@@ -173,6 +174,7 @@ export interface HiddenObjectItem {
   id: string;
   name: string;
   iconUrl: string;
+  details: string;
   coords: { 
     x: number;
     y: number;
@@ -297,7 +299,13 @@ export interface ColoringMissionData {
 }
 
 // --- Rally Call Game Types (UPDATED) ---
-// This type is now a discriminated union to clearly separate the two game modes.
+
+// This type is a discriminated union to clearly separate the two game modes.
+export interface HichPuzzleData {
+  modifiedText: string;
+  answers: string[];
+  definitions: Record<string, string>;
+}
 
 // For Morale/Icon-based choices
 export interface RallyCallChoice {
@@ -475,7 +483,7 @@ export interface StrategicPathMissionData {
   mapLayout: number[][]; 
   start: { x: number; y: number };
   end: { x: number; y: number };
-  reward: Reward;
+  reward?: Reward;
   initialSupplies: number;
   unstableMountains?: { x: number, y: number }[];
   convoyPath?: { x: number, y: number }[];
@@ -485,7 +493,8 @@ export interface StrategicPathMissionData {
 export interface ConstructionPuzzlePiece {
     id: string;
     shape: number[][];
-    color: string;
+    color?: string; // Made optional
+    imageUrl?: string; // Added for thematic pieces
 }
 
 export interface ConstructionPuzzleMissionData {
@@ -511,8 +520,18 @@ export interface NavalBattleMissionData {
     reward?: Reward;
 }
 
+// --- Lane Battle Game Types ---
+export interface LaneBattleMissionData {
+    type: 'laneBattle';
+    id: string;
+    title: string;
+    duration: number; // in seconds
+    defensePoints: number;
+    reward: Reward;
+}
 
-export type MissionData = PuzzleMissionData | NarrativeMissionData | TimelineMissionData | ARMissionData | HiddenObjectMissionData | QuizMissionData | ConstructionMissionData | DiplomacyMissionData | TradingMissionData | RhythmMissionData | ColoringMissionData | RallyCallMissionData | ForgingMissionData | TacticalMapMissionData | DefenseMissionData | StrategyMapMissionData | CoinMintingMissionData | CityPlanningMissionData | TypesettingMissionData | AdventurePuzzleMissionData | StrategicPathMissionData | ConstructionPuzzleMissionData | NavalBattleMissionData;
+
+export type MissionData = PuzzleMissionData | NarrativeMissionData | TimelineMissionData | ARMissionData | HiddenObjectMissionData | QuizMissionData | ConstructionMissionData | DiplomacyMissionData | TradingMissionData | RhythmMissionData | ColoringMissionData | RallyCallMissionData | ForgingMissionData | TacticalMapMissionData | DefenseMissionData | StrategyMapMissionData | CoinMintingMissionData | CityPlanningMissionData | TypesettingMissionData | AdventurePuzzleMissionData | StrategicPathMissionData | ConstructionPuzzleMissionData | NavalBattleMissionData | LaneBattleMissionData;
 
 // --- Quest Chain Types ---
 export interface QuestChainStep {

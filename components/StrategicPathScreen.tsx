@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { StrategicPathMissionData, Reward, ActiveSideQuestState } from '../types';
+import { StrategicPathMissionData, Reward, ActiveSideQuestState, NotebookPage } from '../types';
 import { playSound } from '../utils/audio';
 import { ALL_ARTIFACTS_MAP, NOTEBOOK_PAGES, MISSION_DONG_LOC_PATH_ID, MISSION_CUA_CHUA_PATH_ID, MISSION_SEBANGHIENG_PATH_ID, SIDE_QUESTS } from '../constants';
 import NotebookModal from './NotebookModal';
@@ -16,7 +16,7 @@ type TimeOfDay = 'day' | 'night';
 const StrategicPathScreen: React.FC<{
     missionData: StrategicPathMissionData;
     onReturnToMuseum: () => void;
-    onComplete: (reward: Reward) => void;
+    onComplete: (reward?: Reward) => void;
     unlockedNotebookPages: number[];
     onUnlockNotebookPage: (pageIndex: number) => void;
     onTriggerDialogue: (scriptKey: string) => void;
@@ -48,8 +48,20 @@ const StrategicPathScreen: React.FC<{
     
     const { start, end } = missionData;
 
+    const notebookPagesForModal = useMemo(() => {
+        const pages: NotebookPage[] = [];
+        Object.entries(NOTEBOOK_PAGES).forEach(([key, value]) => {
+            const index = parseInt(key, 10);
+            // Check if key is a number and value is a NotebookPage object
+            if (!isNaN(index) && value && typeof value === 'object' && !Array.isArray(value) && 'content' in value) {
+                pages[index] = value as NotebookPage;
+            }
+        });
+        return pages.filter(Boolean); // Filter out empty/undefined slots
+    }, []);
+
     const rewardImageUrl = useMemo(() => {
-        if (missionData.reward.type === 'artifact') {
+        if (missionData.reward && missionData.reward.type === 'artifact') {
             const artifact = ALL_ARTIFACTS_MAP[missionData.reward.id];
             return artifact ? artifact.imageUrl : '';
         }
@@ -498,7 +510,7 @@ const StrategicPathScreen: React.FC<{
                 )}
             </div>
             
-            <NotebookModal isOpen={isNotebookOpen} onClose={() => setIsNotebookOpen(false)} pagesData={NOTEBOOK_PAGES} unlockedPageIndices={unlockedNotebookPages} />
+            <NotebookModal isOpen={isNotebookOpen} onClose={() => setIsNotebookOpen(false)} pagesData={notebookPagesForModal} unlockedPageIndices={unlockedNotebookPages} />
             {pageUnlockNotification && (<div id="page-unlock-notification">{pageUnlockNotification}</div>)}
         </div>
     );

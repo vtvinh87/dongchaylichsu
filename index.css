@@ -1,0 +1,2503 @@
+
+
+body {
+      font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; /* Ensure no default margin */
+      /* background-image is now handled by App.tsx */
+    }
+
+    /* --- CSS to center all mission screens --- */
+    .screen-transition-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      min-height: 100vh;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    /* --- CSS cho Landing Screen --- */
+    .landing-screen {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .landing-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.8) 100%);
+    }
+
+    .landing-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem; /* 24px */
+      animation: fadeInDown 1.5s ease-out forwards;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .app-logo {
+        width: 100%;
+        max-width: 450px;
+        height: auto;
+        filter: drop-shadow(0 5px 20px rgba(0,0,0,0.6));
+    }
+    
+    .landing-content .app-logo {
+        margin-bottom: 0;
+    }
+    
+    .login-screen .app-logo {
+        margin-bottom: 2rem; /* Matches the old h1 margin */
+    }
+
+
+    .landing-content h2 {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.5rem; /* 24px */
+      font-weight: 600; /* Semibold */
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      max-width: 600px;
+    }
+
+    #start-adventure-button {
+      margin-top: 1rem;
+      padding: 1rem 2.5rem;
+      font-size: 1.25rem; /* 20px */
+      font-weight: 700;
+      color: #78350f; /* amber-800 */
+      background: linear-gradient(145deg, #fcd34d, #fbbf24); /* amber-300 to amber-400 */
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 5px 20px rgba(251, 191, 36, 0.4), inset 0 -2px 5px rgba(0,0,0,0.2);
+      transition: all 0.3s ease-out;
+      transform: scale(1);
+    }
+
+    #start-adventure-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(251, 191, 36, 0.6), inset 0 -2px 5px rgba(0,0,0,0.2);
+      background: linear-gradient(145deg, #fde047, #facc15); /* amber-200 to amber-400 */
+    }
+
+    #start-adventure-button:active {
+      transform: scale(1);
+      box-shadow: 0 2px 10px rgba(251, 191, 36, 0.5), inset 0 -1px 3px rgba(0,0,0,0.3);
+    }
+    
+    /* Keyframes for modal animation (can be component-scoped too) */
+    @keyframes fadeInScaleUp {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .animate-fadeInScaleUp {
+      -webkit-animation: fadeInScaleUp 0.3s forwards;
+      animation: fadeInScaleUp 0.3s forwards;
+    }
+
+    /* --- CSS cho Hiệu ứng chuyển cảnh --- */
+    .screen-fade-in {
+        -webkit-animation: fadeInScreen 0.5s forwards;
+        animation: fadeInScreen 0.5s forwards;
+    }
+
+    .screen-fade-out {
+        -webkit-animation: fadeOutScreen 0.5s forwards;
+        animation: fadeOutScreen 0.5s forwards;
+    }
+
+    @keyframes fadeInScreen {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes fadeOutScreen {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+
+    /* --- Cải tiến UI chung --- */
+    button, .mission-card {
+      transition: all 0.2s ease-in-out;
+    }
+    .mission-card:not(.locked):hover, button:not([disabled]):hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+    }
+    .mission-card:not(.locked):active, button:not([disabled]):active {
+      transform: translateY(-1px) scale(0.98);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+
+    /* --- CSS cho AR Back Button --- */
+    #ar-back-button {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10002; /* Ensure it's above the AR scene and modals */
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: #f59e0b; /* Amber 500 */
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    #ar-back-button:hover {
+      background-color: #d97706; /* Amber 600 */
+    }
+
+    .dark #ar-back-button { /* Applied when <html> has 'dark' class */
+      background-color: #78350f; /* Amber 800 */
+      color: #fef3c7; /* Amber 100 */
+      box-shadow: 0 4px 6px rgba(255,255,255,0.1);
+    }
+    .dark #ar-back-button:hover {
+      background-color: #92400e; /* Amber 700 */
+    }
+
+    /* --- CSS for Premium Locked Mission --- */
+    .premium-locked-visuals {
+      border-color: #fbbf24; /* amber-400 */
+      box-shadow: 0 0 15px rgba(251, 191, 36, 0.6), 0 0 25px rgba(251, 191, 36, 0.4);
+      -webkit-animation: premium-glow 2.5s infinite alternate;
+      animation: premium-glow 2.5s infinite alternate;
+    }
+    .dark .premium-locked-visuals {
+      box-shadow: 0 0 15px rgba(251, 191, 36, 0.7), 0 0 25px rgba(251, 191, 36, 0.5);
+    }
+
+    @keyframes premium-glow {
+      from { box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+      to { box-shadow: 0 0 20px rgba(251, 191, 36, 0.8); }
+    }
+
+    .premium-locked-visuals .premium-crown {
+      content: '👑';
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      font-size: 28px;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+      transform: rotate(15deg);
+    }
+    
+    /* --- CSS cho Cấu trúc Hồi/Chương --- */
+    .hoi-container {
+      background-color: rgba(255, 250, 235, 0.6); /* amber-50 with alpha */
+      border: 1px solid #fde68a; /* amber-200 */
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      transition: all 0.3s ease-in-out;
+      backdrop-filter: blur(3px);
+    }
+    .dark .hoi-container {
+      background-color: rgba(30, 27, 27, 0.6); /* a dark stone with alpha */
+      border-color: #a16207; /* amber-700 */
+    }
+
+    .hoi-container.locked {
+      filter: grayscale(90%);
+      opacity: 0.6;
+      pointer-events: none;
+      user-select: none;
+      position: relative;
+    }
+    
+    .hoi-container.locked::after {
+        content: '🔒';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 6rem;
+        color: white;
+        text-shadow: 0 0 15px black;
+        z-index: 10;
+        opacity: 0.7;
+    }
+
+    .mission-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1.5rem;
+    }
+
+    /* --- CSS cho Hướng dẫn Tương tác --- */
+    #tutorial-overlay-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 9998; /* Dưới hộp thoại, trên tất cả mọi thứ khác */
+    }
+
+    .tutorial-highlight {
+        position: absolute;
+        border-radius: 0.5rem; /* Match target element's rounding */
+        /* This box-shadow creates the "cutout" effect */
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+        z-index: 9999;
+        pointer-events: none;
+        transition: all 0.3s ease-in-out;
+    }
+
+    #tutorial-box {
+        position: absolute;
+        z-index: 10000;
+        min-width: 280px;
+        max-width: 350px;
+        background-color: white;
+        color: #333;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        border: 2px solid #f59e0b; /* amber-500 */
+        transition: all 0.3s ease-in-out;
+    }
+
+    .dark #tutorial-box {
+        background-color: #292524; /* stone-800 */
+        color: #f5f5f4; /* stone-100 */
+        border-color: #d97706; /* amber-600 */
+    }
+
+    /* --- CSS for Customization Screen --- */
+    .customization-item-card {
+      position: relative;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s ease-in-out;
+    }
+    .customization-item-card.item-locked {
+      filter: grayscale(1);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    .customization-item-card.item-locked::after {
+      content: '🔒';
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 1.5rem;
+      color: white;
+      text-shadow: 0 0 5px black;
+    }
+    .customization-item-card.item-selected {
+      border-color: #3b82f6; /* blue-600 */
+    }
+    
+    /* --- CSS cho Adventure Puzzle Screen --- */
+    #adventure-puzzle-screen {
+      background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-ban-do-vuot-bien.png');
+      background-size: cover;
+      background-position: center;
+      width: 100%;
+      max-width: 900px;
+      height: 90vh;
+      max-height: 700px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      border-radius: 0.75rem;
+      position: relative;
+    }
+
+    #adventure-puzzle-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: rgba(0,0,0,0.3);
+      border-radius: 0.75rem; /* Match parent's rounding */
+    }
+
+    .adventure-puzzle-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      color: #3a2e20; /* Dark brown text */
+    }
+
+    .adventure-puzzle-content h2 {
+      color: #fefce8; /* amber-50 */
+      text-shadow: 0 0 4px #fefce8, 0 0 8px #fde047, 0 0 12px #facc15;
+      animation: pulse-yellow-glow 2.5s infinite alternate ease-in-out;
+    }
+
+    #riddle-display {
+      /* Replaced parchment with frosted glass for better readability */
+      background-color: rgba(255, 255, 255, 0.4);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      padding: 2.5rem 3rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      font-family: 'Special Elite', cursive;
+      font-size: 1.25rem;
+      line-height: 1.6;
+      color: #3a2e20;
+    }
+
+    .dark #riddle-display {
+      background-color: rgba(30, 27, 27, 0.5);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #fefce8;
+    }
+
+    #answer-input-area {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+
+    #answer-input-area input {
+      flex-grow: 1;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      border: 2px solid #a16207; /* amber-700 */
+      background-color: #fef3c7; /* amber-100 */
+      color: #3a2e20;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    #answer-input-area input:focus {
+      background-color: #fefce8; /* amber-50 */
+      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.4); /* ring-amber-600 with opacity */
+    }
+
+    #answer-input-area button {
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      border: none;
+      background-color: #a16207; /* amber-700 */
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    #answer-input-area button:hover {
+      background-color: #78350f; /* amber-800 */
+    }
+
+    .feedback-display {
+        background-color: rgba(255, 237, 213, 0.9); /* orange-100 with alpha */
+        border: 1px solid #fdba74; /* orange-300 */
+        color: #c2410c; /* orange-700 */
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        animation: fadeInScaleUp 0.3s forwards;
+    }
+
+    /* --- CSS cho Strategic Path Screen --- */
+    #strategic-path-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr); /* 10 columns */
+      grid-template-rows: repeat(15, 1fr); /* 15 rows */
+      gap: 2px;
+      width: 100%;
+      height: 100%;
+      background-color: #1a2e22; /* Dark green base */
+      border: 4px solid #4a2c13; /* Dark brown border */
+      border-radius: 0.5rem;
+    }
+    
+    .strategic-path-cell {
+      width: 100%;
+      height: 100%;
+      transition: all 0.2s ease-in-out;
+      position: relative;
+    }
+    
+    .cell-jungle {
+      background-color: #166534; /* green-800 */
+    }
+    .cell-jungle:hover {
+       background-color: #15803d; /* green-700 */
+    }
+
+    .cell-mountain {
+      background-color: #57534e; /* stone-600 */
+      background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjNTc1MzRlIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiM0NDQwM2YiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=');
+      cursor: not-allowed;
+    }
+    
+    .cell-river {
+      background-color: #0ea5e9; /* sky-500 */
+      cursor: not-allowed;
+    }
+
+    .cell-start, .cell-end {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 0 4px black;
+    }
+
+    .cell-start {
+      background-color: #fbbf24 !important; /* amber-400 */
+    }
+
+    .cell-end {
+       background-color: #ef4444 !important; /* red-500 */
+    }
+    
+    .cell-player-path {
+      background-color: #ca8a04; /* yellow-600 */
+      border: 1px solid #fde047; /* yellow-200 */
+      box-shadow: inset 0 0 5px rgba(255,255,255,0.4);
+    }
+    
+    .cell-open-path {
+        background-color: #65a30d; /* lime-600 */
+        cursor: pointer;
+    }
+    .cell-open-path:hover {
+        background-color: #84cc16; /* lime-500 */
+    }
+
+
+    /* Styles for new interactive elements */
+    #player-hud {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      font-weight: 600;
+      position: relative;
+    }
+
+    #skill-bar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap; /* Allow skills to wrap on smaller screens */
+      justify-content: center;
+    }
+    #skill-bar button {
+      background-color: #ca8a04; /* yellow-600 */
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+    #skill-bar button:hover:not(:disabled) {
+      background-color: #a16207; /* yellow-700 */
+    }
+    #skill-bar button:disabled {
+      background-color: #57534e; /* stone-600 */
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    #skill-bar button.skill-active {
+      border: 2px solid #fde047; /* yellow-200 */
+      box-shadow: 0 0 10px #fde047;
+      transform: scale(1.05);
+    }
+
+    .cell-crater {
+      background-color: #4a2c13; /* Dark brown */
+      background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-ho-bom.png');
+      background-size: 80%;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    .cell-crater:hover:not(.cell-player-path) {
+      outline: 2px solid #facc15; /* amber-400 */
+      z-index: 10;
+    }
+
+    .cell-broken-bridge {
+      background-color: #0ea5e9; /* sky-500, like river */
+      background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-cau-sap.png');
+      background-size: 90%;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .cell-resource-wood {
+      background-color: #166534; /* green-800 */
+      background-image: url('https://i.ibb.co/k5JqTz5/icon-go.png');
+      background-size: 80%;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    .cell-resource-wood:hover {
+      outline: 2px solid #facc15; /* amber-400 */
+      z-index: 10;
+    }
+
+    .cell-sensor {
+      background-color: #166534; /* jungle background */
+      background-image: url('https://i.ibb.co/3cqFHRd/icon-cam-bien.png');
+      background-size: 90%;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    .cell-sensor:hover:not(.cell-player-path) {
+        outline: 2px solid #facc15; /* amber-400 */
+        z-index: 10;
+    }
+
+    .cell-sensor-disabled {
+      background-color: #166534; /* jungle background */
+      background-image: url('https://i.ibb.co/JqjT2W9/icon-cam-bien-disabled.png');
+      background-size: 90%;
+      background-repeat: no-repeat;
+      background-position: center;
+      cursor: not-allowed;
+    }
+
+    #night-overlay {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(0, 0, 50, 0.3);
+      pointer-events: none;
+      z-index: 20; /* Make sure it's on top of the grid but below modals */
+      border-radius: 0.5rem; /* Match parent grid's rounding */
+      transition: opacity 0.5s ease-in-out;
+      opacity: 0;
+    }
+    #night-overlay.active {
+      opacity: 1;
+    }
+    
+    .cell-timed-bomb {
+      background-color: #166534; /* jungle background */
+      background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-bom-no-cham.png');
+      background-size: 90%;
+      background-repeat: no-repeat;
+      background-position: center;
+      animation: flash-red 1.2s infinite;
+    }
+    @keyframes flash-red {
+      0%, 100% { box-shadow: inset 0 0 8px rgba(239, 68, 68, 0); }
+      50% { box-shadow: inset 0 0 8px rgba(239, 68, 68, 0.9); }
+    }
+    .bomb-timer {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: #ef4444; /* red-500 */
+        font-weight: bold;
+        font-size: 0.8rem;
+        padding: 1px 3px;
+        border-radius: 3px;
+        line-height: 1;
+    }
+
+    .cell-rockslide {
+      background-color: #57534e; /* stone-600 */
+      background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-sat-lo-da.png');
+      background-size: 90%;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .cell-unstable-mountain {
+      animation: shake 4s infinite ease-in-out;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translate(0, 0) rotate(0); }
+      20%, 60% { transform: translate(-1px, 1px) rotate(-0.5deg); }
+      40%, 80% { transform: translate(1px, -1px) rotate(0.5deg); }
+    }
+    
+    .cell-supply-cache {
+      background-color: #166534; /* jungle background */
+      background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-kho-vat-tu.png');
+      background-size: 80%;
+      background-repeat: no-repeat;
+      background-position: center;
+      cursor: pointer;
+    }
+    .cell-supply-cache:hover {
+      outline: 2px solid #facc15; /* amber-400 */
+      z-index: 10;
+    }
+
+    .cell-sebanghieng-river {
+      background-color: #0369a1; /* cyan-700 */
+      cursor: not-allowed;
+      animation: flow 4s linear infinite;
+    }
+    @keyframes flow {
+      0% { background-position: 0 0; }
+      100% { background-position: -80px 40px; }
+    }
+    .cell-sebanghieng-river:hover {
+      background-color: #075985; /* cyan-800 */
+    }
+
+    .cell-lao-village {
+      background-color: #166534; /* jungle base */
+      background-image: url('https://i.ibb.co/y4Y2Qwq/icon-lang-lao.png');
+      background-size: 90%;
+      background-repeat: no-repeat;
+      background-position: center;
+      cursor: pointer;
+    }
+    .cell-lao-village.visited {
+      filter: grayscale(80%) opacity(70%);
+      cursor: not-allowed;
+    }
+
+    .cell-pontoon-bridge {
+      background-color: #0369a1; /* river base */
+      background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-cau-phao.png');
+      background-size: 100%;
+      background-repeat: no-repeat;
+      background-position: center;
+      cursor: pointer;
+    }
+    
+    .convoy-icon {
+      position: absolute;
+      width: 10%; /* 1 of 10 columns */
+      height: calc(100% / 15); /* 1 of 15 rows */
+      background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-xe-khong-kinh-ngang.png');
+      background-size: 90%; /* Make icon smaller than cell */
+      background-repeat: no-repeat;
+      background-position: center;
+      z-index: 15;
+      pointer-events: none;
+      transition: all 0.5s linear;
+    }
+    
+    #flash-flood-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(3, 105, 161, 0) 0%, rgba(3, 105, 161, 0.7) 50%, rgba(3, 105, 161, 0) 100%);
+      pointer-events: none;
+      z-index: 25;
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+
+    #flash-flood-overlay.active {
+      animation: flash-flood-anim 1.5s ease-out forwards;
+    }
+
+    @keyframes flash-flood-anim {
+      0% { opacity: 1; transform: translateX(-100%); }
+      50% { transform: translateX(0%); }
+      100% { opacity: 0; transform: translateX(100%); }
+    }
+
+
+    /* --- CSS cho Notebook Modal --- */
+    #notebook-modal {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        padding: 1rem;
+    }
+
+    #notebook-container {
+        width: 100%;
+        max-width: 900px;
+        aspect-ratio: 16/10;
+        background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-so-tay.png');
+        background-size: 100% 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        position: relative;
+        padding: 5% 7%;
+    }
+
+    .notebook-page {
+        flex-basis: 50%;
+        padding: 1.5rem 2rem;
+        overflow-y: auto;
+        font-family: 'Dancing Script', cursive;
+        color: #3a2e20;
+        font-size: 1.5rem;
+        line-height: 2.0;
+        white-space: pre-wrap;
+    }
+    
+    #left-page {
+        border-right: 1px dashed rgba(0,0,0,0.1);
+    }
+    
+    .notebook-controls {
+        position: absolute;
+        bottom: 2%;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+    
+    .notebook-controls button, #close-notebook-button {
+        background-color: #854d0e; /* amber-800 */
+        color: white;
+        border: 2px solid #eab308; /* yellow-500 */
+        padding: 0.5rem 1.5rem;
+        border-radius: 20px;
+        cursor: pointer;
+        font-family: 'Nunito', sans-serif;
+        font-weight: bold;
+        transition: all 0.2s ease;
+    }
+    .notebook-controls button:hover:not(:disabled) {
+        background-color: #a16207; /* amber-700 */
+    }
+    .notebook-controls button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    #close-notebook-button {
+        position: absolute;
+        top: 2%;
+        right: 2%;
+        padding: 0.25rem 1rem;
+    }
+    
+    #notebook-page-indicator {
+      font-family: 'Nunito', sans-serif;
+      font-weight: bold;
+      color: #3a2e20;
+    }
+
+    #page-unlock-notification {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #fde68a;
+      color: #78350f;
+      padding: 1rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: bold;
+      z-index: 50;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      animation: fadeInOutToast 3s forwards;
+    }
+    @keyframes fadeInOutToast {
+      0%, 100% { opacity: 0; transform: translate(-50%, 20px); }
+      10%, 90% { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    /* --- CSS for Dialogue Modal --- */
+    .dialogue-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: 250; /* Above most things, below system-level modals if any */
+      -webkit-animation: fadeInScreen 0.3s forwards;
+      animation: fadeInScreen 0.3s forwards;
+    }
+
+    .dialogue-box {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 800px;
+      background-color: #fdfbf6; /* A slightly creamy white */
+      border: 4px solid #a16207; /* amber-700 */
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      animation: slideUpIn 0.5s ease-out forwards;
+    }
+    .dark .dialogue-box {
+      background-color: #292524; /* stone-800 */
+      border-color: #d97706; /* amber-600 */
+    }
+
+    @keyframes slideUpIn {
+      from {
+        transform: translate(-50%, 50px);
+        opacity: 0;
+      }
+      to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+      }
+    }
+
+    .character-portrait {
+      flex-shrink: 0;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 3px solid #fcd34d; /* amber-300 */
+      object-fit: cover;
+      background-color: #fefce8; /* amber-50 */
+    }
+    .dark .character-portrait {
+      border-color: #f59e0b; /* amber-500 */
+      background-color: #44403c; /* stone-700 */
+    }
+
+    .dialogue-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100px; /* Ensure a minimum height */
+    }
+
+    .speaker-name {
+      font-family: 'Special Elite', cursive;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #78350f; /* amber-800 */
+      margin-bottom: 0.5rem;
+    }
+    .dark .speaker-name {
+      color: #fcd34d; /* amber-300 */
+    }
+
+    #dialogue-text {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.125rem; /* 18px */
+      color: #3f3f46; /* stone-700 */
+      flex-grow: 1;
+      min-height: 50px;
+    }
+    .dark #dialogue-text {
+      color: #e7e5e4; /* stone-200 */
+    }
+
+    .dialogue-controls {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    #dialogue-continue-button {
+      background-color: #a16207; /* amber-700 */
+      color: white;
+      padding: 0.5rem 2rem;
+      border: none;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    #dialogue-continue-button:hover {
+      background-color: #78350f; /* amber-800 */
+      transform: scale(1.05);
+    }
+    .dark #dialogue-continue-button {
+      background-color: #f59e0b; /* amber-500 */
+      color: #44403c;
+    }
+    .dark #dialogue-continue-button:hover {
+      background-color: #d97706; /* amber-600 */
+    }
+    
+    /* --- CSS for Side Quest System --- */
+    .dialogue-option-button {
+      background-color: #16a34a; /* green-600 */
+      color: white;
+      padding: 0.5rem 1.5rem;
+      border: none;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .dialogue-option-button:hover {
+      background-color: #15803d; /* green-700 */
+      transform: scale(1.05);
+    }
+    #side-quest-tracker {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background-color: rgba(255, 250, 235, 0.9);
+      color: #78350f;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 2px solid #fcd34d;
+      max-width: 250px;
+      z-index: 10;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      backdrop-filter: blur(4px);
+      animation: fadeInScaleUp 0.4s ease-out forwards;
+    }
+    .dark #side-quest-tracker {
+      background-color: rgba(30, 27, 27, 0.9);
+      color: #fef3c7;
+      border-color: #a16207;
+    }
+    #side-quest-tracker h4 {
+        font-family: 'Special Elite', cursive;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        border-bottom: 1px dashed #fcd34d;
+        padding-bottom: 0.25rem;
+    }
+    #side-quest-tracker p {
+        font-family: 'Nunito', sans-serif;
+        font-size: 0.9rem;
+    }
+    .cell-quest-location {
+        animation: pulse-yellow 2s infinite;
+    }
+    @keyframes pulse-yellow {
+        0% { box-shadow: inset 0 0 0 0px rgba(250, 204, 21, 0.9); }
+        70% { box-shadow: inset 0 0 0 10px rgba(250, 204, 21, 0); }
+        100% { box-shadow: inset 0 0 0 0px rgba(250, 204, 21, 0); }
+    }
+    .cell-herb {
+        background-color: #166534; /* jungle base */
+        background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-cay-thao-duoc.png');
+        background-size: 80%;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+    }
+    .cell-herb:hover {
+        outline: 2px solid #facc15; /* amber-400 */
+        z-index: 10;
+    }
+    .cell-friendly-camp {
+        background-color: #166534; /* jungle base */
+        background-image: url('https://i.ibb.co/x78hC1Q/icon-trai-ban.png');
+        background-size: 90%;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+    }
+    .cell-friendly-camp:hover {
+        outline: 2px solid #facc15; /* amber-400 */
+        z-index: 10;
+    }
+    .cell-scout {
+        background-color: #166534; /* jungle base */
+        background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Avatars/Avt-anh-linh-trinh-sat.png');
+        background-size: 90%;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+    }
+    .cell-scout:hover {
+        outline: 2px solid #facc15; /* amber-400 */
+        z-index: 10;
+    }
+    .cell-hidden-sensor {
+        background-color: #166534; /* jungle base */
+    }
+    .cell-hidden-sensor:hover {
+       background-color: #15803d; /* green-700 */
+    }
+
+    /* --- Puzzle Mission Update --- */
+    #fun-fact-modal {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        padding: 1rem;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease-in-out;
+    }
+    #fun-fact-modal.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    #fun-fact-modal .modal-content {
+        background-color: #fef3c7; /* amber-100 */
+        color: #78350f; /* amber-800 */
+        padding: 2rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+        border: 3px solid #fcd34d; /* amber-300 */
+        max-width: 450px;
+        text-align: center;
+    }
+    .dark #fun-fact-modal .modal-content {
+        background-color: #44403c; /* stone-700 */
+        color: #fef3c7; /* amber-100 */
+        border-color: #f59e0b; /* amber-500 */
+    }
+    #mission-timer {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background-color: rgba(255, 255, 255, 0.8);
+        color: #1f2937;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 10;
+        transition: all 0.3s ease;
+    }
+    .dark #mission-timer {
+        background-color: rgba(0, 0, 0, 0.7);
+        color: #f3f4f6;
+    }
+    #mission-timer.low-time {
+        color: #ef4444; /* red-500 */
+        transform: scale(1.1);
+        animation: pulse-red-timer 1s infinite;
+    }
+    @keyframes pulse-red-timer {
+      0%, 100% { transform: scale(1.1); }
+      50% { transform: scale(1.15); }
+    }
+    @keyframes lightUp {
+      from { box-shadow: 0 0 0px rgba(251, 191, 36, 0); }
+      to { box-shadow: 0 0 25px rgba(251, 191, 36, 0.8); }
+    }
+    .light-up-animation {
+      animation: lightUp 0.5s forwards;
+    }
+    #puzzle-container {
+        background-image: url('https://lh3.googleusercontent.com/pw/AP1GczNcItQtNleM-QCkrTSz_HJ981XrtkJzZ-nI0gn2P9UGvOh0fb-o4cdp1ovSLGnEjM7bAxA-fVeNiVGarwQIHiDTqxMaDo3l3dgmdZhBv-Y1jB-eqPW8fuiP5yGMNi8wyUV2h08a7Wg9yyI89QIBbX8QlawVH9l2FXSwu16NDrHy79naAYZiMhBRA9dnkqfrh04ADU8baNZE1LE71WIY7J8hlQkkis-brVJI9gr82ZTdZn1fk86bp9hSj7kt732mnDtn7Pcpr8vtqhHgpNgcxkuPfVCbRhCW08bscrQozRbhw3GpQcnm7TPnXR1WfpJv7PGVfubL6kFVobVr7Gv32HRE7gzEEJ4TTErx8jSrVgYfhQ9d8-L8mdQZYhvG1ffUL9XAlWxI4n66WroS3-LrJhX_mfiiwnUXy22IhSMOWkCI4pHqRdbn2lT2jKHZlvl5C8qznOjLL0lxBVxcCpjkY2IGhXCIS4L3spUycnTZMIWTUtQxopelxsU6E3cqQCWCLtSr3Cxr5a9QEoHNLGFC3c0aG-BURDC3Wfqmc14v-zaJabrJ0c-iOTYWWBcMsRjw8Z1_Ix7fqLCYjwtmlM9uEtTyIzUpVN3sRV57WeL0hf99qFm43SDYSTtSEtLNbAA9nbZ7r7oLPoYktHM3AU4GM4yBqkBEOMFu6lBiBCs2HUrItz-FAdjPlkZTygDZucP3dkkOmUz8ArlaoImzgWpmDtQHXMJB6kDWrPE0Li5cfCcKkglHnps80B8B-itiXGun0v-bg_unjvmrQ8bzPUN3VfS4u6gS8hRPre1wJ9ktzgjtRKY8zg5qV2nWwxUaZ1OR8roRky7-AV-oD9mZ5jOpMo67oce0iKVZYEB8twEvY5HjwWYJEdT2udagGorpW81I8XoJ-L_HAP6gff8lA7kLPDQYv8ixfVluyhqIHpGo58DEZkU0cPWcEdyXEsqbmTsWBwb0m6CbJ6LjL2EVw7v9SAry884IApHMcCg0MzI9iw=w745-h745-s-no?authuser=0');
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    /* --- CSS cho Timeline Mission Mới --- */
+    #timeline-timer {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background-color: rgba(255, 255, 255, 0.8);
+      color: #1f2937;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
+    .dark #timeline-timer {
+        background-color: rgba(0, 0, 0, 0.7);
+        color: #f3f4f6;
+    }
+    #timeline-timer.low-time {
+        color: #ef4444; /* red-500 */
+        transform: scale(1.1);
+        animation: pulse-red-timer 1s infinite;
+    }
+
+    .event-card-with-image {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.5rem;
+    }
+
+    .event-card-with-image img {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: 0.25rem;
+        border: 1px solid rgba(0,0,0,0.1);
+        pointer-events: none; /* Make image non-draggable */
+    }
+
+    .timeline-slot-with-image {
+        padding: 0.5rem;
+    }
+    .timeline-slot-with-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 0.375rem;
+    }
+
+    #event-detail-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 1rem;
+      animation: fadeInScreen 0.3s forwards;
+    }
+    #event-detail-modal-content {
+      background-color: #fef3c7; /* amber-100 */
+      color: #78350f; /* amber-800 */
+      padding: 2rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+      border: 3px solid #fcd34d; /* amber-300 */
+      max-width: 500px;
+      text-align: center;
+      position: relative;
+    }
+    .dark #event-detail-modal-content {
+        background-color: #44403c; /* stone-700 */
+        color: #fef3c7; /* amber-100 */
+        border-color: #f59e0b; /* amber-500 */
+    }
+    #event-detail-modal-content img {
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    /* --- CSS cho Rally Call / Oath Screen --- */
+    .rally-call-screen {
+        position: relative;
+        background-size: cover;
+        background-position: center;
+        color: white;
+        transition: background-image 0.8s ease-in-out;
+    }
+    .rally-call-screen.screen-shaking {
+      animation: screenShake 0.4s ease-in-out;
+    }
+    @keyframes screenShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+    }
+    .rally-call-screen::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.9) 20%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0.9) 100%);
+        border-radius: 0.5rem; /* Match parent */
+    }
+    .rally-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 1.5rem;
+        box-sizing: border-box;
+    }
+    .morale-bar-container {
+        width: 100%;
+        background-color: rgba(0,0,0,0.5);
+        border: 2px solid #fcd34d;
+        border-radius: 10px;
+        padding: 4px;
+        margin-bottom: 1rem;
+    }
+    .morale-bar-fill {
+        height: 20px;
+        border-radius: 6px;
+        transition: width 0.5s ease-out, background-color 0.5s ease-out;
+        box-shadow: 0 0 10px rgba(252, 211, 77, 0.5);
+    }
+    .oath-prompt {
+        font-family: 'Special Elite', cursive;
+        font-size: 1.5rem;
+        text-shadow: 0 2px 5px black;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0,0,0,0.3);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .oath-choices-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        margin-top: auto;
+    }
+    .oath-choice-button {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem; /* 12px */
+        background: linear-gradient(145deg, #d97706, #92400e);
+        color: white;
+        border: 2px solid #fcd34d;
+        font-weight: bold;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        transition: all 0.2s ease-out;
+        text-align: left;
+    }
+    .oath-choice-button img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        background-color: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        padding: 4px;
+    }
+    .oath-choice-button:not(:disabled):hover {
+        background: linear-gradient(145deg, #f59e0b, #b45309);
+        transform: scale(1.03);
+    }
+    .oath-choice-button.correct {
+        background: linear-gradient(145deg, #22c55e, #15803d);
+        border-color: #86efac;
+        box-shadow: 0 0 15px #86efac;
+    }
+    .oath-choice-button.incorrect {
+        background: linear-gradient(145deg, #ef4444, #b91c1c);
+        border-color: #fca5a5;
+        opacity: 0.7;
+    }
+    .oath-choice-button:disabled {
+        cursor: not-allowed;
+    }
+
+    /* Naval Battle Screen */
+    .naval-battle-area {
+      position: relative;
+      width: 100%;
+      height: 250px;
+      background-size: cover;
+      background-position: center;
+      border: 2px solid #4a2c13; /* Dark brown border */
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+    .trap-zone-indicator {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      background-color: rgba(239, 68, 68, 0.2);
+      border-left: 2px dashed rgba(239, 68, 68, 0.8);
+      border-right: 2px dashed rgba(239, 68, 68, 0.8);
+      z-index: 1;
+    }
+    .enemy-ship-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 80px; /* Adjust size */
+      height: auto;
+      transition: left 0.1s linear; /* Smooth movement */
+      z-index: 2;
+    }
+    .tide-bar-container {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      bottom: 10px;
+      width: 30px;
+      background-color: rgba(0, 0, 0, 0.5);
+      border: 1px solid white;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column-reverse; /* Fill from bottom */
+      z-index: 3;
+    }
+    .tide-bar-fill {
+      width: 100%;
+      background: linear-gradient(to top, #0ea5e9, #67e8f9); /* sky-500 to cyan-200 */
+      border-radius: 9px;
+      transition: height 0.5s ease-in-out;
+    }
+    .naval-battle-controls {
+      margin-top: 1rem;
+    }
+    .attack-button {
+      padding: 1rem 2.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(145deg, #ef4444, #b91c1c); /* red-500 to red-800 */
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 5px 20px rgba(239, 68, 68, 0.4);
+      transition: all 0.3s ease-out;
+    }
+    .attack-button:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+    }
+    .attack-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* --- CSS for Defense Mission --- */
+    .evacuation-unit {
+      width: 10%; /* Fit in a 10x10 grid */
+      height: 10%;
+      position: absolute;
+      transition: all 0.3s ease-in-out;
+      cursor: grab;
+    }
+    .evacuation-unit.dragging {
+      opacity: 0.5;
+      transform: scale(1.2);
+    }
+    .unit-icon {
+        width: 100%;
+        height: 100%;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    .unit-civilian .unit-icon { background-image: url('https://i.ibb.co/wJ1Fj89/person-icon.png'); }
+    .unit-supplies .unit-icon { background-image: url('https://i.ibb.co/51v518h/food-cart-icon.png'); }
+    .unit-wounded .unit-icon { background-image: url('https://i.ibb.co/pW9B3Yf/icon-thuong-binh.png'); }
+
+    #rain-overlay {
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(to bottom, rgba(100, 116, 139, 0.4), rgba(100, 116, 139, 0.6));
+        pointer-events: none;
+        z-index: 10;
+        animation: rain 0.5s linear infinite;
+    }
+    @keyframes rain {
+        0% { background-position: 0% 0%; }
+        100% { background-position: 20% 100%; }
+    }
+    
+    #enemy-progress-bar {
+      display: flex;
+      width: 100%;
+      height: 20px;
+      background-color: #44403c;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    #enemy-progress-bar-fill {
+        height: 100%;
+        background-color: #ef4444;
+        transition: width 0.5s ease-out;
+    }
+    #enemy-progress-bar.intel-active .progress-segment.attack-path {
+        background-color: #fde047; /* yellow-200 */
+        box-shadow: inset 0 0 5px #facc15; /* amber-400 */
+    }
+
+    /* --- NEW CSS for Rally Call Screen v2 (Fill-in-the-blank) --- */
+    #hich-content {
+      font-family: 'Special Elite', cursive;
+      line-height: 2.5;
+      background-color: rgba(253, 230, 138, 0.4); /* amber-200 with alpha */
+      border: 1px solid #fcd34d; /* amber-300 */
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+    }
+    .dark #hich-content {
+      background-color: rgba(68, 64, 60, 0.4); /* stone-700 with alpha */
+      border-color: #a16207; /* amber-700 */
+    }
+    .blank-slot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: bottom;
+      width: 150px;
+      min-height: 40px;
+      margin: 0 0.25rem;
+      background-color: rgba(0, 0, 0, 0.1);
+      border-bottom: 2px solid #a16207; /* amber-700 */
+      border-radius: 4px;
+      padding: 2px;
+    }
+    .draggable-phrase {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background-color: #fde68a; /* amber-200 */
+      color: #78350f; /* amber-800 */
+      border-radius: 6px;
+      border: 1px solid #fcd34d; /* amber-300 */
+      cursor: grab;
+      font-weight: bold;
+      user-select: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .dark .draggable-phrase {
+      background-color: #b45309; /* amber-700 */
+      color: #fefce8; /* amber-50 */
+      border-color: #f59e0b; /* amber-500 */
+    }
+    .blank-slot .draggable-phrase {
+      margin: auto;
+    }
+    .difficult-word {
+      border-bottom: 1px dotted #a16207; /* amber-700 */
+      cursor: help;
+      position: relative;
+    }
+    .dark .difficult-word {
+      border-bottom-color: #fcd34d; /* amber-300 */
+    }
+    #tooltip {
+      position: fixed; /* Use fixed positioning for tooltip */
+      visibility: hidden;
+      opacity: 0;
+      background-color: #1f2937; /* gray-800 */
+      color: #f9fafb; /* gray-50 */
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      z-index: 100;
+      max-width: 250px;
+      font-size: 0.875rem;
+      transition: opacity 0.2s ease-in-out;
+      pointer-events: none;
+      font-family: 'Nunito', sans-serif; /* Use standard font for readability */
+    }
+    #tooltip.visible {
+      visibility: visible;
+      opacity: 1;
+    }
+    .highlight-hint {
+      animation: highlight-hint-anim 2.5s ease-out;
+    }
+    @keyframes highlight-hint-anim {
+      0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+      50% { box-shadow: 0 0 15px 5px rgba(59, 130, 246, 0.7); }
+      100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+    }
+
+    /* --- NEW CSS for Chatbot Character Selection --- */
+    #character-selection {
+        padding: 0.5rem;
+        background-color: #fef3c7; /* amber-100 */
+        border-bottom: 1px solid #fde68a; /* amber-200 */
+        text-align: center;
+        flex-shrink: 0; /* Prevent this section from shrinking */
+    }
+    .dark #character-selection {
+        background-color: #44403c; /* stone-700 */
+        border-bottom-color: #57534e; /* stone-600 */
+    }
+    #character-selection-scroll {
+        display: flex;
+        gap: 0.75rem; /* 12px */
+        overflow-x: auto;
+        padding-bottom: 0.5rem; /* For scrollbar spacing */
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+    #character-selection-scroll::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, and Opera */
+    }
+    .character-avatar-button {
+        flex-shrink: 0;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        padding: 2px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+    .character-avatar-button img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+    .character-avatar-button.avatar-locked {
+        filter: grayscale(1);
+        cursor: not-allowed;
+    }
+    .character-avatar-button.avatar-selected {
+        border-color: #3b82f6; /* blue-500 */
+        transform: scale(1.1);
+        box-shadow: 0 0 10px #3b82f6;
+    }
+    .character-avatar-button:not(.avatar-selected):not(.avatar-locked):hover {
+        transform: scale(1.05);
+        border-color: #9ca3af; /* gray-400 */
+    }
+
+    /* --- CSS for Forging Mission --- */
+    .force-bar-container {
+        width: 100%;
+        height: 30px;
+        background-color: #4b5563; /* gray-600 */
+        border-radius: 5px;
+        position: relative;
+        overflow: hidden;
+        border: 2px solid #1f2937; /* gray-800 */
+    }
+    .force-bar-zone {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+    }
+    .force-bar-good-zone {
+        left: 25%;
+        width: 50%;
+        background-color: #f59e0b; /* amber-500 */
+    }
+    .force-bar-perfect-zone {
+        left: 45%;
+        width: 10%;
+        background-color: #16a34a; /* green-600 */
+    }
+    .hit-marker {
+        position: absolute;
+        top: -5px;
+        bottom: -5px;
+        width: 4px;
+        background-color: white;
+        box-shadow: 0 0 5px white;
+        animation: move-marker 2s linear infinite alternate;
+    }
+    @keyframes move-marker {
+      from { left: 0%; }
+      to { left: calc(100% - 4px); }
+    }
+    .sparks-effect {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -60%);
+        width: 200px;
+        height: 200px;
+        pointer-events: none;
+        z-index: 5;
+        opacity: 0;
+        transition: opacity 0.3s ease-out;
+    }
+    .sparks-effect.show {
+        opacity: 1;
+    }
+
+/* --- NEW CSS for Typesetting Mission --- */
+#typesetting-screen {
+  background: #3a2e20; /* dark wood color */
+  background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+  width: 100%;
+  color: #fef3c7; /* amber-100 */
+  font-family: 'Special Elite', cursive;
+  position: relative; /* for absolute positioned children */
+}
+
+#text-template {
+  font-family: 'Special Elite', cursive;
+  font-size: 2rem;
+  letter-spacing: 0.5rem;
+  text-align: center;
+  color: #fef3c7; /* amber-100 */
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  border: 2px solid #5d4a36;
+  background-color: rgba(0,0,0,0.2);
+  padding: 0.5rem;
+  user-select: none;
+}
+
+#composition-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: #5d4a36;
+  border: 4px solid #1c140d;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+  min-height: 80px;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.6);
+  flex-wrap: wrap;
+}
+
+.composition-slot {
+  width: 50px;
+  height: 60px;
+}
+
+.slot-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.3);
+    border: 2px dashed #856a4e;
+    border-radius: 4px;
+}
+
+.composition-spacer {
+    width: 25px; /* Half width of a letter block */
+    height: 60px;
+}
+
+#letter-tray {
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1rem;
+  border: 4px solid #1c140d;
+  background-color: #5d4a36;
+  border-radius: 0.5rem;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.6);
+}
+
+#tray-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    min-height: 80px;
+    align-items: center;
+}
+
+.letter-block {
+  width: 50px;
+  height: 60px;
+  background: linear-gradient(145deg, #d1d5db, #9ca3af); /* gray-300 to gray-400 */
+  color: #1f2937; /* gray-800 */
+  border: 1px solid #6b7280; /* gray-500 */
+  border-bottom: 4px solid #4b5563; /* gray-600 */
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  user-select: none;
+  transition: all 0.2s ease-out;
+}
+
+.letter-block:active, .letter-block.dragging {
+    cursor: grabbing;
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    z-index: 100;
+    opacity: 0.8;
+}
+
+.letter-block span {
+    font-size: 2.5rem;
+    line-height: 1;
+    transform: scaleX(-1); /* Mirror effect for printing press */
+    text-shadow: 1px 1px 1px rgba(255,255,255,0.4);
+    pointer-events: none; /* Make sure span doesn't interfere with drag events */
+}
+
+/* Trading Screen Specific Styles */
+.stat-item {
+    background-color: rgba(254, 243, 199, 0.5);
+    color: #44403c;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 1.125rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.dark .stat-item {
+    background-color: rgba(68, 64, 60, 0.5);
+    color: #e7e5e4;
+}
+
+.trading-card {
+    background-color: #fefce8;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    border-width: 2px;
+    border-color: #fde68a;
+}
+
+.dark .trading-card {
+    background-color: #44403c;
+    border-color: #57534e;
+}
+
+.trading-card.small {
+    display: flex;
+    align-items: center;
+    text-align: left;
+    padding: 0.5rem;
+}
+
+.trade-button {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+    border-radius: 0.375rem;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease-in-out;
+}
+
+.trade-button:not(:disabled):hover {
+    transform: scale(1.05);
+}
+
+.trade-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.buy-button {
+    background-color: #2563eb;
+}
+.buy-button:hover:not(:disabled) {
+    background-color: #1d4ed8;
+}
+
+.sell-button {
+    background-color: #16a34a;
+}
+.sell-button:hover:not(:disabled) {
+    background-color: #15803d;
+}
+
+/* --- Frosted Glass Container for Screens --- */
+.frosted-glass-container {
+    width: 100%;
+    padding: 1.5rem 2rem;
+    color: #0c0a09;
+    border-radius: 1.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    /* Frosted glass effect - More Opaque */
+    background-color: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.dark .frosted-glass-container {
+    color: #f5f5f4;
+    background-color: rgba(30, 27, 27, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.quiz-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    color: #78350f;
+}
+.dark .quiz-header {
+    color: #fcd34d;
+}
+
+
+.quiz-header #quiz-progress {
+    font-weight: 700;
+    font-size: 1.125rem;
+    background-color: rgba(0,0,0,0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+}
+.dark .quiz-header #quiz-progress {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.quiz-header #quiz-lives {
+    font-size: 2rem;
+    display: flex;
+    gap: 0.25rem;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.quiz-question-box {
+    width: 100%;
+    background-color: rgba(250, 235, 215, 0.6);
+    padding: 1.5rem;
+    margin: 1rem 0;
+    border-radius: 0.75rem;
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(161, 98, 7, 0.4);
+    font-family: 'Special Elite', cursive;
+}
+.dark .quiz-question-box {
+    background-color: rgba(68, 64, 60, 0.6);
+    border-color: rgba(217, 119, 6, 0.5);
+}
+
+#question-text {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 600;
+    text-align: center;
+    color: #78350f;
+}
+.dark #question-text {
+    color: #fef3c7;
+}
+
+#hint-button {
+    margin-bottom: 1.5rem;
+    background-color: rgba(14, 165, 233, 0.8); /* sky-500 with alpha */
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease-in-out;
+}
+#hint-button:hover:not(:disabled) {
+    background-color: rgba(2, 132, 199, 0.9); /* sky-600 */
+    transform: scale(1.05);
+}
+#hint-button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+.dark #hint-button:disabled {
+    background-color: #4b5563;
+}
+
+#answer-options {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.quiz-option {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255,255,255,0.7);
+    font-weight: 700;
+    font-size: 1.125rem;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
+}
+.quiz-option:disabled {
+    cursor: not-allowed;
+}
+
+.quiz-option.base {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #374151;
+}
+.dark .quiz-option.base {
+    background-color: rgba(75, 85, 99, 0.5);
+    border-color: rgba(255,255,255,0.1);
+    color: #f3f4f6;
+}
+.quiz-option.base:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(255,255,255, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+.dark .quiz-option.base:hover:not(:disabled) {
+    background-color: rgba(107, 114, 128, 0.7);
+    border-color: rgba(255,255,255,0.3);
+}
+
+.quiz-option.correct {
+    background-color: #22c55e;
+    border-color: #16a34a;
+    color: white;
+    transform: scale(1.05);
+    animation: pulse-green 0.5s;
+}
+.quiz-option.correct::after { content: ' ✔'; }
+
+.quiz-option.incorrect {
+    background-color: #ef4444;
+    border-color: #dc2626;
+    color: white;
+    opacity: 0.8;
+}
+.quiz-option.incorrect::after { content: ' ✖'; }
+
+.quiz-option.disabled {
+    background-color: rgba(229, 231, 235, 0.5);
+    border-color: rgba(209, 213, 219, 0.5);
+    color: #6b7280;
+    opacity: 0.6;
+}
+.dark .quiz-option.disabled {
+    background-color: rgba(55, 65, 81, 0.5);
+    border-color: rgba(31, 41, 55, 0.5);
+    color: #9ca3af;
+}
+
+#feedback-container .action-button {
+    margin-top: 1rem;
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 700;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    font-size: 1.25rem;
+    transition: all 0.2s ease-in-out;
+}
+#feedback-container .action-button:hover {
+    background-color: #2563eb;
+    transform: scale(1.05);
+}
+
+.loading-spinner {
+    border: 6px solid #f3f3f3;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    border-top-color: #f59e0b;
+}
+.dark .loading-spinner {
+  border-color: rgba(255, 255, 255, 0.2);
+  border-top-color: #fcd34d;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse-green {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.07); }
+    100% { transform: scale(1.05); }
+}
+
+/* Hint Modal Styles */
+.hint-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.hint-modal-content {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 1);
+    padding: 2rem;
+    border-radius: 1.5rem;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    text-align: center;
+}
+.dark .hint-modal-content {
+    background-color: rgba(30, 27, 27, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #f5f5f4;
+}
+.hint-modal-content h3 {
+    font-family: 'Special Elite', cursive;
+    font-size: 1.75rem;
+    color: #a16207;
+    margin-bottom: 1rem;
+}
+.dark .hint-modal-content h3 {
+    color: #fcd34d;
+}
+.hint-modal-content p {
+    font-size: 1.125rem;
+    line-height: 1.75;
+    margin-bottom: 1.5rem;
+}
+.hint-modal-content .action-button {
+    background-color: #78350f;
+    color: white;
+    font-weight: 700;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+}
+.dark .hint-modal-content .action-button {
+    background-color: #f59e0b;
+    color: #1f2937;
+}
+.hint-modal-content .action-button:hover {
+    background-color: #a16207;
+}
+.dark .hint-modal-content .action-button:hover {
+    background-color: #d97706;
+}
+
+/* --- Diplomacy Screen Specific Styles --- */
+#goodwill-bar-container {
+    width: 100%;
+    height: 24px;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 4px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+}
+#goodwill-bar {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.5s ease-out, background-color 0.5s ease-out;
+}
+
+#npc-dialogue-box {
+    width: 100%;
+    background-color: rgba(250, 235, 215, 0.6);
+    padding: 1.5rem;
+    margin: 1rem 0;
+    border-radius: 0.75rem;
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(161, 98, 7, 0.4);
+    font-family: 'Special Elite', cursive;
+    font-size: 1.25rem;
+}
+.dark #npc-dialogue-box {
+    background-color: rgba(68, 64, 60, 0.6);
+    border-color: rgba(217, 119, 6, 0.5);
+}
+
+.diplomacy-choice-button {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255,255,255,0.7);
+    font-weight: 700;
+    font-size: 1.125rem;
+    text-align: left;
+    transition: all 0.2s ease-in-out;
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #374151;
+}
+.dark .diplomacy-choice-button {
+    background-color: rgba(75, 85, 99, 0.5);
+    border-color: rgba(255,255,255,0.1);
+    color: #f3f4f6;
+}
+.diplomacy-choice-button:not(:disabled):hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(255,255,255, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+.dark .diplomacy-choice-button:not(:disabled):hover {
+    background-color: rgba(107, 114, 128, 0.7);
+    border-color: rgba(255,255,255,0.3);
+}
+
+.diplomacy-choice-button:disabled {
+    cursor: not-allowed;
+}
+
+.diplomacy-choice-button.selected-correct {
+    background-color: #22c55e;
+    border-color: #16a34a;
+    color: white;
+    transform: scale(1.02);
+    animation: pulse-green 0.5s;
+}
+.dark .diplomacy-choice-button.selected-correct {
+    background-color: #16a34a;
+}
+.diplomacy-choice-button.selected-wrong {
+    background-color: #ef4444;
+    border-color: #dc2626;
+    color: white;
+    animation: shake-horizontal 0.4s;
+}
+.dark .diplomacy-choice-button.selected-wrong {
+    background-color: #b91c1c;
+}
+
+@keyframes shake-horizontal {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* --- CSS for Construction Puzzle --- */
+#construction-puzzle-screen {
+  background-color: #d6d3d1; /* stone-300 */
+}
+.dark #construction-puzzle-screen {
+  background-color: #292524; /* stone-800 */
+}
+
+#construction-puzzle-screen h2 {
+    color: #a16207; /* amber-700 */
+}
+.dark #construction-puzzle-screen h2 {
+    color: #fcd34d; /* amber-300 */
+}
+
+#building-grid {
+  position: relative; /* For absolute positioning of pieces */
+  background-color: #fefce8; /* amber-50 */
+  border: 2px solid #a16207; /* amber-700 */
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+  padding: 2px;
+  gap: 2px;
+}
+.dark #building-grid {
+    background-color: #292524; /* stone-800 */
+    border-color: #78350f; /* amber-800 */
+}
+.grid-cell {
+  background-color: #fef3c7; /* amber-100 */
+  border-radius: 2px;
+}
+.dark .grid-cell {
+  background-color: #44403c; /* stone-700 */
+}
+
+.placed-puzzle-piece {
+    cursor: grab;
+    transition: all 0.2s ease-in-out;
+}
+.placed-puzzle-piece:active {
+    cursor: grabbing;
+    filter: brightness(1.1);
+}
+.placed-puzzle-piece img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none; /* Make image non-draggable */
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.4));
+}
+.hinted-piece {
+    animation: pulse-yellow 1.5s ease-out;
+}
+
+#building-pieces-palette {
+    background-color: #f5f5f4; /* stone-100 */
+    border: 2px solid #a8a29e; /* stone-400 */
+}
+.dark #building-pieces-palette {
+    background-color: #44403c; /* stone-700 */
+    border-color: #57534e; /* stone-600 */
+}
+.palette-inner {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+.palette-piece-container {
+  padding: 0.5rem;
+  background-color: #fff;
+  border-radius: 0.375rem;
+  border: 1px solid #d6d3d1;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.dark .palette-piece-container {
+    background-color: #57534e;
+    border-color: #78716c;
+}
+.palette-piece-container:hover {
+  background-color: #fef3c7; /* amber-100 */
+}
+.dark .palette-piece-container:hover {
+  background-color: #78716c;
+}
+.palette-piece-image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1/1;
+  object-fit: contain;
+  cursor: grab;
+  transition: transform 0.3s ease;
+}
+.palette-piece-image:active {
+  cursor: grabbing;
+}
+.highlight-overlay {
+    position: absolute;
+    pointer-events: none;
+    z-index: 50;
+    transition: all 0.1s;
+}
+.highlight-overlay.valid {
+    background-color: rgba(74, 222, 128, 0.4); /* green-400 with alpha */
+    border: 2px solid #22c55e; /* green-500 */
+}
+.highlight-overlay.invalid {
+    background-color: rgba(248, 113, 113, 0.4); /* red-400 with alpha */
+    border: 2px solid #ef4444; /* red-500 */
+}
+
+/* --- Lane Battle Screen --- */
+#lane-battle-screen {
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 9 / 16;
+  background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-chien-truong-bach-dang.png');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 4px solid #4a2c13;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.lane-battle-shake {
+  animation: screenShake 0.4s ease-in-out;
+}
+#battlefield {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-around;
+}
+.lane {
+  width: 33.33%;
+  height: 100%;
+  position: relative;
+  border-left: 1px dashed rgba(255, 255, 255, 0.2);
+  border-right: 1px dashed rgba(255, 255, 255, 0.2);
+}
+#player-character {
+  position: absolute;
+  bottom: 5%;
+  width: 33.33%;
+  height: 20%;
+  background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Character/C-ba-trieu-tren-voi-chien.png');
+  background-size: contain;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  transition: left 0.2s ease-out;
+  z-index: 10;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+.enemy-unit {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 10%;
+  background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Character/C-linh-dich.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.enemy-unit.stunned {
+  animation: spin-stun 1s infinite;
+}
+@keyframes spin-stun {
+  from { transform: translateX(-50%) rotate(0deg); }
+  to { transform: translateX(-50%) rotate(360deg); }
+}
+.ally-unit {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 15%;
+  background-image: url('https://i.ibb.co/18yG74W/Avt-cong-binh.png');
+  background-size: contain;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  z-index: 5;
+}
+.ally-unit.ally-hit {
+  animation: flash-red-hit 0.3s;
+}
+@keyframes flash-red-hit {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(3) contrast(2) saturate(0); }
+}
+#battle-skill-bar {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255,255,255,0.3);
+  z-index: 20;
+}
+.skill-button {
+  width: 60px;
+  height: 60px;
+  background-color: #57534e;
+  border: 2px solid #a8a29e;
+  border-radius: 50%;
+  background-size: 60%;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+  transition: all 0.2s;
+}
+.skill-button:hover:not(:disabled) {
+  border-color: #facc15;
+  transform: scale(1.1);
+}
+.skill-button:disabled {
+  filter: grayscale(1);
+  cursor: not-allowed;
+}
+.cooldown-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0,0,0,0.7);
+  pointer-events: none;
+  transition: height 0.5s linear;
+}
+.charge-visual {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -25%;
+  width: 150%;
+  background: linear-gradient(to top, rgba(255, 224, 130, 0), rgba(255, 236, 179, 0.8), rgba(255, 224, 130, 0));
+  animation: charge-anim 0.4s ease-out forwards;
+  pointer-events: none;
+  z-index: 15;
+}
+@keyframes charge-anim {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); opacity: 0; }
+}
+.roar-visual {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  width: 200%;
+  height: 150px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  border: 5px solid rgba(255, 193, 7, 0.8);
+  animation: roar-anim 0.5s ease-out forwards;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 15;
+}
+@keyframes roar-anim {
+  from { transform: translateX(-50%) scale(0.1); opacity: 1; }
+  to { transform: translateX(-50%) scale(1.5); opacity: 0; }
+}
+.key-hint {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid white;
+  border-radius: 0.25rem;
+  font-weight: bold;
+}
+
+/* --- Achievement Toast Notification --- */
+#achievement-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000; /* High z-index to appear on top */
+  width: 90%;
+  max-width: 400px;
+  pointer-events: none; /* Allow clicks to pass through to elements behind it */
+  animation: slideInAndOut 4s ease-in-out forwards;
+}
+
+#achievement-toast > div {
+  pointer-events: all; /* Make the toast content itself clickable if needed */
+}
+
+@keyframes slideInAndOut {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -150%);
+  }
+  10%, 90% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -150%);
+  }
+}
+@keyframes pulse-yellow-glow {
+  from {
+    text-shadow: 0 0 4px #fefce8, 0 0 8px #fde047, 0 0 12px #facc15;
+  }
+  to {
+    text-shadow: 0 0 6px #fefce8, 0 0 12px #fde047, 0 0 18px #facc15, 0 0 24px #fbbf24;
+  }
+}

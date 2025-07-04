@@ -141,7 +141,7 @@ const DefenseScreen: React.FC<DefenseScreenProps> = ({ missionData, onReturnToMu
     };
 
     return (
-        <div className="screen-container w-full max-w-5xl p-4 bg-stone-900 text-white rounded-lg shadow-xl flex flex-col items-center">
+        <div className="screen-container w-full max-w-5xl p-4 bg-stone-900 text-white rounded-lg shadow-xl flex flex-col items-center flex-grow">
             {/* Header */}
             <div className="w-full flex justify-between items-center mb-4 flex-wrap gap-2">
                 <h2 className="text-3xl font-bold text-amber-300 font-serif">{missionData.title}</h2>

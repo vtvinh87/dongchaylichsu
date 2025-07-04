@@ -5,7 +5,7 @@ import { playSound } from '../utils/audio';
 
 interface CraftingScreenProps {
   inventory: Record<string, number>;
-  collectedArtifactIds: Set<string>;
+  collectedArtifactIds: string[];
   onCraftItem: (artifactId: string) => void;
   onReturnToMuseum: () => void;
 }
@@ -16,9 +16,9 @@ const CraftingScreen: React.FC<CraftingScreenProps> = ({
   onCraftItem,
   onReturnToMuseum,
 }) => {
-  const craftableArtifacts = Object.values(ALL_ARTIFACTS_MAP).filter(
+  const craftableArtifacts = (Object.values(ALL_ARTIFACTS_MAP) as Artifact[]).filter(
     (artifact) =>
-      artifact.craftingRequirements && !collectedArtifactIds.has(artifact.id)
+      artifact.craftingRequirements && !collectedArtifactIds.includes(artifact.id)
   );
 
   const handleCraftClick = (artifactId: string) => {

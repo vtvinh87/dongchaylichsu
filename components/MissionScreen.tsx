@@ -1,6 +1,7 @@
 
 
 
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { PuzzleMissionData, Reward, PuzzlePieceItem } from '../types';
 import { ALL_ARTIFACTS_MAP } from '../constants';
@@ -47,7 +48,7 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
     setIsPuzzleComplete(false);
     setTimeLeft(mission.timeLimit || 90);
     setTimeChallengeSuccess(true);
-    setIsTimerRunning(false); // Don't start timer until user clicks Start
+    setIsTimerRunning(true); // Start timer immediately
     
     if (mission.reward.type === 'artifact'){
         const artifact = ALL_ARTIFACTS_MAP[mission.reward.id];
@@ -56,7 +57,7 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
   }, [mission]); 
 
   useEffect(() => {
-    if (isTimerRunning && timeLeft > 0) {
+    if (isTimerRunning && timeLeft > 0 && !isPuzzleComplete) {
         const timerId = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
         return () => clearTimeout(timerId);
     } else if (timeLeft === 0 && isTimerRunning) {
@@ -66,21 +67,20 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
             alert("Hết giờ thử thách! Bạn có thể tiếp tục hoàn thành puzzle nhưng sẽ không nhận được phần thưởng thêm.");
         }
     }
-  }, [timeLeft, isTimerRunning, timeChallengeSuccess]);
+  }, [timeLeft, isTimerRunning, isPuzzleComplete, timeChallengeSuccess]);
 
   const handleDragStart = useCallback((event: React.DragEvent<HTMLDivElement>, pieceId: number) => {
-    if (!isTimerRunning && !isPuzzleComplete) return;
+    if (isPuzzleComplete) return;
     event.dataTransfer.setData("application/json", JSON.stringify({ pieceId }));
-  }, [isTimerRunning, isPuzzleComplete]);
+  }, [isPuzzleComplete]);
   
   const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
-    if (!isTimerRunning) return;
     event.preventDefault(); 
-  }, [isTimerRunning]);
+  }, []);
 
   const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>, slotIndex: number) => {
     event.preventDefault();
-    if (solvedSlots[slotIndex] || isPuzzleComplete || !isTimerRunning) return;
+    if (solvedSlots[slotIndex] || isPuzzleComplete) return;
 
     try {
         const data = event.dataTransfer.getData("application/json");
@@ -104,35 +104,42 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
 
           setDraggablePieces(prevPieces => prevPieces.filter(p => p.id !== pieceId));
           
-          if (newSolvedSlots.every(slot => slot !== null)) {
+          const isNowComplete = newSolvedSlots.every(slot => slot !== null);
+          if (isNowComplete) {
             setIsPuzzleComplete(true);
-            setTimeout(() => {
-              onMissionComplete(mission.reward);
-              if (timeChallengeSuccess) {
-                onGrantBonusSupplies(50);
-              }
-            }, 300); 
+            // Completion logic is now moved to handleCloseFunFactModal
+            // If the last piece has no fun fact, we need to trigger completion here.
+            if (!pieceToPlace.funFact) {
+                onMissionComplete(mission.reward);
+                if (timeChallengeSuccess) {
+                    onGrantBonusSupplies(50);
+                }
+            }
           }
+        } else {
+            playSound('sfx_fail');
         }
     } catch (e) {
         console.error("Error parsing drag data:", e);
     }
-  }, [draggablePieces, solvedSlots, isPuzzleComplete, mission.reward, onMissionComplete, timeChallengeSuccess, onGrantBonusSupplies, isTimerRunning]);
+  }, [draggablePieces, solvedSlots, isPuzzleComplete, mission, onMissionComplete, timeChallengeSuccess, onGrantBonusSupplies]);
 
   const handleCloseFunFactModal = () => {
     playSound('sfx_click');
     setFunFactModal({ isOpen: false, text: '' });
     setJustSolvedSlotIndex(null);
-    if (!isPuzzleComplete) {
+    if (isPuzzleComplete) {
+        // This was the last piece, trigger mission completion now.
+        onMissionComplete(mission.reward);
+        if (timeChallengeSuccess) {
+            onGrantBonusSupplies(50);
+        }
+    } else {
+        // Not the last piece, resume timer.
         setIsTimerRunning(true);
     }
   };
   
-  const handleStartGame = () => {
-    playSound('sfx_click');
-    setIsTimerRunning(true);
-  };
-
   return (
     <div className="screen-container w-full max-w-2xl p-6 bg-amber-100 dark:bg-stone-800 rounded-lg shadow-xl text-center relative">
       <button
@@ -171,22 +178,16 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
             ))}
           </div>
 
-          {!isTimerRunning && !isPuzzleComplete ? (
-            <button onClick={handleStartGame} className="action-button mb-6">
-                Bắt đầu Thử thách
-            </button>
-          ) : (
-            <div className="flex flex-wrap justify-center items-center gap-2 mb-6 min-h-[100px] bg-amber-50 dark:bg-stone-700/50 p-3 rounded-lg">
-                {draggablePieces.map(piece => (
-                    <PuzzlePiece
-                    key={piece.id}
-                    piece={piece}
-                    onDragStart={handleDragStart}
-                    isSolved={solvedSlots.some(s => s?.id === piece.id)}
-                    />
-                ))}
-            </div>
-          )}
+          <div className="flex flex-wrap justify-center items-center gap-2 mb-6 min-h-[100px] bg-amber-50 dark:bg-stone-700/50 p-3 rounded-lg">
+              {draggablePieces.map(piece => (
+                  <PuzzlePiece
+                  key={piece.id}
+                  piece={piece}
+                  onDragStart={handleDragStart}
+                  isSolved={solvedSlots.some(s => s?.id === piece.id)}
+                  />
+              ))}
+          </div>
         </>
       )}
 

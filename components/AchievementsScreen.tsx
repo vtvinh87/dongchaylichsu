@@ -1,5 +1,6 @@
 import React from 'react';
 import { ALL_ACHIEVEMENTS_MAP } from '../constants';
+import { Achievement } from '../types';
 
 interface AchievementsScreenProps {
   unlockedAchievementIds: string[];
@@ -10,7 +11,7 @@ const AchievementsScreen: React.FC<AchievementsScreenProps> = ({
   unlockedAchievementIds,
   onReturnToMuseum,
 }) => {
-  const allAchievements = Object.values(ALL_ACHIEVEMENTS_MAP);
+  const allAchievements = Object.values(ALL_ACHIEVEMENTS_MAP) as Achievement[];
 
   return (
     <div className="screen-container w-full max-w-4xl p-6 bg-amber-100 dark:bg-stone-800 rounded-lg shadow-xl flex flex-col">

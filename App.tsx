@@ -1,5 +1,6 @@
 
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+
+import React, { useState, useCallback, useEffect, useMemo, useLayoutEffect, useRef } from 'react';
 import LoginScreen from './components/LoginScreen';
 import MainInterface from './components/MainInterface';
 import MissionScreen from './components/MissionScreen';
@@ -40,12 +41,14 @@ import AdventurePuzzleScreen from './components/AdventurePuzzleScreen';
 import StrategicPathScreen from './components/StrategicPathScreen';
 import ConstructionPuzzleScreen from './components/ConstructionPuzzleScreen';
 import NavalBattleScreen from './components/NavalBattleScreen';
+import LaneBattleScreen from './components/LaneBattleScreen';
 import DialogueModal from './components/DialogueModal';
-import { Screen, Artifact, MissionInfo, HeroCard, MissionData, PuzzleMissionData, NarrativeMissionData, TimelineMissionData, ARMissionData, HiddenObjectMissionData, LeaderboardEntry, AiCharacter, Decoration, QuizMissionData, ConstructionMissionData, Tutorial, SavedGameState, AvatarCustomization, CustomizationItem, DiplomacyMissionData, Reward, MemoryFragment, TradingMissionData, ColoringMissionData, RhythmMissionData, SandboxState, Achievement, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData, DialogueEntry, ActiveSideQuestState, DialogueOption, NotebookUnlockEvent, ConstructionPuzzleMissionData, NavalBattleMissionData } from './types';
+import { GoogleGenAI } from "@google/genai";
+import { Screen, Artifact, MissionInfo, HeroCard, MissionData, PuzzleMissionData, NarrativeMissionData, TimelineMissionData, ARMissionData, HiddenObjectMissionData, LeaderboardEntry, AiCharacter, Decoration, QuizMissionData, ConstructionMissionData, Tutorial, SavedGameState, AvatarCustomization, CustomizationItem, DiplomacyMissionData, Reward, MemoryFragment, TradingMissionData, ColoringMissionData, RhythmMissionData, SandboxState, SandboxBackground, Achievement, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData, DialogueEntry, ActiveSideQuestState, DialogueOption, NotebookUnlockEvent, ConstructionPuzzleMissionData, NavalBattleMissionData, HichPuzzleData, LaneBattleMissionData, NotebookPage, QuizQuestion } from './types';
 import { 
   HOI_DATA, ALL_MISSIONS, APP_NAME, ALL_HERO_CARDS,
-  LEADERBOARD_LOCAL_STORAGE_KEY, POINTS_PER_ARTIFACT, MAX_LEADERBOARD_ENTRIES,
-  AI_CHARACTERS, ALL_DECORATIONS_MAP, TUTORIAL_DATA, ALL_CUSTOMIZATION_ITEMS_MAP, ALL_ARTIFACTS_MAP, ALL_FRAGMENTS_MAP, ALL_SANDBOX_BACKGROUNDS_MAP, ALL_ACHIEVEMENTS_MAP, ALL_QUEST_CHAINS, HOI_6_SCRIPT, SPEAKER_DATA, SIDE_QUESTS
+  LEADERBOARD_LOCAL_STORAGE_KEY,
+  AI_CHARACTERS, ALL_DECORATIONS_MAP, TUTORIAL_DATA, ALL_CUSTOMIZATION_ITEMS_MAP, ALL_ARTIFACTS_MAP, ALL_FRAGMENTS_MAP, ALL_SANDBOX_BACKGROUNDS_MAP, ALL_ACHIEVEMENTS_MAP, ALL_QUEST_CHAINS, NOTEBOOK_PAGES, SPEAKER_DATA, SIDE_QUESTS, MISSION_HICH_TUONG_SI_ID
 } from './constants';
 import { BACKGROUND_IMAGE_URL } from './imageUrls';
 import { initializeAudio, playSound, playMusic, stopMusic, toggleAudio, getIsSoundEnabled } from './utils/audio';
@@ -124,6 +127,13 @@ export const App: React.FC = () => {
   const [pendingReward, setPendingReward] = useState<Reward | undefined>(undefined);
   const [isDialogueOpen, setIsDialogueOpen] = useState(false);
   const [activeSideQuest, setActiveSideQuest] = useState<ActiveSideQuestState | null>(null);
+  
+  // Pre-fetching State
+  const [prefetchedHichPuzzle, setPrefetchedHichPuzzle] = useState<Promise<HichPuzzleData> | null>(null);
+
+
+  // Scroll Position Ref
+  const scrollPositionRef = useRef(0);
 
 
   const [theme, setTheme] = useState<Theme>(() => {
@@ -131,6 +141,21 @@ export const App: React.FC = () => {
     if (storedTheme) return storedTheme;
     return 'dark'; 
   });
+
+  const notebookPagesForModal = useMemo(() => {
+    const pages: NotebookPage[] = [];
+    Object.entries(NOTEBOOK_PAGES).forEach(([key, value]) => {
+        const index = parseInt(key, 10);
+        // Check if key is a number and value is a NotebookPage object
+        if (!isNaN(index) && value && typeof value === 'object' && !Array.isArray(value) && 'content' in value) {
+            pages[index] = value as NotebookPage;
+        }
+    });
+    return pages.filter(Boolean); // Filter out empty/undefined slots
+  }, []);
+
+  const scriptForModal = activeScriptKey ? NOTEBOOK_PAGES[activeScriptKey] : null;
+
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -201,7 +226,10 @@ export const App: React.FC = () => {
 
 
   const navigateTo = useCallback((screen: Screen, mission: MissionData | null = null) => {
-    const nonStandardNavScreens = [Screen.AR_MISSION_SCREEN, Screen.PREMIUM_SCREEN, Screen.SANDBOX, Screen.HIDDEN_OBJECT_SCREEN, Screen.QUIZ_MISSION_SCREEN, Screen.CONSTRUCTION_MISSION_SCREEN, Screen.DIPLOMACY_MISSION_SCREEN, Screen.CUSTOMIZATION, Screen.CRAFTING_SCREEN, Screen.TRADING_SCREEN, Screen.COLORING_MISSION_SCREEN, Screen.RHYTHM_MISSION_SCREEN, Screen.ACHIEVEMENTS, Screen.RALLY_CALL_MISSION_SCREEN, Screen.FORGING_MISSION_SCREEN, Screen.QUEST_CHAIN_SCREEN, Screen.TACTICAL_MAP_MISSION_SCREEN, Screen.DEFENSE_MISSION_SCREEN, Screen.STRATEGY_MAP_MISSION_SCREEN, Screen.COIN_MINTING_MISSION_SCREEN, Screen.CITY_PLANNING_MISSION_SCREEN, Screen.TYPESETTING_MISSION_SCREEN, Screen.ADVENTURE_PUZZLE_SCREEN, Screen.STRATEGIC_PATH_MISSION_SCREEN, Screen.CONSTRUCTION_PUZZLE_SCREEN, Screen.NAVAL_BATTLE_TIMING_SCREEN];
+    if (currentScreen === Screen.MAIN_INTERFACE) {
+      scrollPositionRef.current = window.scrollY;
+    }
+    const nonStandardNavScreens = [Screen.AR_MISSION_SCREEN, Screen.PREMIUM_SCREEN, Screen.SANDBOX, Screen.HIDDEN_OBJECT_SCREEN, Screen.QUIZ_MISSION_SCREEN, Screen.CONSTRUCTION_MISSION_SCREEN, Screen.DIPLOMACY_MISSION_SCREEN, Screen.CUSTOMIZATION, Screen.CRAFTING_SCREEN, Screen.TRADING_SCREEN, Screen.COLORING_MISSION_SCREEN, Screen.RHYTHM_MISSION_SCREEN, Screen.ACHIEVEMENTS, Screen.RALLY_CALL_MISSION_SCREEN, Screen.FORGING_MISSION_SCREEN, Screen.QUEST_CHAIN_SCREEN, Screen.TACTICAL_MAP_MISSION_SCREEN, Screen.DEFENSE_MISSION_SCREEN, Screen.STRATEGY_MAP_MISSION_SCREEN, Screen.COIN_MINTING_MISSION_SCREEN, Screen.CITY_PLANNING_MISSION_SCREEN, Screen.TYPESETTING_MISSION_SCREEN, Screen.ADVENTURE_PUZZLE_SCREEN, Screen.STRATEGIC_PATH_MISSION_SCREEN, Screen.CONSTRUCTION_PUZZLE_SCREEN, Screen.NAVAL_BATTLE_TIMING_SCREEN, Screen.LANE_BATTLE_MISSION_SCREEN];
     if (currentScreen !== screen || activeMission?.id !== mission?.id || nonStandardNavScreens.includes(screen)) {
       setTransitionClass('screen-fade-out');
       setTimeout(() => {
@@ -212,15 +240,22 @@ export const App: React.FC = () => {
     }
   }, [currentScreen, activeMission]);
 
+  // Restore scroll position when returning to main interface
+  useLayoutEffect(() => {
+    if (currentScreen === Screen.MAIN_INTERFACE) {
+        window.scrollTo({ top: scrollPositionRef.current, behavior: 'auto' });
+    }
+  }, [currentScreen]);
+
   const collectedArtifactIds = useMemo(() => new Set(collectedArtifacts.map(a => a.id)), [collectedArtifacts]);
   const collectedHeroCardIds = useMemo(() => new Set(collectedHeroCards.map(h => h.id)), [collectedHeroCards]);
   
   const checkAchievements = useCallback(() => {
     const newlyUnlocked: Achievement[] = [];
-    for (const achievement of Object.values(ALL_ACHIEVEMENTS_MAP)) {
+    for (const achievement of Object.values(ALL_ACHIEVEMENTS_MAP) as Achievement[]) {
       if (!unlockedAchievementIds.includes(achievement.id)) {
         const fullGameState = {
-            userName, gender, collectedArtifactIds: Array.from(collectedArtifactIds), collectedHeroCardIds: Array.from(collectedHeroCardIds),
+            userName, gender, collectedArtifactIds: collectedArtifacts.map(a => a.id), collectedHeroCardIds: collectedHeroCards.map(h => h.id),
             collectedDecorationIds: collectedDecorations.map(d => d.id), inventory, questProgress, isPremium,
             dailyChatCount, lastChatDate, tutorialsSeen, seenInstructions, avatarCustomization,
             unlockedCustomizationItemIds, unlockedCharacterIds, unlockedBackgroundIds, sandboxState,
@@ -236,7 +271,7 @@ export const App: React.FC = () => {
       // Show toast for the first new achievement
       setAchievementNotification(newlyUnlocked[0]);
     }
-  }, [unlockedAchievementIds, userName, gender, collectedArtifactIds, collectedHeroCardIds, collectedDecorations, inventory, questProgress, isPremium, dailyChatCount, lastChatDate, tutorialsSeen, seenInstructions, avatarCustomization, unlockedCustomizationItemIds, unlockedCharacterIds, unlockedBackgroundIds, sandboxState, unlockedNotebookPages, activeSideQuest]);
+  }, [unlockedAchievementIds, userName, gender, collectedArtifacts, collectedHeroCards, collectedDecorations, inventory, questProgress, isPremium, dailyChatCount, lastChatDate, tutorialsSeen, seenInstructions, avatarCustomization, unlockedCustomizationItemIds, unlockedCharacterIds, unlockedBackgroundIds, sandboxState, unlockedNotebookPages, activeSideQuest]);
   
   useEffect(() => {
     // Check achievements whenever relevant state changes
@@ -250,8 +285,8 @@ export const App: React.FC = () => {
       const savedState: SavedGameState = JSON.parse(savedStateJSON);
       setUserName(savedState.userName || '');
       setGender(savedState.gender || 'male');
-      setCollectedArtifacts(savedState.collectedArtifactIds.map(id => ALL_ARTIFACTS_MAP[id]).filter(Boolean));
-      setCollectedHeroCards(savedState.collectedHeroCardIds.map(id => ALL_HERO_CARDS[id]).filter(Boolean));
+      setCollectedArtifacts((savedState.collectedArtifactIds || []).map(id => ALL_ARTIFACTS_MAP[id]).filter(Boolean));
+      setCollectedHeroCards((savedState.collectedHeroCardIds || []).map(id => ALL_HERO_CARDS[id]).filter(Boolean));
       setCollectedDecorations((savedState.collectedDecorationIds || []).map(id => ALL_DECORATIONS_MAP[id]).filter(Boolean));
       setInventory(savedState.inventory || {});
       setQuestProgress(savedState.questProgress || {});
@@ -307,7 +342,6 @@ export const App: React.FC = () => {
 
   const handleGrantBonusSupplies = (amount: number) => {
     setInventory(prev => ({
-        ...prev,
         'vat-tu': (prev['vat-tu'] || 0) + amount
     }));
     alert(`Thử thách hoàn thành! Bạn nhận được thêm ${amount} Vật tư!`);
@@ -357,17 +391,17 @@ export const App: React.FC = () => {
 
     const completedHoi = HOI_DATA.find(hoi => hoi.missions.some(m => m.missionId === activeMission?.id));
     if (completedHoi) {
-        const newlyUnlockedChars = Object.values(AI_CHARACTERS).filter(c => c.unlockHoiId === completedHoi.id && !unlockedCharacterIds.includes(c.id));
+        const newlyUnlockedChars = (Object.values(AI_CHARACTERS) as AiCharacter[]).filter(c => c.unlockHoiId === completedHoi.id && !unlockedCharacterIds.includes(c.id));
         if (newlyUnlockedChars.length > 0) {
             setUnlockedCharacterIds(prev => [...prev, ...newlyUnlockedChars.map(c => c.id)]);
             newCharacterUnlocked = true;
         }
-        const newlyUnlockedBgs = Object.values(ALL_SANDBOX_BACKGROUNDS_MAP).filter(bg => bg.unlockCondition?.type === 'complete_hoi' && bg.unlockCondition.hoi_id === completedHoi.id && !unlockedBackgroundIds.includes(bg.id));
+        const newlyUnlockedBgs = (Object.values(ALL_SANDBOX_BACKGROUNDS_MAP) as SandboxBackground[]).filter(bg => bg.unlockCondition?.type === 'complete_hoi' && bg.unlockCondition.hoi_id === completedHoi.id && !unlockedBackgroundIds.includes(bg.id));
         if (newlyUnlockedBgs.length > 0) {
             setUnlockedBackgroundIds(prev => [...prev, ...newlyUnlockedBgs.map(bg => bg.id)]);
             newBackgroundUnlocked = true;
         }
-        const newlyUnlockedItems = Object.values(ALL_CUSTOMIZATION_ITEMS_MAP).filter(item => item.unlockCondition?.type === 'complete_hoi' && item.unlockCondition.hoi_id === completedHoi.id && !unlockedCustomizationItemIds.includes(item.id));
+        const newlyUnlockedItems = (Object.values(ALL_CUSTOMIZATION_ITEMS_MAP) as CustomizationItem[]).filter(item => item.unlockCondition?.type === 'complete_hoi' && item.unlockCondition.hoi_id === completedHoi.id && !unlockedCustomizationItemIds.includes(item.id));
         if (newlyUnlockedItems.length > 0) {
             setUnlockedCustomizationItemIds(prev => [...prev, ...newlyUnlockedItems.map(i => i.id)]);
         }
@@ -392,6 +426,42 @@ export const App: React.FC = () => {
     }
   }, [collectedArtifacts, collectedHeroCards, collectedDecorations, unlockedCharacterIds, unlockedBackgroundIds, unlockedCustomizationItemIds, activeMission, activeQuestChainId, questProgress, navigateTo]);
   
+  
+  const prefetchHichPuzzle = async (): Promise<HichPuzzleData> => {
+    const missionData = ALL_MISSIONS[MISSION_HICH_TUONG_SI_ID] as RallyCallMissionData;
+    if (!('fullText' in missionData)) throw new Error("Dữ liệu nhiệm vụ không phải là trò chơi điền từ");
+
+    const ai = new GoogleGenAI({apiKey: process.env.API_KEY as string});
+    const puzzlePrompt = `Phân tích đoạn văn sau: "${missionData.fullText}".
+Nhiệm vụ: Tạo một câu đố điền từ cho trò chơi lịch sử.
+Yêu cầu:
+- Chọn 10 từ hoặc cụm từ có ý nghĩa (danh từ, động từ, tính từ).
+- Thay thế chúng bằng "_BLANK_" trong văn bản gốc.
+- Cung cấp định nghĩa ngắn gọn, dễ hiểu cho mỗi từ/cụm từ đã chọn.
+- Trả về một đối tượng JSON duy nhất, không có markdown hay giải thích.
+Format JSON: { "modifiedText": string, "answers": string[], "definitions": Record<string, string> }`;
+
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash-preview-04-17",
+        contents: puzzlePrompt,
+        config: { responseMimeType: "application/json" },
+    });
+
+    let jsonStr = response.text.trim();
+    const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
+    const match = jsonStr.match(fenceRegex);
+    if (match && match[2]) {
+      jsonStr = match[2].trim();
+    }
+    
+    const data = JSON.parse(jsonStr);
+    if (!data.modifiedText || !Array.isArray(data.answers) || typeof data.definitions !== 'object') {
+        throw new Error("Dữ liệu nhận về từ AI không hợp lệ.");
+    }
+
+    return data as HichPuzzleData;
+  };
+
   const actuallyStartMission = (missionInfo: MissionInfo) => {
     if (missionInfo.isPremium && !isPremium) {
       navigateTo(Screen.PREMIUM_SCREEN);
@@ -429,6 +499,7 @@ export const App: React.FC = () => {
           'strategicPath': Screen.STRATEGIC_PATH_MISSION_SCREEN,
           'constructionPuzzle': Screen.CONSTRUCTION_PUZZLE_SCREEN,
           'navalBattle': Screen.NAVAL_BATTLE_TIMING_SCREEN,
+          'laneBattle': Screen.LANE_BATTLE_MISSION_SCREEN,
         };
         const targetScreen = screenMap[missionData.type] || Screen.MAIN_INTERFACE;
         navigateTo(targetScreen, missionData);
@@ -450,9 +521,17 @@ export const App: React.FC = () => {
     playSound('sfx_click');
     setPendingMissionInfo(missionInfo);
     
+    // Reset all prefetch states first
+    setPrefetchedHichPuzzle(null);
+
+    // Prefetching logic for Hich Tuong Si mission
+    if (missionInfo.missionId === MISSION_HICH_TUONG_SI_ID) {
+        setPrefetchedHichPuzzle(prefetchHichPuzzle());
+    }
+    
     // Logic for pre-mission dialogue
     const scriptKey = `before_mission_${missionInfo.missionId}`;
-    if (HOI_6_SCRIPT[scriptKey]) {
+    if (NOTEBOOK_PAGES[scriptKey]) { // Re-using NOTEBOOK_PAGES as script container
         setActiveScriptKey(scriptKey);
         setIsDialogueOpen(true);
         return; // Wait for dialogue to finish
@@ -497,6 +576,10 @@ export const App: React.FC = () => {
   
   const handleAvatarChange = (item: CustomizationItem) => {
     playSound('sfx_click');
+    if (item.id === 'no_hat' && item.type === 'hat') {
+        setAvatarCustomization(prev => ({ ...prev, hat: null }));
+        return;
+    }
     setAvatarCustomization(prev => ({
       ...prev,
       [item.type]: item.id,
@@ -694,7 +777,11 @@ export const App: React.FC = () => {
         break;
       case Screen.QUIZ_MISSION_SCREEN:
         if(activeMission && activeMission.type === 'quiz') {
-            return <QuizScreen missionData={activeMission as QuizMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+            return <QuizScreen 
+                      missionData={activeMission as QuizMissionData} 
+                      onReturnToMuseum={handleReturnToMuseum} 
+                      onComplete={completeMissionLogic}
+                    />;
         }
         break;
       case Screen.CONSTRUCTION_MISSION_SCREEN:
@@ -710,7 +797,7 @@ export const App: React.FC = () => {
       case Screen.CUSTOMIZATION:
         return <CustomizationScreen onReturnToMuseum={handleReturnToMuseum} currentAvatar={avatarCustomization} unlockedItemIds={unlockedCustomizationItemIds} onAvatarChange={handleAvatarChange} gender={gender} />;
       case Screen.CRAFTING_SCREEN:
-        return <CraftingScreen onReturnToMuseum={handleReturnToMuseum} inventory={inventory} collectedArtifactIds={collectedArtifactIds} onCraftItem={handleCraftItem} />;
+        return <CraftingScreen onReturnToMuseum={handleReturnToMuseum} inventory={inventory} collectedArtifactIds={collectedArtifacts.map(a => a.id)} onCraftItem={handleCraftItem} />;
       case Screen.TRADING_SCREEN:
         if(activeMission && activeMission.type === 'trading') {
             return <TradingScreen missionData={activeMission as TradingMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
@@ -736,6 +823,7 @@ export const App: React.FC = () => {
                 onComplete={completeMissionLogic}
                 inventory={inventory}
                 setInventory={setInventory}
+                prefetchedPuzzlePromise={prefetchedHichPuzzle}
             />;
         }
         break;
@@ -819,6 +907,11 @@ export const App: React.FC = () => {
             return <NavalBattleScreen missionData={activeMission as NavalBattleMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
         }
         break;
+      case Screen.LANE_BATTLE_MISSION_SCREEN:
+        if (activeMission && activeMission.type === 'laneBattle') {
+            return <LaneBattleScreen missionData={activeMission as LaneBattleMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} />;
+        }
+        break;
       default:
         // Fallback to main interface if no screen matches
         return <MainInterface
@@ -846,9 +939,32 @@ export const App: React.FC = () => {
               onToggleSound={handleToggleSound}
             />;
     }
-    // Default break handler
-    navigateTo(Screen.MAIN_INTERFACE);
-    return null;
+    // Default break handler for cases that fall through due to invalid state
+    console.error(`Invalid state in renderScreen for screen ${currentScreen}. Returning to MainInterface.`);
+    return <MainInterface
+        userName={userName}
+        gender={gender}
+        avatarCustomization={avatarCustomization}
+        hois={HOI_DATA}
+        collectedArtifacts={collectedArtifacts}
+        collectedHeroCards={collectedHeroCards}
+        collectedDecorations={collectedDecorations}
+        inventory={inventory}
+        onStartMission={handleStartMission}
+        onShowLeaderboard={() => navigateTo(Screen.LEADERBOARD)}
+        onToggleChatbot={() => setShowChatbot(!showChatbot)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        isPremium={isPremium}
+        onShowPremium={() => navigateTo(Screen.PREMIUM_SCREEN)}
+        onShowItemDetails={(item) => setItemForDetailModal(item)}
+        onShowSandbox={() => navigateTo(Screen.SANDBOX)}
+        onShowCustomization={() => navigateTo(Screen.CUSTOMIZATION)}
+        onShowCrafting={() => navigateTo(Screen.CRAFTING_SCREEN)}
+        onShowAchievements={() => navigateTo(Screen.ACHIEVEMENTS)}
+        isSoundEnabled={isSoundEnabled}
+        onToggleSound={handleToggleSound}
+    />;
   };
 
   return (
@@ -894,10 +1010,10 @@ export const App: React.FC = () => {
           }}
         />
       )}
-      {isDialogueOpen && activeScriptKey && HOI_6_SCRIPT[activeScriptKey] && (
+      {isDialogueOpen && scriptForModal && Array.isArray(scriptForModal) && (
         <DialogueModal
           isOpen={isDialogueOpen}
-          script={HOI_6_SCRIPT[activeScriptKey]}
+          script={scriptForModal}
           speakers={SPEAKER_DATA}
           playerAvatar={avatarCustomization}
           gender={gender}

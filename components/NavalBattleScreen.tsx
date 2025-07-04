@@ -14,6 +14,12 @@ const NavalBattleScreen: React.FC<{
 
   const animationFrameRef = useRef<number | null>(null);
   const battleAreaRef = useRef<HTMLDivElement>(null);
+  const lastFrameTimeRef = useRef(performance.now());
+  const gameStateRef = useRef(gameState);
+
+  useEffect(() => {
+      gameStateRef.current = gameState;
+  }, [gameState]);
 
   useEffect(() => {
     if (gameState !== 'playing') {
@@ -36,12 +42,23 @@ const NavalBattleScreen: React.FC<{
   }, [gameState, isTideFalling, missionData.tideDuration]);
 
 
-  const gameLoop = useCallback(() => {
+  const gameLoop = useCallback((currentTime: number) => {
+    if (gameStateRef.current !== 'playing') return;
+
+    const deltaTime = (currentTime - lastFrameTimeRef.current) / 1000;
+    lastFrameTimeRef.current = currentTime;
+
     const battleAreaWidth = battleAreaRef.current?.offsetWidth || 0;
-    const pixelsPerFrame = (missionData.shipSpeed / 60);
+    if (battleAreaWidth === 0) {
+        animationFrameRef.current = requestAnimationFrame(gameLoop);
+        return;
+    }
+    
+    const pixelsPerSecond = missionData.shipSpeed;
+    const pixelsToMove = pixelsPerSecond * deltaTime;
 
     setShipPosition(prev => {
-      const newPos = prev + (pixelsPerFrame / battleAreaWidth * 100);
+      const newPos = prev + (pixelsToMove / battleAreaWidth * 100);
       if (newPos > 110) { // Ship has passed
         setGameState('loss');
         return 110;
@@ -55,11 +72,13 @@ const NavalBattleScreen: React.FC<{
   const startGame = () => {
     playSound('sfx_click');
     setGameState('playing');
-    animationFrameRef.current = requestAnimationFrame(gameLoop);
   };
   
   useEffect(() => {
-    if (gameState === 'win' || gameState === 'loss') {
+    if (gameState === 'playing') {
+        lastFrameTimeRef.current = performance.now();
+        animationFrameRef.current = requestAnimationFrame(gameLoop);
+    } else if (gameState === 'win' || gameState === 'loss') {
         if (animationFrameRef.current) {
             cancelAnimationFrame(animationFrameRef.current);
         }
@@ -69,7 +88,7 @@ const NavalBattleScreen: React.FC<{
             cancelAnimationFrame(animationFrameRef.current);
         }
     };
-  }, [gameState]);
+  }, [gameState, gameLoop]);
 
 
   const handleAttack = () => {

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
 import html2canvas from 'html2canvas';
-import { Artifact, Decoration, SandboxState, PlacedItem, SandboxItem, SpeechBubble } from '../types';
+import { Artifact, Decoration, SandboxState, PlacedItem, SandboxItem, SpeechBubble, SandboxBackground } from '../types';
 import { playSound } from '../utils/audio';
 import { TRANSPARENT_GIF_URL } from '../imageUrls';
 import { ALL_SANDBOX_BACKGROUNDS_MAP } from '../constants';
@@ -233,7 +233,7 @@ const SandboxScreen: React.FC<SandboxScreenProps> = ({
         <div id="background-palette" className="bg-white dark:bg-stone-700 p-3 rounded-lg shadow-inner flex-1">
             <h3 className="text-lg font-semibold text-amber-700 dark:text-amber-400 mb-3 text-center border-b pb-2 border-amber-200 dark:border-stone-600">Bối Cảnh</h3>
             <div className="overflow-y-auto space-y-3 pr-2 sm:max-h-48">
-              {Object.values(ALL_SANDBOX_BACKGROUNDS_MAP).map(bg => {
+              {(Object.values(ALL_SANDBOX_BACKGROUNDS_MAP) as SandboxBackground[]).map(bg => {
                   const isLocked = !unlockedBackgroundIds.includes(bg.id);
                   const isSelected = sandboxState.activeBackgroundId === bg.id;
                   return (

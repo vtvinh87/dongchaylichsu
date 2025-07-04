@@ -1,6 +1,8 @@
 
 
-import React, { useMemo } from 'react';
+
+
+import React, { useMemo, useCallback } from 'react';
 import { Hoi, MissionInfo, Artifact, HeroCard, Decoration, AvatarCustomization, Reward } from '../types';
 import MissionCard from './SagaCard';
 import ArtifactCard from './ArtifactCard';
@@ -62,6 +64,29 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
     // Memoize sets of collected IDs for efficient O(1) lookups.
     const collectedArtifactIds = useMemo(() => new Set(collectedArtifacts.map(a => a.id)), [collectedArtifacts]);
     const collectedHeroCardIds = useMemo(() => new Set(collectedHeroCards.map(h => h.id)), [collectedHeroCards]);
+
+    const isMissionCompleted = useCallback((missionId: string): boolean => {
+        const missionData = ALL_MISSIONS[missionId];
+        // If a mission doesn't exist or has no reward, we don't block based on it.
+        // This is important for steps in a quest chain that grant no intermediate reward.
+        if (!missionData || !missionData.reward) {
+            return true;
+        }
+
+        const reward = missionData.reward;
+        switch(reward.type) {
+            case 'artifact':
+                return collectedArtifactIds.has(reward.id);
+            case 'heroCard':
+                return collectedHeroCardIds.has(reward.id);
+            case 'fragment':
+                return (inventory[reward.id] || 0) > 0;
+            // Decorations and other types don't block progression
+            case 'decoration':
+            default:
+                return true;
+        }
+    }, [collectedArtifactIds, collectedHeroCardIds, inventory]);
 
     const hoiUnlockStatus = useMemo(() => {
         if (isPremium) {
@@ -180,148 +205,135 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
               className="bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center"
               aria-label="Mở Xưởng Chế tác"
             >
-              <span role="img" aria-label="hammer icon" className="mr-2 text-xl">🔨</span>
+              <span role="img" aria-label="hammer and pick icon" className="mr-2">🛠️</span>
               Chế tác
             </button>
-            <button
-              id="main-chatbot-button"
-              onClick={onToggleChatbot}
-              className="bg-sky-500 hover:bg-sky-600 dark:bg-sky-600 dark:hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center"
-              aria-label="Mở chatbot Hỏi Đáp Lịch Sử"
+             <button
+              onClick={onShowCustomization}
+              className="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center"
+              aria-label="Mở màn hình Tùy chỉnh Nhân vật"
             >
-              <span role="img" aria-label="chat icon" className="mr-2 text-xl">💬</span>
-              Hỏi Đáp
-            </button>
-            <button
-              onClick={onShowSandbox}
-              className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center"
-              aria-label="Mở Chế độ Sáng tạo Sandbox"
-            >
-              <span role="img" aria-label="palette icon" className="mr-2 text-xl">🎨</span>
-              Sáng tạo
+                <span role="img" aria-label="artist palette icon" className="mr-2">🎨</span>
+                Tùy chỉnh
             </button>
             <button
               id="main-leaderboard-button"
               onClick={onShowLeaderboard}
-              className="bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center"
+              className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center"
+              aria-label="Mở Bảng Xếp Hạng"
             >
-              <span role="img" aria-label="trophy icon" className="mr-2 text-xl">🏆</span>
+              <span role="img" aria-label="trophy icon" className="mr-2">🏆</span>
               Xếp Hạng
             </button>
-            <button
-              onClick={onShowAchievements}
-              className="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center"
-            >
-              <span role="img" aria-label="medal icon" className="mr-2 text-xl">🎖️</span>
-              Thành tựu
-            </button>
              <button
-              onClick={onShowCustomization}
-              className="bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center"
-              aria-label="Mở màn hình Tùy chỉnh Nhân vật"
+              id="main-chatbot-button"
+              onClick={onToggleChatbot}
+              className="bg-teal-500 hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center"
+              aria-label="Mở chatbot Hỏi Đáp Lịch Sử"
             >
-              <span role="img" aria-label="shirt icon" className="mr-2 text-xl">👕</span>
-              Tùy chỉnh
+              <span role="img" aria-label="speech bubble icon" className="mr-2">💬</span>
+              Hỏi Đáp
+            </button>
+            <button
+                onClick={onShowSandbox}
+                className="bg-indigo-500 hover:bg-indigo-600 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center"
+                aria-label="Mở chế độ Sáng tạo"
+            >
+                <span role="img" aria-label="sparkles icon" className="mr-2">✨</span>
+                Sáng tạo
+            </button>
+            <button
+                onClick={onShowAchievements}
+                className="bg-rose-500 hover:bg-rose-600 dark:bg-rose-600 dark:hover:bg-rose-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center"
+                aria-label="Mở Bảng Thành Tựu"
+            >
+                 <span role="img" aria-label="medal icon" className="mr-2">🎖️</span>
+                Thành tựu
             </button>
         </div>
       </header>
-      
-      <section id="main-journey-section">
-        <h2 className="text-2xl font-semibold text-amber-700 dark:text-amber-400 mb-4">Hành Trình Xuyên Thời Gian</h2>
-        <div className="space-y-8">
-          {hois.map((hoi, index) => {
-            const isHoiUnlocked = hoiUnlockStatus[index];
-            const isPremiumLocked = hoi.isPremiumChapter && !isPremium;
 
-            return (
-              <div key={hoi.id} className={`hoi-container ${(!isHoiUnlocked || isPremiumLocked) ? 'locked' : ''}`}>
-                <h3 className="text-2xl font-bold text-amber-800 dark:text-amber-300 mb-2">{hoi.title}</h3>
-                <p className="text-stone-600 dark:text-stone-400 mb-6">{hoi.description}</p>
-                <div className="mission-list">
-                  {hoi.missions.map((mission) => {
-                    let isDependencyLocked = false;
-                    if (isHoiUnlocked && mission.dependsOnMissionId && !isPremium) {
-                        const dependencyMission = ALL_MISSIONS[mission.dependsOnMissionId];
-                        if (dependencyMission && dependencyMission.reward) {
-                           let isDepRewardCollected = false;
-                           if(dependencyMission.reward.type === 'artifact') {
-                             isDepRewardCollected = collectedArtifactIds.has(dependencyMission.reward.id);
-                           } else if (dependencyMission.reward.type === 'heroCard') {
-                             isDepRewardCollected = collectedHeroCardIds.has(dependencyMission.reward.id);
-                           } else if (dependencyMission.reward.type === 'fragment') {
-                             isDepRewardCollected = (inventory[dependencyMission.reward.id] || 0) > 0;
-                           }
-                           if(!isDepRewardCollected) isDependencyLocked = true;
-                        }
+      {/* Main Content: Chapters (Hồi) */}
+      <main id="main-journey-section" className="space-y-12">
+        {hois.map((hoi, index) => {
+          const isChapterUnlocked = hoiUnlockStatus[index];
+          return (
+            <section key={hoi.id} className={`p-6 rounded-lg shadow-lg ${isChapterUnlocked ? 'bg-amber-50/50 dark:bg-stone-700/50' : 'bg-gray-200/50 dark:bg-stone-800/50 grayscale'}`}>
+              <h2 className="text-2xl font-bold text-amber-700 dark:text-amber-300 mb-2 border-b-2 border-amber-200 dark:border-stone-600 pb-2">{hoi.title}</h2>
+              <p className="text-stone-600 dark:text-stone-400 mb-6">{hoi.description}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {hoi.missions.map(mission => {
+                    if (isPremium) {
+                        return (
+                            <MissionCard 
+                              key={mission.id} 
+                              mission={mission} 
+                              onClick={() => onStartMission(mission)} 
+                              isLocked={false}
+                            />
+                          );
                     }
-                    const isLockedByProgression = !isPremium && (!isHoiUnlocked || isDependencyLocked);
-                    const isLockedByPremium = mission.isPremium && !isPremium;
 
+                    const isDependencyLocked = mission.dependsOnMissionId 
+                      ? !isMissionCompleted(mission.dependsOnMissionId)
+                      : false;
+                    const finalIsLocked = !isChapterUnlocked || isDependencyLocked || (mission.isPremium && !isPremium);
                     return (
                         <MissionCard 
-                            key={mission.id} 
-                            mission={mission} 
-                            onClick={() => onStartMission(mission)}
-                            isLocked={isLockedByProgression || isLockedByPremium}
+                          key={mission.id} 
+                          mission={mission} 
+                          onClick={() => onStartMission(mission)} 
+                          isLocked={finalIsLocked}
                         />
                     );
-                  })}
+                })}
+              </div>
+            </section>
+          )
+        })}
+      </main>
+
+      {/* Collection Section */}
+      <footer id="main-collection-section" className="mt-8 pt-6 border-t-2 border-amber-300 dark:border-stone-700">
+        <h2 className="text-2xl font-bold text-amber-800 dark:text-amber-300 mb-4 text-center">Bộ Sưu Tập Của Bạn</h2>
+        
+        {/* Artifacts */}
+        <div className="mb-6">
+            <h3 className="text-xl font-semibold text-amber-700 dark:text-amber-400 mb-3">Cổ vật</h3>
+            <div className="flex flex-wrap gap-4 p-4 bg-white/30 dark:bg-stone-900/30 rounded-lg justify-center">
+            {collectedArtifacts.length > 0 ? collectedArtifacts.map(artifact => (
+                <div key={artifact.id} onClick={() => onShowItemDetails(artifact)} className="cursor-pointer">
+                    <ArtifactCard artifact={artifact} />
                 </div>
-              </div>
-            );
-          })}
+            )) : <p className="text-stone-500 dark:text-stone-400 italic">Chưa có cổ vật nào.</p>}
+            </div>
         </div>
-      </section>
 
-      {isPremium && (
-          <section>
-            <h2 className="text-2xl font-semibold text-yellow-500 dark:text-yellow-400 mb-4 flex items-center">
-                <span role="img" aria-label="star" className="mr-2">⭐</span> Vật Phẩm Trang Trí Premium
-            </h2>
-            {collectedDecorations.length > 0 ? (
-              <div id="premium-decorations-grid" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {collectedDecorations.map((decoration) => (
-                  <div key={decoration.id} onClick={() => onShowItemDetails(decoration)} className="cursor-pointer" title={`Xem chi tiết ${decoration.name}`}>
+        {/* Hero Cards */}
+        <div className="mb-6">
+            <h3 className="text-xl font-semibold text-amber-700 dark:text-amber-400 mb-3">Nhân vật Lịch sử</h3>
+            <div className="flex flex-wrap gap-4 p-4 bg-white/30 dark:bg-stone-900/30 rounded-lg justify-center">
+            {collectedHeroCards.length > 0 ? collectedHeroCards.map(heroCard => (
+                <div key={heroCard.id} onClick={() => onShowItemDetails(heroCard)} className="cursor-pointer">
+                    <HeroCardDisplay heroCard={heroCard} />
+                </div>
+            )) : <p className="text-stone-500 dark:text-stone-400 italic">Chưa chiêu mộ được nhân vật nào.</p>}
+            </div>
+        </div>
+        
+        {/* Decorations */}
+        <div>
+            <h3 className="text-xl font-semibold text-amber-700 dark:text-amber-400 mb-3">Vật phẩm Trang trí</h3>
+            <div className="flex flex-wrap gap-4 p-4 bg-white/30 dark:bg-stone-900/30 rounded-lg justify-center">
+            {collectedDecorations.length > 0 ? collectedDecorations.map(decoration => (
+                <div key={decoration.id} onClick={() => onShowItemDetails(decoration)} className="cursor-pointer">
                     <DecorationCard decoration={decoration} />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-stone-600 dark:text-stone-400 italic bg-white/30 dark:bg-stone-700/30 p-4 rounded-md">Hoàn thành nhiệm vụ Premium để nhận vật phẩm trang trí độc quyền!</p>
-            )}
-          </section>
-      )}
+                </div>
+            )) : <p className="text-stone-500 dark:text-stone-400 italic">Chưa có vật phẩm trang trí nào.</p>}
+            </div>
+        </div>
 
-      <section id="main-collection-section">
-        <h2 className="text-2xl font-semibold text-amber-700 dark:text-amber-400 mb-4">Cổ Vật Đã Thu Thập</h2>
-        {collectedArtifacts.length > 0 ? (
-          <div id="collection-grid" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {collectedArtifacts.map((artifact) => (
-              <div key={artifact.id} onClick={() => onShowItemDetails(artifact)} className="cursor-pointer" title={`Xem chi tiết ${artifact.name}`}>
-                  <ArtifactCard artifact={artifact} />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-stone-600 dark:text-stone-400 italic bg-white/30 dark:bg-stone-700/30 p-4 rounded-md">Hãy hoàn thành nhiệm vụ để thu thập cổ vật nhé!</p>
-        )}
-      </section>
-
-      
-      <section>
-        <h2 className="text-2xl font-semibold text-amber-700 dark:text-amber-400 mb-4">Thẻ Anh Hùng</h2>
-        {collectedHeroCards.length > 0 ? (
-          <div id="hero-card-grid" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {collectedHeroCards.map((heroCard) => (
-              <div key={heroCard.id} onClick={() => onShowItemDetails(heroCard)} className="cursor-pointer" title={`Xem chi tiết ${heroCard.name}`}>
-                <HeroCardDisplay heroCard={heroCard} />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-stone-600 dark:text-stone-400 italic bg-white/30 dark:bg-stone-700/30 p-4 rounded-md">Hoàn thành các Hồi đặc biệt để nhận thẻ Anh Hùng!</p>
-        )}
-      </section>
+      </footer>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { TimelineMissionData, TimelineEventItem, Reward } from '../types';
 import { ALL_ARTIFACTS_MAP, ALL_FRAGMENTS_MAP } from '../constants';
@@ -154,7 +155,7 @@ const TimelineMissionScreen: React.FC<TimelineMissionScreenProps> = ({
         </div>
       ) : (
         <>
-          <div id="timeline-slots" className="flex justify-center items-stretch gap-2 mb-8 p-3 bg-white/50 dark:bg-stone-700/50 rounded-lg w-full overflow-x-auto min-h-[150px]">
+          <div id="timeline-slots" className="flex flex-wrap justify-center items-stretch gap-4 mb-8 p-3 bg-white/50 dark:bg-stone-700/50 rounded-lg w-full">
             {timelineSlots.map((item, index) => (
               <TimelineSlot
                 key={`slot-${index}`}
@@ -162,7 +163,6 @@ const TimelineMissionScreen: React.FC<TimelineMissionScreenProps> = ({
                 placedEvent={item}
                 onDrop={handleDropOnSlot}
                 onDragOver={handleDragOver}
-                totalSlots={missionData.events.length}
               />
             ))}
           </div>

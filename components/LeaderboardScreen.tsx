@@ -27,12 +27,19 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ currentUserName, 
         entries = [];
       }
     }
-    setLeaderboardEntries(entries.sort((a,b) => b.score - a.score).slice(0, MAX_LEADERBOARD_ENTRIES));
+    setLeaderboardEntries(entries.sort((a, b) => b.score - a.score).slice(0, MAX_LEADERBOARD_ENTRIES));
   }, []);
 
   const handleReturnClick = () => {
     playSound('sfx_click');
     onReturnToMuseum();
+  };
+
+  const getTrophy = (index: number) => {
+    if (index === 0) return '🏆';
+    if (index === 1) return '🥈';
+    if (index === 2) return '🥉';
+    return `#${index + 1}`;
   };
 
   return (
@@ -58,28 +65,17 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ currentUserName, 
               className={`flex justify-between items-center p-3 md:p-4 rounded-lg shadow-sm transition-all duration-200
                           ${entry.userName === currentUserName 
                             ? 'bg-yellow-300 dark:bg-yellow-700 border-2 border-yellow-500 dark:border-yellow-400 scale-105' 
-                            : 'bg-white dark:bg-stone-700 border border-amber-200 dark:border-stone-600 hover:bg-amber-50 dark:hover:bg-stone-600'}`}
+                            : 'bg-white dark:bg-stone-700 border border-amber-200 dark:border-stone-600'}`}
             >
-              <div className="flex items-center">
-                <span 
-                  className={`text-lg md:text-xl font-bold mr-3 md:mr-4 w-8 text-center rounded-full
-                              ${index < 3 ? 'bg-yellow-400 dark:bg-yellow-500 text-white dark:text-stone-900' : 'bg-amber-200 dark:bg-stone-600 text-amber-700 dark:text-amber-300'}`}
-                >
-                  {index + 1}
-                </span>
-                <span className={`text-md md:text-lg font-medium ${entry.userName === currentUserName ? 'text-yellow-800 dark:text-yellow-100' : 'text-amber-700 dark:text-amber-300'}`}>
-                  {entry.userName}
-                </span>
-              </div>
-              <span className={`text-md md:text-lg font-bold ${entry.userName === currentUserName ? 'text-yellow-900 dark:text-yellow-50' : 'text-green-600 dark:text-green-400'}`}>
-                {entry.score} điểm
-              </span>
+              <span className={`font-bold text-lg text-amber-600 dark:text-amber-400 w-12 text-center ${index < 3 ? 'text-2xl' : ''}`}>{getTrophy(index)}</span>
+              <span className="flex-grow text-lg font-semibold text-stone-800 dark:text-stone-100">{entry.userName}</span>
+              <span className="font-bold text-xl text-green-600 dark:text-green-400">{entry.score.toLocaleString()} điểm</span>
             </li>
           ))}
         </ol>
       ) : (
-        <p className="text-stone-600 dark:text-stone-400 italic text-lg mt-6 bg-white/50 dark:bg-stone-700/50 p-6 rounded-md text-center">
-          Chưa có ai trên bảng xếp hạng. Hãy là người đầu tiên ghi danh!
+        <p className="text-stone-600 dark:text-stone-400 italic text-lg bg-white/30 dark:bg-stone-700/30 p-6 rounded-md">
+          Chưa có ai trên bảng xếp hạng. Hãy là người đầu tiên!
         </p>
       )}
     </div>

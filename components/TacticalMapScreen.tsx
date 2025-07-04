@@ -52,7 +52,7 @@ const TacticalMapScreen: React.FC<TacticalMapScreenProps> = ({
   };
 
   return (
-    <div className="screen-container w-full max-w-4xl p-6 bg-stone-800 rounded-lg shadow-xl text-center flex flex-col">
+    <div className="screen-container w-full max-w-4xl p-6 bg-stone-800 rounded-lg shadow-xl text-center flex flex-col flex-grow">
       <button
         onClick={onReturnToMuseum}
         className="absolute top-4 left-4 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-stone-900 font-semibold py-2 px-4 rounded-lg shadow-md transition-colors duration-300 z-30"
