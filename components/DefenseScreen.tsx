@@ -23,6 +23,7 @@ const DefenseScreen: React.FC<{
     const [turnsLeft, setTurnsLeft] = useState(missionData.turnLimit);
     const [units, setUnits] = useState<GameUnit[]>([]);
     const [draggedUnitId, setDraggedUnitId] = useState<string | null>(null);
+    const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null); // For tap-to-select
     const [isGameOver, setIsGameOver] = useState(false);
     const [outcome, setOutcome] = useState<'win' | 'loss' | null>(null);
     const [enemyProgress, setEnemyProgress] = useState(0);
@@ -94,8 +95,42 @@ const DefenseScreen: React.FC<{
     }, []);
 
     const addLog = useCallback((message: string, type: EventLogEntry['type']) => {
-        setEventLog(prev => [{id: Date.now(), message, type}, ...prev].slice(0, 10));
+        setEventLog(prev => [{id: Date.now() + Math.random(), message, type}, ...prev].slice(0, 10));
     }, []);
+    
+    // Extracted movement logic to be reusable for both drag-and-drop and tap-to-place
+    const executeMove = useCallback((unitId: string, targetCellIndex: number) => {
+        const unit = units.find(u => u.id === unitId);
+        if (!unit || unit.status === 'evacuated') return;
+    
+        const distance = findShortestPath(unit.gridIndex, targetCellIndex, missionData.mapLayout);
+    
+        if (distance === Infinity) {
+            playSound('sfx_fail');
+            addLog('Không tìm thấy đường đến khu vực an toàn này!', 'system');
+        } else {
+            const rainCost = isRaining ? 1 : 0;
+            const totalCost = unit.evacuationCost + distance + rainCost;
+    
+            if (turnsLeft >= totalCost) {
+                playSound('sfx_success');
+                setTurnsLeft(prev => prev - totalCost);
+                setEnemyProgress(prev => Math.min(prev + 1, missionData.enemyProgressBarSegments));
+                setUnits(prev => prev.map(u => u.id === unitId ? { ...u, status: 'evacuated' } : u));
+                addLog(`Di tản ${unit.type} tốn ${totalCost} lượt (gốc ${unit.evacuationCost} + ${distance} ô + ${rainCost} mưa).`, 'evac');
+                addLog(`Quân địch đang đến gần hơn!`, 'enemy');
+            } else {
+                playSound('sfx_fail');
+                addLog(`Không đủ lượt đi! Cần ${totalCost}, chỉ có ${turnsLeft}.`, 'system');
+            }
+        }
+    
+        // Reset selection/drag states
+        setSelectedUnitId(null);
+        setSelectedUnitInfo(null);
+        setDraggedUnitId(null);
+    }, [units, findShortestPath, missionData.mapLayout, missionData.enemyProgressBarSegments, isRaining, turnsLeft, addLog]);
+
 
     // Game initialization and event scheduling
     useEffect(() => {
@@ -109,6 +144,7 @@ const DefenseScreen: React.FC<{
         setEventLog([]);
         setTimeLeft(60);
         setElapsedTime(0);
+        setSelectedUnitId(null);
     
         // --- Schedule Random Events ---
         const gameDuration = 60;
@@ -213,7 +249,7 @@ const DefenseScreen: React.FC<{
                         if (emptyCells.length > 0) {
                             const newIntelPos = emptyCells[Math.floor(Math.random() * emptyCells.length)];
                             setIntelPosition(newIntelPos);
-                            addLog('Phát hiện tin tình báo trên bản đồ! Thu thập nhanh trong 3 giây!', 'intel');
+                            addLog('Phát hiện tin tình báo! Thu thập nhanh trong 3 giây!', 'intel');
                             setIntelSpawnTimes(its => its.slice(1));
 
                             setTimeout(() => {
@@ -259,11 +295,40 @@ const DefenseScreen: React.FC<{
     // Game Logic
     const handleCellClick = (cellIndex: number) => {
         if (isGameOver) return;
+
+        // Priority 1: Intel collection
         if (intelPosition !== null && intelPosition === cellIndex) {
             playSound('sfx_collect');
             setTurnsLeft(prev => prev + 2);
             setIntelPosition(null);
             addLog('Thu thập tin tình báo thành công! +2 lượt đi.', 'intel');
+            return;
+        }
+
+        // Priority 2: Placing a selected unit (for touch/click interface)
+        if (selectedUnitId) {
+            const targetCellType = flatLayout[cellIndex];
+            if (targetCellType === 'forest') {
+                executeMove(selectedUnitId, cellIndex);
+            } else {
+                // Tapping somewhere else deselects the unit
+                setSelectedUnitId(null);
+                setSelectedUnitInfo(null);
+            }
+            return;
+        }
+    };
+    
+    // New handler for tap-to-select
+    const handleUnitClick = (unit: GameUnit) => {
+        if (isGameOver || unit.status === 'evacuated') return;
+        playSound('sfx_click');
+        if (selectedUnitId === unit.id) {
+            setSelectedUnitId(null);
+            setSelectedUnitInfo(null);
+        } else {
+            setSelectedUnitId(unit.id);
+            setSelectedUnitInfo(unit);
         }
     };
 
@@ -278,37 +343,8 @@ const DefenseScreen: React.FC<{
         e.preventDefault();
         const cellType = flatLayout[targetCellIndex];
         if (!draggedUnitId || cellType !== 'forest' || isGameOver) return;
-    
-        const unit = units.find(u => u.id === draggedUnitId);
-        if (!unit || unit.status === 'evacuated') return;
-    
-        const distance = findShortestPath(unit.gridIndex, targetCellIndex, missionData.mapLayout);
-    
-        if (distance === Infinity) {
-            playSound('sfx_fail');
-            addLog('Không tìm thấy đường đến khu vực an toàn này!', 'system');
-            setDraggedUnitId(null);
-            setSelectedUnitInfo(null);
-            return;
-        }
-    
-        const rainCost = isRaining ? 1 : 0;
-        const totalCost = unit.evacuationCost + distance + rainCost;
-    
-        if (turnsLeft >= totalCost) {
-            playSound('sfx_success');
-            setTurnsLeft(prev => prev - totalCost);
-            setEnemyProgress(prev => prev + 1);
-            setUnits(prev => prev.map(u => u.id === draggedUnitId ? { ...u, status: 'evacuated' } : u));
-            addLog(`Di tản ${unit.type} tốn ${totalCost} lượt (gốc ${unit.evacuationCost} + ${distance} ô + ${rainCost} mưa).`, 'evac');
-            addLog(`Quân địch đang đến gần hơn!`, 'enemy');
-        } else {
-            playSound('sfx_fail');
-            addLog(`Không đủ lượt đi! Cần ${totalCost}, chỉ có ${turnsLeft}.`, 'system');
-        }
-        setDraggedUnitId(null);
-        setSelectedUnitInfo(null);
-    }, [draggedUnitId, isGameOver, units, flatLayout, missionData.mapLayout, findShortestPath, isRaining, turnsLeft, addLog]);
+        executeMove(draggedUnitId, targetCellIndex);
+    }, [draggedUnitId, isGameOver, flatLayout, executeMove]);
 
     // Win/Loss Condition Checks
     useEffect(() => {
@@ -368,7 +404,7 @@ const DefenseScreen: React.FC<{
                              {isRaining && <p className="text-cyan-300">Chi phí mưa: +1 lượt</p>}
                             <p className="italic text-gray-400 text-sm">Chi phí cuối cùng sẽ cộng thêm khoảng cách đến khu rừng.</p>
                         </div>
-                    ) : <p className="text-gray-400 italic">Kéo một đơn vị để xem chi tiết.</p>}
+                    ) : <p className="text-gray-400 italic">Kéo hoặc chạm vào một đơn vị.</p>}
                 </div>
                  <div id="event-log" className="hud-section">
                     <h3 className="font-bold mb-2">Nhật ký sự kiện</h3>
@@ -417,10 +453,11 @@ const DefenseScreen: React.FC<{
                         {units.filter(u => u.gridIndex === i && u.status === 'unsafe').map(u => (
                             <div
                                 key={u.id}
-                                draggable
+                                draggable={!isGameOver}
+                                onClick={(e) => { e.stopPropagation(); handleUnitClick(u); }}
                                 onDragStart={(e) => handleDragStart(e, u.id)}
-                                onDragEnd={() => setSelectedUnitInfo(null)}
-                                className={`unit-icon ${unitTypeToClass[u.type]}`}
+                                onDragEnd={() => { setSelectedUnitInfo(null); setDraggedUnitId(null); }}
+                                className={`unit-icon ${unitTypeToClass[u.type]} ${selectedUnitId === u.id ? 'selected' : ''}`}
                                 title={`${u.type} (Cost: ${u.evacuationCost})`}
                             />
                         ))}

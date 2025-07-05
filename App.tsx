@@ -539,10 +539,14 @@ Format JSON: { "modifiedText": string, "answers": string[], "definitions": Recor
         navigateTo(targetScreen, missionData);
       };
 
-      if (!seenInstructions.includes(missionData.type)) {
+      const instructionGameType = missionData.type === 'rallyCall' && 'fullText' in missionData 
+        ? 'rallyCallFillBlank' 
+        : missionData.type;
+
+      if (!seenInstructions.includes(instructionGameType)) {
         setInstructionModalState({
           isOpen: true,
-          gameType: missionData.type,
+          gameType: instructionGameType,
           onConfirm: startMission
         });
       } else {

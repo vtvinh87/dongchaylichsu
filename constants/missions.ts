@@ -1,3 +1,4 @@
+
 // constants/missions.ts
 import { MissionData, PuzzlePieceItem, TradingGood, TradingEvent, TimelineEventItem, HiddenObjectItem, QuizQuestion, DiplomacyRound, DiplomacyChoice, RallyCallRound, RallyCallChoice, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingTask, CityPlanningMissionData, TypesettingMissionData, AdventurePuzzleRiddle, StrategicPathMissionData, ConstructionPuzzlePiece, ConstructionPuzzleMissionData, NavalBattleMissionData, LaneBattleMissionData, CoinMintingMissionData, AdventurePuzzleMissionData, TradingMissionData, HiddenObjectMissionData } from '../types';
 import * as Items from './items';
@@ -104,7 +105,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         {
             prompt: "Lời thề thứ ba nhắm vào kẻ thù trực tiếp, kẻ đã gây ra bao đau thương:",
             choices: [
-                {id: 'choice3_1', text: "Ba xin kẻo oan ức lòng chồng!", iconUrl: ImageUrls.ICON_VOW_PERSONAL_URL, moralePoints: 20},
+                {id: 'choice3_1', text: "Ba kẻo oan ức lòng chồng!", iconUrl: ImageUrls.ICON_VOW_PERSONAL_URL, moralePoints: 20},
                 {id: 'choice3_2', text: "Đuổi Tô Định về nước", iconUrl: ImageUrls.ICON_POINT_SWORD_URL, moralePoints: 30},
                 {id: 'choice3_3', text: "Bắt kẻ địch phải quỳ gối", iconUrl: ImageUrls.ICON_VOW_WEALTH_URL, moralePoints: 10},
             ]
@@ -314,8 +315,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
     id: MISSION_HICH_TUONG_SI_ID,
     title: 'Hoàn thành Hịch tướng sĩ',
     reward: { id: Items.HICH_TUONG_SI_ARTIFACT_ID, type: 'artifact' },
-    fullText: `Ta thường nghe: Kỷ Tín đem mình chết thay, cứu thoát cho Cao Đế; Do Vu chìa lưng chịu giáo, che chở cho Chiêu Vương; Dự Nhượng nuốt than, báo thù cho chủ; Thân Khoái chặt tay để cứu nạn cho nước. Các người ở cùng ta, coi giữ binh quyền đã lâu, không có mặc thì ta cho áo, không có ăn thì ta cho cơm. Quan nhỏ thì ta thăng chức, lương ít thì ta cấp bổng. Đi thủy thì ta cho thuyền, đi bộ thì ta cho ngựa. Nay các ngươi nhìn chủ nhục mà không biết lo, thấy nước nhục mà không biết thẹn. Làm tướng triều đình phải hầu quân giặc mà không biết tức. Có kẻ lấy việc chọi gà làm vui, có kẻ lấy việc đánh bạc làm tiêu khiển. Hoặc vui thú vườn ruộng, hoặc quyến luyến vợ con. Nếu có giặc Mông Thát tràn sang thì cựa gà trống không thể đâm thủng áo giáp của giặc, mẹo cờ bạc không thể dùng làm mưu lược nhà binh.`,
-    possibleBlanks: ['Kỷ Tín', 'Do Vu', 'Dự Nhượng', 'Thân Khoái', 'binh quyền', 'chủ nhục', 'nước nhục', 'chọi gà', 'đánh bạc', 'Mông Thát']
+    fullText: `Huống chi, ta cùng các ngươi sinh ra phải thời loạn lạc, lớn lên gặp buổi gian nan. Lén nhìn sứ ngụy đi lại nghênh ngang ngoài đường, uốn tấc lưỡi cú diều mà lăng nhục triều đình; đem tấm thân dê chó mà khinh rẻ tổ phụ. Ỷ mệnh Hốt Tất Liệt mà đòi ngọc lụa để phụng sự lòng tham khôn cùng; khoác hiệu Vân Nam Vương mà hạch bạc vàng, để vét kiệt của kho có hạn. Thật khác nào đem thịt ném cho hổ đói, tránh sao khỏi tai họa về sau.\nTa thường tới bữa quên ăn, nửa đêm vỗ gối, ruột đau như cắt, nước mắt đầm đìa; chỉ giận chưa thể xả thịt, lột da, ăn gan, uống máu quân thù; dẫu cho trăm thân ta phơi ngoài nội cỏ, nghìn thây ta bọc trong da ngựa, cũng nguyện xin làm.`,
   },
   'quang-trung-strategy-map': {
       type: 'strategyMap',

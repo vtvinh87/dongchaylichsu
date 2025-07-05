@@ -1,3 +1,4 @@
+
 // constants/instructions.ts
 import { Tutorial } from '../types';
 
@@ -49,6 +50,10 @@ export const INSTRUCTION_DATA: Record<string, { title: string; text: string }> =
   rallyCall: {
     title: 'Hiệu Triệu Quân Sĩ',
     text: "Trong màn chơi chọn lựa, hãy chọn những lời hiệu triệu mạnh mẽ nhất để tăng sĩ khí quân lính. Đạt được mục tiêu để chiến thắng.",
+  },
+  rallyCallFillBlank: {
+    title: 'Soạn Hịch Tướng Sĩ',
+    text: "Hoàn thành bài hịch kinh điển của Hưng Đạo Vương. Kéo hoặc nhấp để đặt các từ từ ngân hàng vào đúng chỗ trống. Hoàn thành trước khi hết giờ!",
   },
   forging: {
     title: 'Rèn vũ khí',

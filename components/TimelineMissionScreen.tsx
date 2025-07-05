@@ -1,6 +1,4 @@
 
-
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { TimelineMissionData, TimelineEventItem, Reward } from '../types';
 import { ALL_ARTIFACTS_MAP, ALL_FRAGMENTS_MAP } from '../constants';
@@ -35,17 +33,21 @@ const TimelineMissionScreen: React.FC<TimelineMissionScreenProps> = ({
   const [draggedItem, setDraggedItem] = useState<TimelineEventItem | null>(null);
   const [rewardImageUrl, setRewardImageUrl] = useState<string>('');
 
-  // New state for updated features
+  // State for new features
   const [timeLeft, setTimeLeft] = useState(missionData.timeLimit || 120);
   const [timeChallengeSuccess, setTimeChallengeSuccess] = useState(true);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [selectedEventForModal, setSelectedEventForModal] = useState<TimelineEventItem | null>(null);
   const [completionMessage, setCompletionMessage] = useState<string>("");
 
+  // New state for tap-to-select
+  const [selectedEvent, setSelectedEvent] = useState<TimelineEventItem | null>(null);
+
   useEffect(() => {
     setEventPoolItems(shuffleArray([...missionData.events]));
     setTimelineSlots(Array(missionData.events.length).fill(null));
     setIsTimelineComplete(false);
+    setSelectedEvent(null);
     
     let url = '';
     if (missionData.reward.type === 'artifact') {
@@ -74,14 +76,37 @@ const TimelineMissionScreen: React.FC<TimelineMissionScreenProps> = ({
       alert("Hết giờ thử thách! Bạn có thể tiếp tục hoàn thành nhưng sẽ không nhận được thưởng thêm.");
     }
   }, [timeLeft, isTimerRunning]);
+  
+  const placeEvent = useCallback((event: TimelineEventItem, slotIndex: number) => {
+    if (event.correctOrder === slotIndex + 1) {
+        playSound('sfx-success');
+        const newTimelineSlots = [...timelineSlots];
+        newTimelineSlots[slotIndex] = event;
+        setTimelineSlots(newTimelineSlots);
 
-  const handleShowDetails = (item: TimelineEventItem) => {
-    playSound('sfx_click');
-    setSelectedEventForModal(item);
-  };
+        setEventPoolItems(prevPool => prevPool.filter(item => item.id !== event.id));
+        
+        const allSlotsFilled = newTimelineSlots.every(slot => slot !== null);
+        if (allSlotsFilled) {
+            setIsTimerRunning(false);
+            setIsTimelineComplete(true);
+            playSound('sfx_unlock');
+            if (timeChallengeSuccess) {
+                setCompletionMessage("Hoàn thành xuất sắc! Bạn đã vượt qua thử thách thời gian!");
+            } else {
+                setCompletionMessage("Hoàn thành! Bạn đã sắp xếp đúng dòng thời gian!");
+            }
+            setTimeout(() => onComplete(missionData.reward), 2500);
+        }
+    } else {
+        playSound('sfx_fail');
+    }
+  }, [timelineSlots, missionData.reward, onComplete, timeChallengeSuccess]);
+
 
   const handleDragStart = useCallback((event: React.DragEvent<HTMLDivElement>, item: TimelineEventItem) => {
     setDraggedItem(item);
+    setSelectedEvent(null); // Deselect when dragging
     event.dataTransfer.setData('text/plain', item.id); 
     event.dataTransfer.effectAllowed = "move";
   }, []);
@@ -93,39 +118,32 @@ const TimelineMissionScreen: React.FC<TimelineMissionScreenProps> = ({
 
   const handleDropOnSlot = useCallback((event: React.DragEvent<HTMLDivElement>, slotIndex: number) => {
     event.preventDefault();
-    if (!draggedItem || timelineSlots[slotIndex] !== null) {
-      return; 
-    }
-
-    if (draggedItem.correctOrder === slotIndex + 1) {
-      playSound('sfx-success');
-      const newTimelineSlots = [...timelineSlots];
-      newTimelineSlots[slotIndex] = draggedItem;
-      setTimelineSlots(newTimelineSlots);
-
-      setEventPoolItems(prevPool => prevPool.filter(item => item.id !== draggedItem.id));
-      
-      const allSlotsFilled = newTimelineSlots.every(slot => slot !== null);
-      if (allSlotsFilled) {
-        setIsTimerRunning(false);
-        setIsTimelineComplete(true);
-        playSound('sfx_unlock');
-        if (timeChallengeSuccess) {
-          setCompletionMessage("Hoàn thành xuất sắc! Bạn đã vượt qua thử thách thời gian!");
-        } else {
-          setCompletionMessage("Hoàn thành! Bạn đã sắp xếp đúng dòng thời gian!");
-        }
-        setTimeout(() => onComplete(missionData.reward), 2500);
-      }
-    } else {
-      playSound('sfx_fail');
-    }
+    if (!draggedItem || timelineSlots[slotIndex] !== null) return; 
+    placeEvent(draggedItem, slotIndex);
     setDraggedItem(null);
-  }, [draggedItem, timelineSlots, missionData.reward, onComplete, timeChallengeSuccess]);
+  }, [draggedItem, timelineSlots, placeEvent]);
   
   const handleDragEnd = useCallback(() => {
     setDraggedItem(null);
   }, []);
+
+  const handleSelectEvent = (item: TimelineEventItem) => {
+    playSound('sfx_click');
+    setSelectedEvent(prev => (prev?.id === item.id ? null : item));
+  };
+
+  const handleSlotClick = (slotIndex: number) => {
+    const itemInSlot = timelineSlots[slotIndex];
+
+    if (selectedEvent) { // An event from the pool is selected
+      if (!itemInSlot) { // And the slot is empty
+        placeEvent(selectedEvent, slotIndex);
+        setSelectedEvent(null);
+      }
+    } else if (itemInSlot) { // No event selected, and the slot is not empty
+      setSelectedEventForModal(itemInSlot);
+    }
+  };
 
   return (
     <div className="screen-container w-full max-w-4xl p-6 bg-amber-100 dark:bg-stone-800 text-stone-800 dark:text-stone-100 rounded-lg shadow-xl flex flex-col items-center relative">
@@ -163,6 +181,7 @@ const TimelineMissionScreen: React.FC<TimelineMissionScreenProps> = ({
                 placedEvent={item}
                 onDrop={handleDropOnSlot}
                 onDragOver={handleDragOver}
+                onClick={() => handleSlotClick(index)}
               />
             ))}
           </div>
@@ -175,7 +194,8 @@ const TimelineMissionScreen: React.FC<TimelineMissionScreenProps> = ({
                   eventItem={item}
                   onDragStart={handleDragStart}
                   onDragEnd={handleDragEnd}
-                  onShowDetails={handleShowDetails}
+                  onClick={() => handleSelectEvent(item)}
+                  isSelected={selectedEvent?.id === item.id}
                 />
               ))
             ) : (

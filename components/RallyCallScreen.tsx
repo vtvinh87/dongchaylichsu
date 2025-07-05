@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { RallyCallMissionData, Reward, HichPuzzleData } from '../types';
 import { playSound } from '../utils/audio';
@@ -55,6 +56,9 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
     const [filledSlots, setFilledSlots] = useState<(string | null)[]>([]);
     const [tooltip, setTooltip] = useState({ visible: false, content: '', x: 0, y: 0 });
     const [highlightedElements, setHighlightedElements] = useState<{ slot: number; word: string } | null>(null);
+    const [selectedBankWord, setSelectedBankWord] = useState<{ word: string, index: number } | null>(null);
+    const [timeLeft, setTimeLeft] = useState(60);
+
 
     // --- Memos ---
     const rewardImageUrl = useMemo(() => {
@@ -101,6 +105,9 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
         setHighlightedElements(null);
 
         if (isFillBlankGame) {
+            setTimeLeft(60);
+            setSelectedBankWord(null);
+
             if (!prefetchedPuzzlePromise) {
                 setPuzzleError("Lỗi: Không tìm thấy dữ liệu thử thách. Vui lòng thử lại từ giao diện chính.");
                 setIsLoadingPuzzle(false);
@@ -137,6 +144,19 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
             setIsLoadingPuzzle(false);
         }
     }, [missionData, isFillBlankGame, prefetchedPuzzlePromise]);
+    
+    // Timer for fill-in-the-blank game
+    useEffect(() => {
+        if (isFillBlankGame && !isLoadingPuzzle && outcome === null && timeLeft > 0) {
+            const timerId = setTimeout(() => setTimeLeft(t => t - 1), 1000);
+            return () => clearTimeout(timerId);
+        } else if (isFillBlankGame && timeLeft === 0 && outcome === null) {
+            setIsComplete(true);
+            setOutcome('loss');
+            playSound('sfx_fail');
+        }
+    }, [isFillBlankGame, isLoadingPuzzle, outcome, timeLeft]);
+
 
     // --- Morale Game Handlers ---
     const handleMoraleChoiceClick = (points: number) => {
@@ -169,10 +189,12 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
     
     // --- Fill-in-the-Blank Handlers ---
     const handleWordDragStart = (e: React.DragEvent, word: string, source: 'bank' | 'slot', index: number) => {
+        setSelectedBankWord(null);
         e.dataTransfer.setData('application/json', JSON.stringify({ word, source, index }));
     };
     const handleSlotDrop = (e: React.DragEvent, slotIndex: number) => {
         e.preventDefault();
+        setSelectedBankWord(null);
         const data = JSON.parse(e.dataTransfer.getData('application/json'));
         const { word, source, index: sourceIndex } = data;
         
@@ -195,6 +217,7 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
 
     const handleBankDrop = (e: React.DragEvent) => {
         e.preventDefault();
+        setSelectedBankWord(null);
         const data = JSON.parse(e.dataTransfer.getData('application/json'));
         if (data.source !== 'slot') return;
         
@@ -203,6 +226,39 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
         setFilledSlots(newSlots);
         setWordBank(prev => [...prev, data.word]);
     };
+    
+    const handleWordBankClick = (word: string, index: number) => {
+        if (selectedBankWord?.index === index) {
+            setSelectedBankWord(null); // Deselect
+        } else {
+            setSelectedBankWord({ word, index });
+        }
+    };
+    
+    const handleSlotClick = (slotIndex: number) => {
+        const wordInSlot = filledSlots[slotIndex];
+    
+        if (selectedBankWord) { // Placing a word from bank
+            const newSlots = [...filledSlots];
+            newSlots[slotIndex] = selectedBankWord.word;
+    
+            // If slot was occupied, return its word to the bank, else remove selected from bank
+            const newBank = wordBank.filter((_, i) => i !== selectedBankWord.index);
+            if (wordInSlot) {
+                newBank.push(wordInSlot);
+            }
+    
+            setFilledSlots(newSlots);
+            setWordBank(shuffleArray(newBank));
+            setSelectedBankWord(null);
+        } else if (wordInSlot) { // Returning a word from slot to bank
+            const newSlots = [...filledSlots];
+            newSlots[slotIndex] = null;
+            setFilledSlots(newSlots);
+            setWordBank(prev => shuffleArray([...prev, wordInSlot]));
+        }
+    };
+
 
     const handleTooltip = (e: React.MouseEvent, term: string) => {
         const definition = definitions[term];
@@ -323,16 +379,18 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
     return (
         <div className="screen-container w-full max-w-4xl p-6 bg-amber-100 dark:bg-stone-800 rounded-lg shadow-xl flex flex-col items-center">
             <button onClick={onReturnToMuseum} className="absolute top-4 left-4 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md z-10">Quay về</button>
-            <h2 className="text-3xl font-bold text-amber-800 dark:text-amber-300 mb-4">{missionData.title}</h2>
+            <h2 className="text-3xl font-bold text-amber-800 dark:text-amber-300 mb-2">{missionData.title}</h2>
+            {isFillBlankGame && <div className={`font-bold text-2xl mb-4 ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-stone-700 dark:text-stone-200'}`}>Thời gian: {timeLeft}s</div>}
+
 
             <div id="hich-content" className="w-full bg-amber-50 dark:bg-stone-700 p-6 rounded-lg shadow-inner text-lg leading-loose">
                 {parsedHichContent.map((part, i) => {
                     if (part.type === 'blank') {
                         const isHighlighted = highlightedElements?.slot === part.index;
                         return (
-                            <div key={`blank-${part.index}`} className={`blank-slot ${isHighlighted ? 'highlight-hint' : ''}`} onDragOver={(e) => e.preventDefault()} onDrop={(e) => handleSlotDrop(e, part.index)}>
+                             <div key={`blank-${part.index}`} className={`blank-slot ${isHighlighted ? 'highlight-hint' : ''}`} onDragOver={(e) => e.preventDefault()} onDrop={(e) => handleSlotDrop(e, part.index)} onClick={() => handleSlotClick(part.index)}>
                                 {filledSlots[part.index] && (
-                                    <div className="draggable-phrase" draggable onDragStart={(e) => handleWordDragStart(e, filledSlots[part.index]!, 'slot', part.index)}>
+                                    <div className="draggable-phrase" draggable onDragStart={(e) => handleWordDragStart(e, filledSlots[part.index]!, 'slot', part.index)} onClick={(e) => { e.stopPropagation(); handleSlotClick(part.index); }}>
                                         {filledSlots[part.index]}
                                     </div>
                                 )}
@@ -353,7 +411,7 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
                     {wordBank.map((word, i) => {
                          const isHighlighted = highlightedElements?.word === word;
                         return (
-                             <div key={`${word}-${i}`} className={`draggable-phrase m-1 ${isHighlighted ? 'highlight-hint' : ''}`} draggable onDragStart={(e) => handleWordDragStart(e, word, 'bank', i)}>
+                             <div key={`${word}-${i}`} className={`draggable-phrase m-1 ${selectedBankWord?.index === i ? 'selected' : ''} ${isHighlighted ? 'highlight-hint' : ''}`} draggable onDragStart={(e) => handleWordDragStart(e, word, 'bank', i)} onClick={() => handleWordBankClick(word, i)}>
                                 {word}
                             </div>
                         );
@@ -372,7 +430,7 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
 
             {renderOutcomeOverlay(
                  outcome === 'win' ? 'Hoàn thành!' : 'Thất bại!',
-                 outcome === 'win' ? 'Bạn đã soạn thành công Hịch Tướng Sĩ!' : 'Có lỗi sai trong bài hịch. Hãy thử lại!'
+                 outcome === 'win' ? 'Bạn đã soạn thành công Hịch Tướng Sĩ!' : (timeLeft === 0 ? 'Hết giờ rồi!' : 'Có lỗi sai trong bài hịch. Hãy thử lại!')
             )}
         </div>
     );

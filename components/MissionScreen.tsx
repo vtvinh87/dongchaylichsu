@@ -1,7 +1,4 @@
 
-
-
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { PuzzleMissionData, Reward, PuzzlePieceItem } from '../types';
 import { ALL_ARTIFACTS_MAP } from '../constants';
@@ -42,6 +39,9 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
   const [funFactModal, setFunFactModal] = useState<{ isOpen: boolean; text: string }>({ isOpen: false, text: '' });
   const [justSolvedSlotIndex, setJustSolvedSlotIndex] = useState<number | null>(null);
 
+  // New state for tap-to-select functionality
+  const [selectedPieceId, setSelectedPieceId] = useState<number | null>(null);
+
   useEffect(() => {
     setDraggablePieces(shuffleArray(mission.pieces));
     setSolvedSlots(Array(mission.pieces.length).fill(null));
@@ -49,6 +49,7 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
     setTimeLeft(mission.timeLimit || 90);
     setTimeChallengeSuccess(true);
     setIsTimerRunning(true); // Start timer immediately
+    setSelectedPieceId(null);
     
     if (mission.reward.type === 'artifact'){
         const artifact = ALL_ARTIFACTS_MAP[mission.reward.id];
@@ -71,6 +72,7 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
 
   const handleDragStart = useCallback((event: React.DragEvent<HTMLDivElement>, pieceId: number) => {
     if (isPuzzleComplete) return;
+    setSelectedPieceId(null); // Deselect if starting a drag
     event.dataTransfer.setData("application/json", JSON.stringify({ pieceId }));
   }, [isPuzzleComplete]);
   
@@ -78,66 +80,84 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
     event.preventDefault(); 
   }, []);
 
+  const placePiece = useCallback((pieceId: number, slotIndex: number) => {
+    const pieceToPlace = draggablePieces.find(p => p.id === pieceId);
+    if (!pieceToPlace || pieceToPlace.id !== slotIndex) {
+        playSound('sfx_fail');
+        return false;
+    }
+
+    // Success logic
+    playSound('sfx-success');
+    setIsTimerRunning(false); // Pause timer
+    setJustSolvedSlotIndex(slotIndex);
+
+    if (pieceToPlace.funFact) {
+        setFunFactModal({ isOpen: true, text: pieceToPlace.funFact });
+    }
+    
+    const newSolvedSlots = [...solvedSlots];
+    newSolvedSlots[slotIndex] = pieceToPlace;
+    setSolvedSlots(newSolvedSlots);
+
+    setDraggablePieces(prevPieces => prevPieces.filter(p => p.id !== pieceId));
+    
+    const isNowComplete = newSolvedSlots.every(slot => slot !== null);
+    if (isNowComplete) {
+        setIsPuzzleComplete(true);
+        if (!pieceToPlace.funFact) {
+            onMissionComplete(mission.reward);
+            if (timeChallengeSuccess) {
+                onGrantBonusSupplies(50);
+            }
+        }
+    }
+    return true;
+  }, [draggablePieces, solvedSlots, mission.reward, onMissionComplete, timeChallengeSuccess, onGrantBonusSupplies]);
+
+
   const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>, slotIndex: number) => {
     event.preventDefault();
     if (solvedSlots[slotIndex] || isPuzzleComplete) return;
+    setSelectedPieceId(null);
 
     try {
         const data = event.dataTransfer.getData("application/json");
         if (!data) return;
 
         const { pieceId } = JSON.parse(data) as { pieceId: number };
-        const pieceToPlace = draggablePieces.find(p => p.id === pieceId);
-
-        if (pieceToPlace && pieceToPlace.id === slotIndex) { 
-          playSound('sfx-success');
-          setIsTimerRunning(false); // Pause timer
-          setJustSolvedSlotIndex(slotIndex);
-
-          if (pieceToPlace.funFact) {
-            setFunFactModal({ isOpen: true, text: pieceToPlace.funFact });
-          }
-          
-          const newSolvedSlots = [...solvedSlots];
-          newSolvedSlots[slotIndex] = pieceToPlace;
-          setSolvedSlots(newSolvedSlots);
-
-          setDraggablePieces(prevPieces => prevPieces.filter(p => p.id !== pieceId));
-          
-          const isNowComplete = newSolvedSlots.every(slot => slot !== null);
-          if (isNowComplete) {
-            setIsPuzzleComplete(true);
-            // Completion logic is now moved to handleCloseFunFactModal
-            // If the last piece has no fun fact, we need to trigger completion here.
-            if (!pieceToPlace.funFact) {
-                onMissionComplete(mission.reward);
-                if (timeChallengeSuccess) {
-                    onGrantBonusSupplies(50);
-                }
-            }
-          }
-        } else {
-            playSound('sfx_fail');
-        }
+        placePiece(pieceId, slotIndex);
     } catch (e) {
         console.error("Error parsing drag data:", e);
     }
-  }, [draggablePieces, solvedSlots, isPuzzleComplete, mission, onMissionComplete, timeChallengeSuccess, onGrantBonusSupplies]);
+  }, [solvedSlots, isPuzzleComplete, placePiece]);
 
   const handleCloseFunFactModal = () => {
     playSound('sfx_click');
     setFunFactModal({ isOpen: false, text: '' });
     setJustSolvedSlotIndex(null);
     if (isPuzzleComplete) {
-        // This was the last piece, trigger mission completion now.
         onMissionComplete(mission.reward);
         if (timeChallengeSuccess) {
             onGrantBonusSupplies(50);
         }
     } else {
-        // Not the last piece, resume timer.
         setIsTimerRunning(true);
     }
+  };
+
+  const handlePieceClick = (pieceId: number) => {
+    if (isPuzzleComplete) return;
+    playSound('sfx_click');
+    setSelectedPieceId(prev => (prev === pieceId ? null : pieceId));
+  };
+  
+  const handleSlotClick = (slotIndex: number) => {
+    if (isPuzzleComplete || selectedPieceId === null || solvedSlots[slotIndex]) return;
+    
+    const success = placePiece(selectedPieceId, slotIndex);
+    // Always deselect after a placement attempt
+    setSelectedPieceId(null);
   };
   
   return (
@@ -173,6 +193,7 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
                 solvedPiece={piece}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
+                onClick={() => handleSlotClick(index)}
                 justSolved={index === justSolvedSlotIndex}
               />
             ))}
@@ -181,10 +202,12 @@ const MissionScreen: React.FC<MissionScreenProps> = ({
           <div className="flex flex-wrap justify-center items-center gap-2 mb-6 min-h-[100px] bg-amber-50 dark:bg-stone-700/50 p-3 rounded-lg">
               {draggablePieces.map(piece => (
                   <PuzzlePiece
-                  key={piece.id}
-                  piece={piece}
-                  onDragStart={handleDragStart}
-                  isSolved={solvedSlots.some(s => s?.id === piece.id)}
+                    key={piece.id}
+                    piece={piece}
+                    onDragStart={handleDragStart}
+                    onClick={() => handlePieceClick(piece.id)}
+                    isSolved={solvedSlots.some(s => s?.id === piece.id)}
+                    isSelected={selectedPieceId === piece.id}
                   />
               ))}
           </div>

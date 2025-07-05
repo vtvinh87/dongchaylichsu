@@ -330,7 +330,7 @@ interface RallyCallMoraleData {
 // For Fill-in-the-blank game
 interface RallyCallFillBlankData {
     fullText: string;
-    possibleBlanks: string[];
+    possibleBlanks?: string[];
     definitions?: Record<string, string>;
     rounds?: never;
 }
