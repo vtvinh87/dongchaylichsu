@@ -220,7 +220,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
           { id: 'unit3', type: 'wounded', gridIndex: 42, evacuationCost: 3 },
           { id: 'unit4', type: 'civilian', gridIndex: 47, evacuationCost: 1 },
       ],
-      turnLimit: 20,
+      turnLimit: 10,
       enemyProgressBarSegments: 10,
       reward: { id: Items.MU_TRU_NHA_TRAN_ARTIFACT_ID, type: 'artifact' },
   },

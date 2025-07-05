@@ -27,11 +27,17 @@ const DefenseScreen: React.FC<{
     const [outcome, setOutcome] = useState<'win' | 'loss' | null>(null);
     const [enemyProgress, setEnemyProgress] = useState(0);
     const [isRaining, setIsRaining] = useState(false);
-    const [rainTurnsLeft, setRainTurnsLeft] = useState(0);
-    const [intelReportSegment, setIntelReportSegment] = useState<number | null>(null);
+    const [intelPosition, setIntelPosition] = useState<number | null>(null);
     const [eventLog, setEventLog] = useState<EventLogEntry[]>([]);
     const [selectedUnitInfo, setSelectedUnitInfo] = useState<GameUnit | null>(null);
     const [timeLeft, setTimeLeft] = useState(60);
+
+    // Time-based event scheduling state
+    const [elapsedTime, setElapsedTime] = useState(0);
+    const [intelSpawnTimes, setIntelSpawnTimes] = useState<number[]>([]);
+    const [rainEvents, setRainEvents] = useState<{ start: number, end: number }[]>([]);
+    const [surgeTimes, setSurgeTimes] = useState<number[]>([]);
+
 
     // Mappings and Memos
     const rewardImageUrl = useMemo(() => {
@@ -91,42 +97,7 @@ const DefenseScreen: React.FC<{
         setEventLog(prev => [{id: Date.now(), message, type}, ...prev].slice(0, 10));
     }, []);
 
-    const triggerRandomEvent = useCallback(() => {
-        // Rain event logic
-        if (rainTurnsLeft > 1) {
-            setRainTurnsLeft(prev => prev - 1);
-        } else if (rainTurnsLeft === 1) {
-            setIsRaining(false);
-            setRainTurnsLeft(0);
-            addLog('Trời đã tạnh mưa.', 'rain');
-        }
-
-        const rand = Math.random();
-        // 15% chance to start raining if not already raining
-        if (!isRaining && rand < 0.15) {
-            setIsRaining(true);
-            setRainTurnsLeft(3); // Rain for 3 turns
-            addLog('Trời đổ mưa lớn! Chi phí di tản tăng thêm 1 lượt.', 'rain');
-        }
-
-        const actionRand = Math.random();
-        setIntelReportSegment(null); // Clear old intel
-        
-        // 15% chance for enemy surge
-        if (actionRand < 0.15) {
-            setEnemyProgress(prev => Math.min(prev + 2, missionData.enemyProgressBarSegments));
-            addLog('Quân địch tấn công dồn dập!', 'enemy_surge');
-        } 
-        // 15% chance for new intel report
-        else if (actionRand > 0.85) {
-            const randomSegment = Math.floor(Math.random() * missionData.enemyProgressBarSegments);
-            setIntelReportSegment(randomSegment);
-            addLog(`Quân địch có thể sẽ tập trung tấn công vào khu vực được đánh dấu!`, 'intel');
-        }
-
-    }, [isRaining, rainTurnsLeft, missionData.enemyProgressBarSegments, addLog]);
-
-    // Game initialization
+    // Game initialization and event scheduling
     useEffect(() => {
         setTurnsLeft(missionData.turnLimit);
         setUnits(missionData.units.map(u => ({ ...u, status: 'unsafe' })));
@@ -134,14 +105,88 @@ const DefenseScreen: React.FC<{
         setOutcome(null);
         setEnemyProgress(0);
         setIsRaining(false);
-        setRainTurnsLeft(0);
-        setIntelReportSegment(null);
+        setIntelPosition(null);
         setEventLog([]);
         setTimeLeft(60);
+        setElapsedTime(0);
+    
+        // --- Schedule Random Events ---
+        const gameDuration = 60;
+        const spawnStartSecond = 5;
+        const spawnEndSecond = 55;
+    
+        // 1. Schedule Rain Events first
+        const newRainEvents: { start: number, end: number }[] = [];
+        const numRainEvents = Math.floor(Math.random() * 2) + 2; // 2 to 3 rain events
+        const usedTimes = new Set<number>();
+    
+        for (let i = 0; i < numRainEvents; i++) {
+            const rainDuration = Math.floor(Math.random() * 9) + 10; // 10-18 seconds duration
+            let rainStart = -1;
+            let attempt = 0;
+            
+            while (attempt < 20) {
+                let potentialStart = Math.floor(Math.random() * (gameDuration - rainDuration - spawnStartSecond)) + spawnStartSecond;
+                let isOverlapping = false;
+                for (let t = potentialStart; t < potentialStart + rainDuration; t++) {
+                    if (usedTimes.has(t)) {
+                        isOverlapping = true;
+                        break;
+                    }
+                }
+                if (!isOverlapping) {
+                    rainStart = potentialStart;
+                    break;
+                }
+                attempt++;
+            }
+            
+            if (rainStart === -1) {
+                rainStart = Math.floor(Math.random() * (gameDuration - rainDuration - spawnStartSecond)) + spawnStartSecond;
+            }
+            
+            const rainEnd = rainStart + rainDuration;
+            newRainEvents.push({ start: rainStart, end: rainEnd });
+            
+            for (let t = rainStart; t < rainEnd; t++) {
+                usedTimes.add(t);
+            }
+        }
+        setRainEvents(newRainEvents);
+    
+        // 2. Schedule Intel Spawns with bias during rain
+        const numIntel = Math.floor(Math.random() * 4) + 5; // 5 to 8 intel drops
+        const RAIN_BIAS_FACTOR = 3; // A second during rain is 3x more likely to be picked
+        
+        const weightedSpawnSeconds: number[] = [];
+        for (let t = spawnStartSecond; t <= spawnEndSecond; t++) {
+            const isDuringRain = newRainEvents.some(event => t >= event.start && t < event.end);
+            const weight = isDuringRain ? RAIN_BIAS_FACTOR : 1;
+            for (let i = 0; i < weight; i++) {
+                weightedSpawnSeconds.push(t);
+            }
+        }
+    
+        const intelTimes = new Set<number>();
+        const shuffledWeightedSeconds = weightedSpawnSeconds.sort(() => 0.5 - Math.random());
+        for (const time of shuffledWeightedSeconds) {
+            if (intelTimes.size >= numIntel) break;
+            intelTimes.add(time);
+        }
+        setIntelSpawnTimes(Array.from(intelTimes).sort((a, b) => a - b));
+    
+        // 3. Schedule Enemy Surges
+        const numSurges = Math.random() < 0.4 ? 2 : 1; // 40% chance of 2 surges
+        const surgeT = new Set<number>();
+        while (surgeT.size < numSurges) {
+            surgeT.add(Math.floor(Math.random() * 45) + 10); // Surges between 10s and 54s
+        }
+        setSurgeTimes(Array.from(surgeT).sort((a, b) => a - b));
+    
         addLog('Nhiệm vụ bắt đầu! Sơ tán các đơn vị đến khu vực an toàn (rừng cây).', 'system');
     }, [missionData, addLog]);
 
-     // Timer effect
+     // Timer and Event Trigger effect
     useEffect(() => {
         if (isGameOver) return;
         if (timeLeft <= 0) {
@@ -153,13 +198,75 @@ const DefenseScreen: React.FC<{
 
         const timerId = setInterval(() => {
             setTimeLeft(prev => prev - 1);
+            setElapsedTime(e => {
+                const newElapsedTime = e + 1;
+
+                // --- Check for scheduled events ---
+                // Intel Spawn with 3-second timeout
+                if (intelSpawnTimes.length > 0 && newElapsedTime >= intelSpawnTimes[0]) {
+                    if (intelPosition === null) {
+                        const occupiedCells = new Set(units.filter(u => u.status === 'unsafe').map(u => u.gridIndex));
+                        const emptyCells = flatLayout
+                            .map((cell, index) => ((cell === 'empty' || cell === 'road') && !occupiedCells.has(index) ? index : -1))
+                            .filter(index => index !== -1);
+                        
+                        if (emptyCells.length > 0) {
+                            const newIntelPos = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                            setIntelPosition(newIntelPos);
+                            addLog('Phát hiện tin tình báo trên bản đồ! Thu thập nhanh trong 3 giây!', 'intel');
+                            setIntelSpawnTimes(its => its.slice(1));
+
+                            setTimeout(() => {
+                                setIntelPosition(currentPos => {
+                                    if (currentPos === newIntelPos) {
+                                        addLog('Tin tình báo đã biến mất!', 'system');
+                                        return null;
+                                    }
+                                    return currentPos;
+                                });
+                            }, 3000);
+                        }
+                    }
+                }
+
+                // Rain Event
+                const nowIsRaining = rainEvents.some(event => newElapsedTime >= event.start && newElapsedTime < event.end);
+                const wasRaining = rainEvents.some(event => (newElapsedTime - 1) >= event.start && (newElapsedTime - 1) < event.end);
+
+                if (nowIsRaining && !wasRaining) {
+                    setIsRaining(true);
+                    addLog('Trời đổ mưa lớn! Chi phí di tản tăng thêm 1 lượt.', 'rain');
+                } else if (!nowIsRaining && wasRaining) {
+                    setIsRaining(false);
+                    addLog('Trời đã tạnh mưa.', 'rain');
+                }
+
+                // Enemy Surge
+                if (surgeTimes.length > 0 && newElapsedTime >= surgeTimes[0]) {
+                    setEnemyProgress(prev => Math.min(prev + 2, missionData.enemyProgressBarSegments));
+                    addLog('Quân địch tấn công dồn dập!', 'enemy_surge');
+                    setSurgeTimes(st => st.slice(1));
+                }
+
+                return newElapsedTime;
+            });
         }, 1000);
 
         return () => clearInterval(timerId);
-    }, [timeLeft, isGameOver, addLog]);
+    }, [timeLeft, isGameOver, addLog, intelSpawnTimes, rainEvents, surgeTimes, intelPosition, units, flatLayout, missionData.enemyProgressBarSegments]);
 
 
     // Game Logic
+    const handleCellClick = (cellIndex: number) => {
+        if (isGameOver) return;
+        if (intelPosition !== null && intelPosition === cellIndex) {
+            playSound('sfx_collect');
+            setTurnsLeft(prev => prev + 2);
+            setIntelPosition(null);
+            addLog('Thu thập tin tình báo thành công! +2 lượt đi.', 'intel');
+        }
+    };
+
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, unitId: string) => {
         if (isGameOver) return;
         setDraggedUnitId(unitId);
@@ -195,14 +302,13 @@ const DefenseScreen: React.FC<{
             setUnits(prev => prev.map(u => u.id === draggedUnitId ? { ...u, status: 'evacuated' } : u));
             addLog(`Di tản ${unit.type} tốn ${totalCost} lượt (gốc ${unit.evacuationCost} + ${distance} ô + ${rainCost} mưa).`, 'evac');
             addLog(`Quân địch đang đến gần hơn!`, 'enemy');
-            triggerRandomEvent();
         } else {
             playSound('sfx_fail');
             addLog(`Không đủ lượt đi! Cần ${totalCost}, chỉ có ${turnsLeft}.`, 'system');
         }
         setDraggedUnitId(null);
         setSelectedUnitInfo(null);
-    }, [draggedUnitId, isGameOver, units, flatLayout, missionData.mapLayout, findShortestPath, isRaining, turnsLeft, addLog, triggerRandomEvent]);
+    }, [draggedUnitId, isGameOver, units, flatLayout, missionData.mapLayout, findShortestPath, isRaining, turnsLeft, addLog]);
 
     // Win/Loss Condition Checks
     useEffect(() => {
@@ -285,7 +391,7 @@ const DefenseScreen: React.FC<{
                    <div id="enemy-threat-meter-progress" style={{ width: `${(enemyProgress / missionData.enemyProgressBarSegments) * 100}%` }}></div>
                    {/* This part below is just for visual segments, the progress is the colored bar above */}
                    {Array.from({ length: missionData.enemyProgressBarSegments }).map((_, i) => (
-                        <div key={i} className={`h-full flex-1 border-r border-black/30 ${i === intelReportSegment ? 'animate-pulse bg-yellow-400/50' : ''}`}></div>
+                        <div key={i} className={`h-full flex-1 border-r border-black/30`}></div>
                     ))}
                 </div>
             </div>
@@ -300,7 +406,14 @@ const DefenseScreen: React.FC<{
                         className={`map-cell cell-${cellType}`}
                         onDrop={(e) => handleDrop(e, i)}
                         onDragOver={(e) => cellType === 'forest' && e.preventDefault()}
+                        onClick={() => handleCellClick(i)}
                     >
+                         {intelPosition === i && (
+                            <div
+                                className="intel-item"
+                                title="Thu thập tin tình báo (+2 lượt)"
+                            />
+                        )}
                         {units.filter(u => u.gridIndex === i && u.status === 'unsafe').map(u => (
                             <div
                                 key={u.id}
