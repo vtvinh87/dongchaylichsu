@@ -1,3 +1,4 @@
+
 // components/DetectiveScreen.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { DetectiveMissionData, Reward, DetectiveClue, DetectiveNPC } from '../types';
@@ -173,6 +174,52 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
     }
   };
 
+  const handleNotebookHint = () => {
+    if (turnsLeft < 1) {
+        alert("Không đủ lượt đi để dùng gợi ý (cần 1 lượt).");
+        return;
+    }
+    playSound('sfx_unlock');
+    spendTurn(1);
+
+    // 1. Check for collected contradictory pairs that haven't been used to reveal a new clue
+    for (const clueId1 in missionData.contradictions) {
+        const [clueId2, newClueId] = missionData.contradictions[clueId1];
+        if (collectedClues[clueId1] && collectedClues[clueId2] && !collectedClues[newClueId]) {
+            alert("Gợi ý: Dường như có hai manh mối trong sổ tay của bạn mâu thuẫn với nhau. Hãy thử chọn chúng để xem có khám phá được gì mới không.");
+            return;
+        }
+    }
+
+    // 2. Check for one half of a contradictory pair and hint at the other half's source
+    for (const clueId1 in missionData.contradictions) {
+        const [clueId2] = missionData.contradictions[clueId1];
+        const checkAndHint = (id1: string, id2: string) => {
+            if (collectedClues[id1] && !collectedClues[id2]) {
+                const npcForClue = missionData.npcs.find(npc => npc.clue.id === id2);
+                if (npcForClue && !questionedNpcIds.includes(npcForClue.id)) {
+                    alert(`Gợi ý: Manh mối bạn có vẻ chưa đầy đủ. Thử nói chuyện với ${npcForClue.name} xem sao.`);
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        if (checkAndHint(clueId1, clueId2) || checkAndHint(clueId2, clueId1)) {
+            return;
+        }
+    }
+
+    // 3. Fallback to original hint if no contradiction-related hints are possible
+    const unQuestionedNpcs = missionData.npcs.filter(npc => !questionedNpcIds.includes(npc.id));
+    if (unQuestionedNpcs.length > 0) {
+        const hintNpc = unQuestionedNpcs[0];
+        alert(`Gợi ý: Có vẻ như ${hintNpc.name} biết điều gì đó...`);
+    } else {
+        alert("Bạn đã hỏi chuyện tất cả mọi người. Hãy tập trung vào Bảng Suy Luận.");
+    }
+  };
+
   const handleDragStart = (e: React.DragEvent, clue: DetectiveClue) => {
     setDraggedClue(clue);
     setInspectedClue(null); // Close inspector on drag
@@ -299,29 +346,63 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
 
   return (
     <div className="detective-screen-container">
-      <div id="detective-screen" style={{ backgroundImage: `url(${missionData.backgroundUrl})`}}>
-        {renderResultOverlay()}
-        {missionData.npcs.map(npc => (
-          <div
-            key={npc.id}
-            className={`npc-on-screen ${questionedNpcIds.includes(npc.id) ? 'questioned' : ''}`}
-            style={{ top: npc.position.top, left: npc.position.left }}
-            onClick={() => handleNpcClick(npc)}
+      <div id="detective-screen">
+          {renderResultOverlay()}
+          
+          {/* ---- DESKTOP VIEW ---- */}
+          <div 
+              className="hidden md:block w-full h-full" 
+              style={{ backgroundImage: `url(${missionData.backgroundUrl})`}}
           >
-            <img src={npc.avatarUrl} alt={npc.name} />
-          </div>
-        ))}
-        {activeDialogue && (
-            <div className="npc-dialogue-box" >
-                {activeDialogue.professionInfo && <button className="profession-info-button" onClick={() => setInfoModalContent(activeDialogue.professionInfo!)}>i</button>}
-                <div className="dialogue-header">
-                    <img src={activeDialogue.dialogueAvatarUrl || activeDialogue.avatarUrl} alt={activeDialogue.name} className="dialogue-avatar" />
-                    <h4>{activeDialogue.name}</h4>
+              {missionData.npcs.map(npc => (
+                <div
+                  key={npc.id}
+                  className={`npc-on-screen ${questionedNpcIds.includes(npc.id) ? 'questioned' : ''}`}
+                  style={{ top: npc.position.top, left: npc.position.left }}
+                  onClick={() => handleNpcClick(npc)}
+                >
+                  <img src={npc.avatarUrl} alt={npc.name} />
                 </div>
-                <p className="dialogue-text">"{activeDialogue.initialDialogue}"</p>
-                <div className="dialogue-actions">
-                    <button onClick={() => setActiveDialogue(null)}>Thôi</button>
-                    <button onClick={handleQuestionNpc}>Hỏi chuyện (-{activeDialogue.turnCost || 1} lượt)</button>
+              ))}
+          </div>
+          
+           {/* ---- MOBILE VIEW ---- */}
+          <div className="block md:hidden detective-mobile-view">
+             <h3 className="text-xl font-bold text-center text-amber-200 mb-4">Các nhân vật trong thành</h3>
+             <div className="detective-mobile-list">
+                {missionData.npcs.map(npc => (
+                    <div 
+                        key={npc.id} 
+                        className={`detective-mobile-npc-card ${questionedNpcIds.includes(npc.id) ? 'questioned' : ''}`}
+                        onClick={() => handleNpcClick(npc)}
+                    >
+                        <img src={npc.dialogueAvatarUrl || npc.avatarUrl} alt={npc.name} className="dialogue-avatar" />
+                        <div className="flex-grow">
+                            <p className="font-bold text-stone-800">{npc.name}</p>
+                            <p className="text-sm italic text-stone-600">{npc.professionInfo?.title}</p>
+                        </div>
+                        {!questionedNpcIds.includes(npc.id) && (
+                            <button className="ask-button">Hỏi</button>
+                        )}
+                    </div>
+                ))}
+             </div>
+          </div>
+
+
+          {activeDialogue && (
+            <div className="detective-modal-overlay" onClick={() => setActiveDialogue(null)}>
+                <div className="detective-modal-content clue-collection-modal" onClick={e => e.stopPropagation()}>
+                    {activeDialogue.professionInfo && <button className="profession-info-button" onClick={(e) => { e.stopPropagation(); setInfoModalContent(activeDialogue.professionInfo!);}}>i</button>}
+                    <div className="dialogue-header">
+                        <img src={activeDialogue.dialogueAvatarUrl || activeDialogue.avatarUrl} alt={activeDialogue.name} className="dialogue-avatar" />
+                        <h4>{activeDialogue.name}</h4>
+                    </div>
+                    <p className="dialogue-text">"{activeDialogue.initialDialogue}"</p>
+                    <div className="dialogue-actions">
+                        <button onClick={() => setActiveDialogue(null)}>Thôi</button>
+                        <button onClick={handleQuestionNpc}>Hỏi chuyện (-{activeDialogue.turnCost || 1} lượt)</button>
+                    </div>
                 </div>
             </div>
         )}
@@ -366,6 +447,7 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
         <div className="detective-modal-overlay" onClick={() => setShowNotebook(false)}>
             <div id="notebook-modal" className="detective-modal-content" onClick={e => e.stopPropagation()}>
                 <h3 id="notebook-title">Sổ Tay Mật Thám</h3>
+                <p className="text-center text-sm text-stone-600 mb-2">Chọn 2 manh mối để tìm mâu thuẫn, hoặc dùng gợi ý.</p>
                 <div id="clues-list">
                   {Object.keys(collectedClues).length > 0 ? Object.values(collectedClues).map(clue => (
                     <div 
@@ -378,6 +460,15 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
                     </div>
                   )) : <p style={{textAlign: 'center', color: '#44403c'}}>Chưa có manh mối nào.</p>}
                 </div>
+                <div className="mt-4 p-2 border-t border-dashed border-stone-400 text-center">
+                    <button 
+                        onClick={handleNotebookHint}
+                        disabled={isGameOver || turnsLeft < 1}
+                        className="hud-buttons button bg-blue-600 text-white border-blue-700 hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed px-4 py-2"
+                    >
+                       Lấy Gợi Ý (-1 Lượt)
+                    </button>
+                </div>
                 <button className="modal-close-button" onClick={() => setShowNotebook(false)}>&times;</button>
             </div>
         </div>
@@ -387,53 +478,57 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
         <div className="detective-modal-overlay" onClick={() => setShowDeductionBoard(false)}>
             <div id="deduction-board-modal" className="detective-modal-content" onClick={e => e.stopPropagation()}>
               <h3 id="deduction-board-title">Bảng Suy Luận</h3>
-              <div id="suspects-container">
-                  {missionData.suspects.map(suspect => (
-                      <div key={suspect.id} className="suspect-area">
-                          <img src={suspect.portraitUrl} alt={suspect.name} className="suspect-portrait" />
-                          <h4>{suspect.name}</h4>
-                          <div className="evidence-slots">
-                              {[0, 1, 2].map(i => (
-                                <div 
-                                  key={i} 
-                                  className={`evidence-slot ${draggedClue ? 'drag-over' : ''}`}
-                                  onDragOver={handleDragOver}
-                                  onDrop={(e) => handleDrop(e, suspect.id, i)}
-                                  onClick={() => handleSlotClick(suspect.id, i)}
-                                >
-                                  {deductionSlots[suspect.id][i] && (
-                                    <div className="clue-item" draggable onDragStart={(e) => handleDragStart(e, collectedClues[deductionSlots[suspect.id][i]!])}>
-                                      <img src={collectedClues[deductionSlots[suspect.id][i]!].iconUrl} alt="clue" className="clue-icon"/>
-                                      <span>{collectedClues[deductionSlots[suspect.id][i]!].text}</span>
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-                          </div>
+              <button className="modal-close-button" onClick={() => setShowDeductionBoard(false)}>&times;</button>
+              
+              <div className="flex-grow overflow-y-auto pr-4 -mr-4">
+                <div id="suspects-container">
+                    {missionData.suspects.map(suspect => (
+                        <div key={suspect.id} className="suspect-area">
+                            <img src={suspect.portraitUrl} alt={suspect.name} className="suspect-portrait" />
+                            <h4>{suspect.name}</h4>
+                            <div className="evidence-slots">
+                                {[0, 1, 2].map(i => (
+                                  <div 
+                                    key={i} 
+                                    className={`evidence-slot ${draggedClue ? 'drag-over' : ''}`}
+                                    onDragOver={handleDragOver}
+                                    onDrop={(e) => handleDrop(e, suspect.id, i)}
+                                    onClick={() => handleSlotClick(suspect.id, i)}
+                                  >
+                                    {deductionSlots[suspect.id][i] && (
+                                      <div className="clue-item" draggable onDragStart={(e) => handleDragStart(e, collectedClues[deductionSlots[suspect.id][i]!])}>
+                                        <img src={collectedClues[deductionSlots[suspect.id][i]!].iconUrl} alt="clue" className="clue-icon"/>
+                                        <span>{collectedClues[deductionSlots[suspect.id][i]!].text}</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                <div id="evidence-pool-container">
+                  <h4>Manh mối có thể dùng</h4>
+                  <div id="evidence-pool" onDragOver={handleDragOver} onDrop={(e) => { /* Handle drop back to pool if needed */ }}>
+                    {Object.values(collectedClues)
+                      .filter(clue => !Object.values(deductionSlots).flat().includes(clue.id))
+                      .map(clue => (
+                      <div 
+                        key={clue.id} 
+                        className={`clue-icon-in-pool ${selectedClueForPlacement?.id === clue.id ? 'selected-for-placement' : ''}`} 
+                        title={clue.text}
+                        onClick={() => setInspectedClue(clue)}>
+                          <img src={clue.iconUrl} alt="clue"/>
                       </div>
-                  ))}
-              </div>
-              <div id="evidence-pool-container">
-                <h4>Manh mối có thể dùng</h4>
-                <div id="evidence-pool" onDragOver={handleDragOver} onDrop={(e) => { /* Handle drop back to pool if needed */ }}>
-                  {Object.values(collectedClues)
-                    .filter(clue => !Object.values(deductionSlots).flat().includes(clue.id))
-                    .map(clue => (
-                    <div 
-                      key={clue.id} 
-                      className={`clue-icon-in-pool ${selectedClueForPlacement?.id === clue.id ? 'selected-for-placement' : ''}`} 
-                      title={clue.text}
-                      onClick={() => setInspectedClue(clue)}>
-                        <img src={clue.iconUrl} alt="clue"/>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
-              <div id="deduction-controls">
+
+              <div id="deduction-controls" className="flex-shrink-0">
                 <button className="hint-button" onClick={handleHint} disabled={isGameOver || hintsUsed >= 3 || turnsLeft < 2}>Gợi ý ({3 - hintsUsed}/3)</button>
                 <button className="accuse-button" onClick={handleAccuse}>Buộc tội</button>
               </div>
-              <button className="modal-close-button" onClick={() => setShowDeductionBoard(false)}>&times;</button>
 
               {inspectedClue && (
                 <div className="clue-inspector-modal" >

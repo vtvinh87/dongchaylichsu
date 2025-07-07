@@ -2699,7 +2699,7 @@ body {
   }
 }
 
-/* === DETECTIVE SCREEN STYLES === */
+/* === DETECTIVE SCREEN STYLES (UPDATES & ADDITIONS) === */
 @keyframes pulse-yellow-glow {
     0% { filter: drop-shadow(0 0 5px #fcd34d); }
     50% { filter: drop-shadow(0 0 15px #fef08a); }
@@ -2707,8 +2707,9 @@ body {
 }
 
 .detective-screen-container {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
     display: flex;
     flex-direction: column;
     background-color: #3d3d3d; /* Fallback */
@@ -2718,10 +2719,16 @@ body {
 #detective-screen {
     flex-grow: 1;
     position: relative;
-    background-size: cover;
-    background-position: center;
     border-bottom: 4px solid #4a2c13; /* Dark brown border */
     overflow: hidden;
+    display: flex;
+}
+
+#detective-screen .hidden.md\:block {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
 }
 
 .npc-on-screen {
@@ -2742,6 +2749,66 @@ body {
 .npc-on-screen img {
     width: 200px;
     height: auto;
+}
+
+.detective-mobile-view {
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+    overflow-y: auto;
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-phien-cho-thoi-ly.png');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+.detective-mobile-view::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+.detective-mobile-view > * {
+    position: relative; /* Make content appear above overlay */
+    z-index: 1;
+}
+
+.detective-mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.detective-mobile-npc-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: rgba(253, 246, 235, 0.8); /* beige color with transparency */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 2px solid #d6bda2;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.detective-mobile-npc-card:hover {
+    border-color: #c0ab8f;
+    transform: scale(1.02);
+}
+
+.detective-mobile-npc-card.questioned {
+    filter: grayscale(1);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.detective-mobile-npc-card .ask-button {
+    flex-shrink: 0;
+    background-color: #78350f; /* amber-800 */
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-weight: bold;
 }
 
 #detective-hud {
