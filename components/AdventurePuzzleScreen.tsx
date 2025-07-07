@@ -18,6 +18,7 @@ const AdventurePuzzleScreen: React.FC<{
     missionData: AdventurePuzzleMissionData;
     onReturnToMuseum: () => void;
     onComplete: (reward: Reward) => void;
+    onFail?: () => void;
 }> = ({ missionData, onReturnToMuseum, onComplete }) => {
     const [currentRiddleIndex, setCurrentRiddleIndex] = useState(0);
     const [inputValue, setInputValue] = useState('');

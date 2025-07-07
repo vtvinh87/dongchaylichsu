@@ -11,6 +11,7 @@ interface RallyCallScreenProps {
     missionData: RallyCallMissionData;
     onReturnToMuseum: () => void;
     onComplete: (reward?: Reward) => void;
+    onFail: () => void;
     inventory: Record<string, number>;
     setInventory: React.Dispatch<React.SetStateAction<Record<string, number>>>;
     prefetchedPuzzlePromise: Promise<HichPuzzleData> | null;
@@ -30,6 +31,7 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
     missionData,
     onReturnToMuseum,
     onComplete,
+    onFail,
     inventory,
     setInventory,
     prefetchedPuzzlePromise,
@@ -63,6 +65,7 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
     // --- Memos ---
     const rewardImageUrl = useMemo(() => {
         const reward = missionData.reward;
+        if (!reward) return '';
         if (reward.type === 'artifact') return ALL_ARTIFACTS_MAP[reward.id]?.imageUrl || '';
         if (reward.type === 'fragment') return ALL_FRAGMENTS_MAP[reward.id]?.imageUrl || '';
         return '';
@@ -153,9 +156,10 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
         } else if (isFillBlankGame && timeLeft === 0 && outcome === null) {
             setIsComplete(true);
             setOutcome('loss');
+            onFail();
             playSound('sfx_fail');
         }
-    }, [isFillBlankGame, isLoadingPuzzle, outcome, timeLeft]);
+    }, [isFillBlankGame, isLoadingPuzzle, outcome, timeLeft, onFail]);
 
 
     // --- Morale Game Handlers ---
@@ -175,13 +179,14 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
             setTimeout(() => setCurrentRoundIndex(prev => prev + 1), 500);
         } else {
             setIsComplete(true);
-            const maxMorale = missionData.rounds!.reduce((acc, round) => acc + Math.max(...round.choices.map(c => c.moralePoints)), 0);
-            if (newMorale >= maxMorale * 0.7) { // 70% threshold to win
+            const maxMoralePossible = missionData.rounds!.reduce((acc, round) => acc + Math.max(...round.choices.map(c => c.moralePoints)), 0);
+            if (newMorale >= maxMoralePossible * 0.7) { // 70% threshold to win
                 setOutcome('win');
                 playSound('sfx_unlock');
                 setTimeout(() => onComplete(missionData.reward), 2000);
             } else {
                 setOutcome('loss');
+                onFail();
                 playSound('sfx_fail');
             }
         }
@@ -299,6 +304,7 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
             setTimeout(() => onComplete(missionData.reward), 2000);
         } else {
             playSound('sfx_fail');
+            onFail();
             setOutcome('loss');
         }
     };

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { NavalBattleMissionData, Reward, BachDangCampaignState } from '../types';
 import { playSound } from '../utils/audio';
@@ -7,7 +8,8 @@ const NavalBattleScreen: React.FC<{
   bachDangCampaign: BachDangCampaignState;
   onReturnToMuseum: () => void;
   onComplete: (reward?: Reward) => void;
-}> = ({ missionData, bachDangCampaign, onReturnToMuseum, onComplete }) => {
+  onFail: () => void;
+}> = ({ missionData, bachDangCampaign, onReturnToMuseum, onComplete, onFail }) => {
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'win' | 'loss'>('idle');
   const [shipPosition, setShipPosition] = useState(-10); // Start off-screen
   const [tideLevel, setTideLevel] = useState(100); // Start at high tide
@@ -80,13 +82,14 @@ const NavalBattleScreen: React.FC<{
       const newPos = prev + (pixelsToMove / battleAreaWidth * 100);
       if (newPos > 110) { // Ship has passed
         setGameState('loss');
+        onFail();
         return 110;
       }
       return newPos;
     });
 
     animationFrameRef.current = requestAnimationFrame(gameLoop);
-  }, [missionData.shipSpeed]);
+  }, [missionData.shipSpeed, onFail]);
 
   const startGame = () => {
     setShipPosition(-10);
@@ -126,6 +129,7 @@ const NavalBattleScreen: React.FC<{
       setTimeout(() => onComplete(missionData.reward), 2000);
     } else {
       playSound('sfx_fail');
+      onFail();
       setGameState('loss');
     }
   };

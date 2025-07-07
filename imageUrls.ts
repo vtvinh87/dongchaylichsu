@@ -1,4 +1,5 @@
 
+
 // imageUrls.ts
 
 // --- Logos & Branding ---
@@ -172,6 +173,7 @@ export const SAGA_TRUONG_SON_URL = 'https://raw.githubusercontent.com/vtvinh87/d
 export const SAGA_DONG_LOC_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Quest/Q-nga-ba-dong-loc.png';
 export const SAGA_CUA_CHUA_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Quest/Q-cua-chu-a.png';
 export const SAGA_SEBANGHIENG_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Quest/Q-vuot-song-se-bang-hieng.png';
+export const SAGA_DETECTIVE_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Quest/Q-gian-diep-thoi-ly.png';
 
 export const HAI_BA_TRUNG_AVATAR_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Avatars/Avt-hai-ba-trung.png';
 export const QUANG_TRUNG_AVATAR_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Avatars/Avt-Quang-Trung.png';

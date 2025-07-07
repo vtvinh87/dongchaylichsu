@@ -10,12 +10,14 @@ interface ForgingScreenProps {
   missionData: ForgingMissionData;
   onReturnToMuseum: () => void;
   onComplete: (reward: Reward) => void;
+  onFail: () => void;
 }
 
 const ForgingScreen: React.FC<ForgingScreenProps> = ({
   missionData,
   onReturnToMuseum,
   onComplete,
+  onFail,
 }) => {
   const [gameState, setGameState] = useState<GameState>('idle');
   const [progress, setProgress] = useState(0);
@@ -117,6 +119,7 @@ const ForgingScreen: React.FC<ForgingScreenProps> = ({
         setTimeLeft(prev => {
           if (prev <= 1) {
             setGameState('loss');
+            onFail();
             clearInterval(timer);
             return 0;
           }
@@ -125,7 +128,7 @@ const ForgingScreen: React.FC<ForgingScreenProps> = ({
       }, 1000);
       return () => clearInterval(timer);
     }
-  }, [gameState]);
+  }, [gameState, onFail]);
 
   useEffect(() => {
     if (progress >= missionData.targetProgress && gameState === 'playing') {

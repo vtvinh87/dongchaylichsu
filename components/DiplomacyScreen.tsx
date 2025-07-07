@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { DiplomacyMissionData, Reward } from '../types';
 import { ALL_ARTIFACTS_MAP } from '../constants';
@@ -8,12 +9,14 @@ interface DiplomacyScreenProps {
   missionData: DiplomacyMissionData;
   onReturnToMuseum: () => void;
   onComplete: (reward: Reward) => void;
+  onFail: () => void;
 }
 
 const DiplomacyScreen: React.FC<DiplomacyScreenProps> = ({
   missionData,
   onReturnToMuseum,
   onComplete,
+  onFail,
 }) => {
   const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
   const [goodwill, setGoodwill] = useState(missionData.initialGoodwill);
@@ -59,6 +62,7 @@ const DiplomacyScreen: React.FC<DiplomacyScreenProps> = ({
         if (newGoodwill <= 0) {
             setOutcome('loss');
             setIsMissionOver(true);
+            onFail();
         } else if (newGoodwill >= missionData.targetGoodwill) {
             playSound('sfx_unlock');
             setOutcome('win');
@@ -68,6 +72,7 @@ const DiplomacyScreen: React.FC<DiplomacyScreenProps> = ({
             // Ran out of rounds without winning or losing
             setOutcome('loss');
             setIsMissionOver(true);
+            onFail();
         } else {
             // Go to next round
             setCurrentRoundIndex(prev => prev + 1);

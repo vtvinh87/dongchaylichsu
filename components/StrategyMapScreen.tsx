@@ -7,6 +7,7 @@ interface StrategyMapScreenProps {
   missionData: StrategyMapMissionData;
   onReturnToMuseum: () => void;
   onComplete: (reward: Reward) => void;
+  onFail?: () => void;
 }
 
 interface Point { x: number; y: number; }

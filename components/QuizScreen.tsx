@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { QuizMissionData, Reward, QuizQuestion } from '../types';
 import { ALL_ARTIFACTS_MAP } from '../constants';
@@ -20,9 +21,10 @@ interface QuizScreenProps {
   missionData: QuizMissionData;
   onReturnToMuseum: () => void;
   onComplete: (reward: Reward) => void;
+  onFail: () => void;
 }
 
-const QuizScreen: React.FC<QuizScreenProps> = ({ missionData, onReturnToMuseum, onComplete }) => {
+const QuizScreen: React.FC<QuizScreenProps> = ({ missionData, onReturnToMuseum, onComplete, onFail }) => {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -131,6 +133,15 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ missionData, onReturnToMuseum, 
       setLives(prev => prev - 1);
     }
   };
+  
+  const endQuiz = useCallback((isWin: boolean, finalScore: number) => {
+    setIsQuizOver(true);
+    if(isWin) {
+        setTimeout(() => onComplete(missionData.reward), 2000);
+    } else {
+        onFail();
+    }
+  }, [missionData.reward, onComplete, onFail]);
 
   const handleNextQuestion = useCallback(() => {
     playSound('sfx_click');
@@ -150,7 +161,7 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ missionData, onReturnToMuseum, 
     } else {
         endQuiz(score >= 3, score); // Win if score is 3 or more.
     }
-  }, [currentQuestionIndex, lives, questions.length, score, selectedAnswer]);
+  }, [currentQuestionIndex, lives, questions.length, score, selectedAnswer, endQuiz]);
 
   const handleUseHint = async () => {
     if (hintUsedForQuestion || isAnswered || isHintLoading) {
@@ -181,12 +192,6 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ missionData, onReturnToMuseum, 
     }
   };
   
-  const endQuiz = useCallback((isWin: boolean, finalScore: number) => {
-    setIsQuizOver(true);
-    if(isWin) {
-        setTimeout(() => onComplete(missionData.reward), 2000);
-    }
-  }, [missionData.reward, onComplete]);
 
   // Check for game over condition after lives change
   useEffect(() => {

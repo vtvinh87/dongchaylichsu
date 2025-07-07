@@ -36,14 +36,15 @@ const RhythmScreen: React.FC<{
   missionData: RhythmMissionData;
   onReturnToMuseum: () => void;
   onComplete: (reward: Reward) => void;
-}> = ({ missionData, onReturnToMuseum, onComplete }) => {
+  onFail: () => void;
+}> = ({ missionData, onReturnToMuseum, onComplete, onFail }) => {
     const [gameState, setGameState] = useState<'idle' | 'playing' | 'finished'>('idle');
     const [score, setScore] = useState(0);
     const [combo, setCombo] = useState(0);
     const [feedback, setFeedback] = useState<FeedbackDisplay[]>([]);
     
     const audioRef = useRef<HTMLAudioElement | null>(null);
-    const playAreaRef = useRef<HTMLDivElement>(null);
+    const playAreaRef = useRef<HTMLDivElement | null>(null);
     const animationFrameRef = useRef<number>(0);
     const notesRef = useRef<ActiveNote[]>([]);
     const nextNoteIndexRef = useRef(0);
@@ -173,11 +174,13 @@ const RhythmScreen: React.FC<{
                  if (scoreRef.current >= missionData.targetScore) {
                     playSound('sfx-unlock');
                     setTimeout(() => onComplete(missionData.reward), 1500);
+                } else {
+                    onFail();
                 }
             }, NOTE_FALL_DURATION_MS / 2); // Wait half fall duration
         };
 
-    }, [missionData, onComplete, gameLoop, cleanupGame]);
+    }, [missionData, onComplete, gameLoop, cleanupGame, onFail]);
 
 
     const handleKeyPress = useCallback((e: KeyboardEvent) => {

@@ -18,7 +18,8 @@ const DefenseScreen: React.FC<{
     missionData: DefenseMissionData;
     onReturnToMuseum: () => void;
     onComplete: (reward: Reward) => void;
-}> = ({ missionData, onReturnToMuseum, onComplete }) => {
+    onFail: () => void;
+}> = ({ missionData, onReturnToMuseum, onComplete, onFail }) => {
     // State
     const [turnsLeft, setTurnsLeft] = useState(missionData.turnLimit);
     const [units, setUnits] = useState<GameUnit[]>([]);
@@ -228,6 +229,7 @@ const DefenseScreen: React.FC<{
         if (timeLeft <= 0) {
             setIsGameOver(true);
             setOutcome('loss');
+            onFail();
             addLog('Hết giờ! Quân địch đã tràn vào!', 'system');
             return;
         }
@@ -289,7 +291,7 @@ const DefenseScreen: React.FC<{
         }, 1000);
 
         return () => clearInterval(timerId);
-    }, [timeLeft, isGameOver, addLog, intelSpawnTimes, rainEvents, surgeTimes, intelPosition, units, flatLayout, missionData.enemyProgressBarSegments]);
+    }, [timeLeft, isGameOver, addLog, intelSpawnTimes, rainEvents, surgeTimes, intelPosition, units, flatLayout, missionData.enemyProgressBarSegments, onFail]);
 
 
     // Game Logic
@@ -354,11 +356,12 @@ const DefenseScreen: React.FC<{
             setOutcome('win');
             playSound('sfx_unlock');
             setTimeout(() => onComplete(missionData.reward), 2000);
-        } else if (turnsLeft <= 0 || enemyProgress >= missionData.enemyProgressBarSegments || timeLeft <= 0) {
+        } else if (turnsLeft <= 0 || enemyProgress >= missionData.enemyProgressBarSegments) {
             setIsGameOver(true);
             setOutcome('loss');
+            onFail();
         }
-    }, [units, turnsLeft, enemyProgress, isGameOver, onComplete, missionData.reward, missionData.enemyProgressBarSegments, timeLeft]);
+    }, [units, turnsLeft, enemyProgress, isGameOver, onComplete, missionData.reward, missionData.enemyProgressBarSegments, onFail]);
 
     const renderOutcomeOverlay = () => {
         if (!isGameOver) return null;

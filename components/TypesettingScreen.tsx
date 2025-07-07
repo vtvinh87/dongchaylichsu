@@ -29,6 +29,7 @@ const TypesettingScreen: React.FC<{
     missionData: TypesettingMissionData;
     onReturnToMuseum: () => void;
     onComplete: (reward: Reward) => void;
+    onFail?: () => void;
 }> = ({ missionData, onReturnToMuseum, onComplete }) => {
     
     // De-duplicated and unique-ID'd list of available letters for the tray

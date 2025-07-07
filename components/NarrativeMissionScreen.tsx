@@ -1,6 +1,7 @@
 
 
 
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { NarrativeMissionData, NarrativeNode, Reward } from '../types';
 import { playSound } from '../utils/audio'; 
@@ -9,12 +10,14 @@ interface NarrativeMissionScreenProps {
   missionData: NarrativeMissionData;
   onReturnToMuseum: () => void;
   onComplete: (reward?: Reward) => void;
+  onFail: () => void;
 }
 
 const NarrativeMissionScreen: React.FC<NarrativeMissionScreenProps> = ({
   missionData,
   onReturnToMuseum,
   onComplete,
+  onFail,
 }) => {
   const [currentNodeId, setCurrentNodeId] = useState<string>(missionData.startNodeId);
   const [showCompletionMessage, setShowCompletionMessage] = useState<boolean>(false);
@@ -46,12 +49,13 @@ const NarrativeMissionScreen: React.FC<NarrativeMissionScreenProps> = ({
       if (currentNode.isSuccessOutcome && currentNode.grantsMissionReward) {
         onComplete(missionData.reward);
       } else {
-        onComplete(undefined);
+        onFail();
+        onReturnToMuseum();
       }
     } else {
       onReturnToMuseum();
     }
-  }, [currentNode, missionData.reward, onComplete, onReturnToMuseum]);
+  }, [currentNode, missionData.reward, onComplete, onReturnToMuseum, onFail]);
 
 
   if (!currentNode) {

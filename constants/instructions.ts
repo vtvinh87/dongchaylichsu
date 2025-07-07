@@ -1,4 +1,5 @@
 
+
 // constants/instructions.ts
 import { Tutorial } from '../types';
 
@@ -35,9 +36,9 @@ export const INSTRUCTION_DATA: Record<string, { title: string; text: string }> =
     title: 'Đối thoại Lịch sử',
     text: "Trò chuyện với các nhân vật lịch sử và đưa ra những lựa chọn đối thoại khôn ngoan để tăng mức độ thiện chí của họ. Đạt được mục tiêu để hoàn thành nhiệm vụ.",
   },
-  trading: {
-    title: 'Giao thương Hội An',
-    text: "Mua và bán các mặt hàng để kiếm lợi nhuận. Hãy chú ý đến các sự kiện ngẫu nhiên có thể ảnh hưởng đến giá cả. Đạt được mục tiêu về vốn trước khi hết ngày!",
+  detective: {
+    title: 'Mật Thám Chốn Thị Thành',
+    text: 'Chào mừng đến với Thăng Long thành! Một vụ án gián điệp đang gây xôn xao. Nhiệm vụ của bạn là hỏi chuyện các nhân vật (NPC), thu thập manh mối và tìm ra mâu thuẫn. Sử dụng sổ tay để xem lại manh mối và bảng suy luận để buộc tội nghi phạm. Mỗi hành động sẽ tốn một lượt đi. Hãy phá án trước khi hết lượt nhé!',
   },
   rhythm: {
     title: 'Giai điệu Cung đình',

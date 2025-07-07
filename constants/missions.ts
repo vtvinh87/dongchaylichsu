@@ -1,6 +1,5 @@
-
 // constants/missions.ts
-import { MissionData, PuzzlePieceItem, TradingGood, TradingEvent, TimelineEventItem, HiddenObjectItem, QuizQuestion, DiplomacyRound, DiplomacyChoice, RallyCallRound, RallyCallChoice, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingTask, CityPlanningMissionData, TypesettingMissionData, AdventurePuzzleRiddle, StrategicPathMissionData, ConstructionPuzzlePiece, ConstructionPuzzleMissionData, NavalBattleMissionData, LaneBattleMissionData, CoinMintingMissionData, AdventurePuzzleMissionData, TradingMissionData, HiddenObjectMissionData } from '../types';
+import { MissionData, DetectiveMissionData } from '../types';
 import * as Items from './items';
 import * as ImageUrls from '../imageUrls';
 
@@ -180,18 +179,79 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
     modelUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/main/pictures/AR/NoThan-AR.glb',
     reward: { id: Items.NO_THAN_ARTIFACT_ID, type: 'artifact' },
   },
-  'hidden-object-ly-market': {
-    type: 'hiddenObject',
-    id: 'hidden-object-ly-market',
-    title: 'Tìm vật phẩm ở chợ thời Lý',
-    backgroundImageUrl: ImageUrls.HIDDEN_OBJECT_BG_URL,
-    objectsToFind: [
-        { id: 'item_coin', name: 'Tiền đồng', iconUrl: ImageUrls.LY_DYNASTY_COIN_URL, details: 'Tiền đồng là đơn vị tiền tệ chính được lưu hành dưới thời Lý, cho thấy một nền kinh tế thương mại phát triển.', coords: { x: 55, y: 75, width: 8, height: 12 } },
-        { id: 'item_brush', name: 'Bút lông', iconUrl: ImageUrls.BUT_LONG_NGHIEN_MUC_URL, details: 'Bút lông và nghiên mực là vật dụng không thể thiếu của các nhà nho và sĩ tử, thể hiện sự coi trọng giáo dục.', coords: { x: 22, y: 55, width: 10, height: 15 } },
-        { id: 'item_pottery', name: 'Gốm sứ', iconUrl: ImageUrls.TRADING_CERAMICS_ICON_URL, details: 'Gốm sứ men ngọc thời Lý nổi tiếng với chất lượng và hoa văn tinh xảo, là một mặt hàng xuất khẩu có giá trị.', coords: { x: 78, y: 60, width: 12, height: 18 } },
-    ],
+  'thang_long_spy': {
+    type: 'detective',
+    id: 'thang_long_spy',
+    title: 'Mật Thám Chốn Thị Thành',
     reward: { id: Items.LY_DYNASTY_COIN_ARTIFACT_ID, type: 'artifact' },
-  },
+    backgroundUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-phien-cho-thoi-ly.png',
+    turnLimit: 12,
+    npcs: [
+      {
+        id: 'ba_ban_tra', name: 'Bà bán trà',
+        avatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-ba-ban-tra.png',
+        position: { top: '30%', left: '15%' },
+        initialDialogue: "Trà mới đây, trà mới thơm ngon đây! Chà, trông quan nhân có vẻ đang tìm kiếm gì đó thì phải?",
+        clue: { id: 'clue_dialogue_1', text: 'Bà bán trà nghe loáng thoáng có người hẹn gặp ở bến tàu để giao "hàng đặc biệt".', isTrue: false, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-cuoc-hoi-thoai.png' }
+      },
+      {
+        id: 'nguoi_ban_lua', name: 'Cô bán lụa',
+        avatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-nguoi-ban-lua.png',
+        position: { top: '65%', left: '25%' },
+        initialDialogue: "Lụa Hà Đông đẹp nhất Thăng Long thành đây, quan nhân muốn mua một tấm không?",
+        clue: { id: 'clue_silk_1', text: 'Cô bán lụa bán một tấm vải đen, dày cho một người đàn ông đi khập khiễng, có vẻ để gói vật nặng.', isTrue: false, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-vai-lua.png' }
+      },
+      {
+        id: 'bac_tho_ren', name: 'Bác thợ rèn',
+        avatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-bac-tho-ren.png',
+        position: { top: '50%', left: '70%' },
+        initialDialogue: "Búa và đe của tôi lúc nào cũng sẵn sàng. Quan nhân cần rèn thứ gì à?",
+        clue: { id: 'clue_metal_box_1', text: 'Bác thợ rèn được đặt làm một chiếc hộp sắt nhỏ nhưng rất nặng. Người đặt hàng không hề đi khập khiễng.', isTrue: true, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-thanh-sat.png' }
+      },
+      {
+        id: 'linh_gac_thanh', name: 'Lính gác thành',
+        avatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-linh-gac-thanh.png',
+        position: { top: '10%', left: '85%' },
+        initialDialogue: "Cửa Tây nghiêm ngặt, phận sự của ta là đảm bảo không kẻ gian nào lọt qua.",
+        clue: { id: 'clue_gate_1', text: 'Lính gác thành để ý thấy có kẻ lạ mặt lảng vảng gần cửa Tây, có cử chỉ ám muội với một vị thương nhân ngoại quốc.', isTrue: true, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-vu-khi-la.png' }
+      },
+      {
+        id: 'nguoi_ban_hoa_qua', name: 'Chị bán hoa quả',
+        avatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-nguoi-ban-hoa-qua.png',
+        position: { top: '75%', left: '55%' },
+        initialDialogue: "Mận, đào, mơ tươi ngon! Mời quan nhân nếm thử!",
+        clue: { id: 'clue_fruits_1', text: 'Một vị quý tộc trông có vẻ lo lắng, mua rất nhiều hoa quả rẻ tiền, khác hẳn với thói quen thường ngày.', isTrue: true, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-quan-sat.png' }
+      },
+      {
+        id: 'nguoi_dan_thuong', name: 'Người dân thường',
+        avatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-dan-thuong.png',
+        position: { top: '40%', left: '40%' },
+        initialDialogue: "Haizz, dạo này sưu cao thuế nặng, cuộc sống khó khăn quá...",
+        clue: { id: 'clue_marina_1', text: 'Người dân thường phàn nàn về việc bến tàu dạo này có nhiều lính canh hơn, kiểm tra hàng hóa rất gắt gao.', isTrue: false, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-ben-tau.png' }
+      },
+    ],
+    suspects: [
+      { id: 'suspect_1', name: 'Lão thương nhân', portraitUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Character/C-nghi-pham-1.png' },
+      { id: 'suspect_2', name: 'Vị quý tộc', portraitUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Character/C-nghi-pham-2.png' },
+      { id: 'suspect_3', name: 'Thợ thủ công ngoại quốc', portraitUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Character/C-nghi-pham-3.png' },
+    ],
+    solution: {
+      culpritId: 'suspect_3',
+      evidenceIds: ['clue_metal_box_1', 'clue_gate_1', 'clue_deception_1']
+    },
+    contradictions: {
+      'clue_silk_1': ['clue_metal_box_1', 'clue_deception_1'],
+    },
+    deductionClues: {
+      'clue_deception_1': {
+        id: 'clue_deception_1',
+        text: 'Manh mối mâu thuẫn! Có kẻ đang cố tình tung hỏa mù. Vụ án có thể có 2 người, hoặc một kẻ cải trang.',
+        isTrue: true,
+        iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-mat-na.png',
+        revealedByContradiction: true,
+      }
+    }
+  } as DetectiveMissionData,
   'quiz-general-knowledge': {
     type: 'quiz',
     id: 'quiz-general-knowledge',
@@ -261,28 +321,6 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
     ],
     reward: { id: Items.CHIEU_DOI_DO_ARTIFACT_ID, type: 'artifact' }
   },
-  'trading-hoi-an': {
-      type: 'trading',
-      id: 'trading-hoi-an',
-      title: 'Giao thương Hội An',
-      initialCapital: 1000,
-      targetCapital: 5000,
-      daysLimit: 20,
-      goods: [
-          { id: 'silk', name: 'Tơ lụa', basePrice: 100, iconUrl: ImageUrls.TRADING_SILK_ICON_URL },
-          { id: 'ceramics', name: 'Gốm sứ', basePrice: 60, iconUrl: ImageUrls.TRADING_CERAMICS_ICON_URL },
-          { id: 'spices', name: 'Trầm hương', basePrice: 250, iconUrl: ImageUrls.TRADING_SPICES_ICON_URL },
-      ],
-      events: [
-          { description: 'Thuyền buôn Ba Tư đến, giá Trầm hương tăng vọt!', priceModifier: { goodId: 'spices', multiplier: 1.8 } },
-          { description: 'Làng gốm Bát Tràng được mùa, gốm sứ giá rẻ!', priceModifier: { goodId: 'ceramics', multiplier: 0.7 } },
-          { description: 'Nắng nóng kéo dài, tằm kém ăn, giá tơ lụa tăng.', priceModifier: { goodId: 'silk', multiplier: 1.5 } },
-          { description: 'Bão lớn, thuyền buôn không thể cập bến, mọi thứ đều đắt đỏ!', priceModifier: { goodId: 'spices', multiplier: 1.2 } },
-          { description: 'Mùa màng thất bát, giá Tơ lụa giảm mạnh.', priceModifier: { goodId: 'silk', multiplier: 0.6 } },
-          { description: 'Phát hiện mỏ đất sét mới, giá Gốm sứ hạ.', priceModifier: { goodId: 'ceramics', multiplier: 0.8 } },
-      ],
-      reward: { id: Items.TIEN_QUANG_TRUNG_THONG_BAO_ARTIFACT_ID, type: 'artifact' }
-  } as TradingMissionData,
   'coloring-dong-ho': {
     type: 'coloring',
     id: 'coloring-dong-ho',
@@ -330,7 +368,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
           { x: 50, y: 35, radius: 15 },
       ],
       reward: { id: Items.AO_BAO_TAY_SON_ARTIFACT_ID, type: 'artifact' },
-  } as StrategyMapMissionData,
+  },
   'quang-trung-coin-minting': {
       type: 'coinMinting',
       id: 'quang-trung-coin-minting',
@@ -347,7 +385,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         { id: 'mold_ly', name: 'Khuôn thời Lý', imageUrl: ImageUrls.MOLD_LY_URL },
       ],
       reward: { id: Items.DONG_TIEN_QUANG_TRUNG_ARTIFACT_ID, type: 'artifact' },
-  } as CoinMintingMissionData,
+  },
   'hue-city-planning': {
     type: 'cityPlanning',
     id: 'hue-city-planning',
@@ -359,7 +397,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         { id: 'the-mieu', name: 'Thế Miếu', iconUrl: ImageUrls.ICON_THE_MIEU_URL, correctPosition: { x: 15, y: 60 } },
     ],
     reward: { id: Items.MO_HINH_CUU_DINH_ARTIFACT_ID, type: 'artifact' },
-  } as CityPlanningMissionData,
+  },
   'quoc-ngu-typesetting': {
     type: 'typesetting',
     id: 'quoc-ngu-typesetting',
@@ -367,7 +405,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
     targetText: 'ĐỘC LẬP TỰ DO',
     availableLetters: ['Đ', 'Ộ', 'C', 'L', 'Ậ', 'P', 'T', 'Ự', 'D', 'O', 'A', 'N', 'H', 'G', 'Ê', 'M'],
     reward: { id: Items.GIA_DINH_BAO_ARTIFACT_ID, type: 'artifact' },
-  } as TypesettingMissionData,
+  },
   'dong-du-adventure-puzzle': {
     type: 'adventurePuzzle',
     id: 'dong-du-adventure-puzzle',
@@ -378,7 +416,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         { riddleText: "Phong trào mang tên 'Hành trình về phương Đông'. Tên của phong trào là gì?", correctAnswer: "Dong Du", hint: "Tên phong trào có hai chữ, ghép từ 'phương Đông' và 'du học'." },
     ],
     reward: { id: Items.VALI_DONG_DU_ARTIFACT_ID, type: 'artifact' },
-  } as AdventurePuzzleMissionData,
+  },
   [MISSION_DONG_LOC_PATH_ID]: {
     type: 'strategicPath',
     id: MISSION_DONG_LOC_PATH_ID,
@@ -404,7 +442,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         [3,8,8,5,8,8,8,8,8,3],
         [1,1,1,1,1,8,1,1,1,1],
     ]
-  } as StrategicPathMissionData,
+  },
   [MISSION_CUA_CHUA_PATH_ID]: {
     type: 'strategicPath',
     id: MISSION_CUA_CHUA_PATH_ID,
@@ -431,7 +469,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         [1,1,1,15,1,1,1,1,1,1],
     ],
     unstableMountains: [ {x:2, y:3}, {x:2, y:5}, {x:7, y:3}, {x:7, y:5}, {x:2, y:13}, {x:7, y:13} ],
-  } as StrategicPathMissionData,
+  },
   [MISSION_SEBANGHIENG_PATH_ID]: {
     type: 'strategicPath',
     id: MISSION_SEBANGHIENG_PATH_ID,
@@ -458,7 +496,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         [15,0,0,0,0,0,0,0,0,15],
     ],
     convoyPath: [ {x:0, y:3}, {x:1, y:3}, {x:2, y:3}, {x:3, y:3}, {x:4, y:3}, {x:5, y:3}, {x:6, y:3}, {x:7, y:3}, {x:8, y:3}, {x:9, y:3} ],
-  } as StrategicPathMissionData,
+  },
   'ba-trieu-lanes': {
     type: 'laneBattle',
     id: 'ba-trieu-lanes',
@@ -466,23 +504,18 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
     duration: 90, // 90 seconds
     defensePoints: 10,
     reward: { id: Items.BA_TRIEU_PHOENIX_HAIRPIN_ARTIFACT_ID, type: 'artifact' }
-  } as LaneBattleMissionData,
+  },
   'xay-chua-van-xuan': {
     type: 'constructionPuzzle',
     id: 'xay-chua-van-xuan',
     title: 'Lý Bí và nước Vạn Xuân',
     gridSize: { rows: 10, cols: 10 },
     pieces: [
-        { id: 'foundation', shape: [
-            [1, 1, 1, 1],
-            [1, 1, 1, 1],
-            [1, 1, 1, 1],
-            [1, 1, 1, 1],
-        ], imageUrl: ImageUrls.PUZZLE_CHUA_NEN_MONG_URL },
-        { id: 'gate', shape: [[1,1,1],[1,1,1],[1,1,1]], imageUrl: ImageUrls.PUZZLE_CHUA_CONG_CHUA_URL },
-        { id: 'corridor', shape: [[1,1,1],[1,1,1],[1,1,1]], imageUrl: ImageUrls.PUZZLE_CHUA_HANH_LANG_URL },
-        { id: 'main_hall', shape: [[1,1,1],[1,1,1],[1,1,1]], imageUrl: ImageUrls.PUZZLE_CHUA_CHINH_DIEN_URL },
-        { id: 'roof', shape: [[1,1,1],[1,1,1],[1,1,1]], imageUrl: ImageUrls.PUZZLE_CHUA_MAI_CHUA_URL },
+        { id: 'foundation', name: 'Nền móng', shape: [[1, 1, 1, 1],[1, 1, 1, 1],[1, 1, 1, 1],[1, 1, 1, 1]], imageUrl: ImageUrls.PUZZLE_CHUA_NEN_MONG_URL },
+        { id: 'gate', name: 'Cổng chùa', shape: [[1,1,1],[1,1,1],[1,1,1]], imageUrl: ImageUrls.PUZZLE_CHUA_CONG_CHUA_URL },
+        { id: 'corridor', name: 'Hành lang', shape: [[1,1,1],[1,1,1],[1,1,1]], imageUrl: ImageUrls.PUZZLE_CHUA_HANH_LANG_URL },
+        { id: 'main_hall', name: 'Chính điện', shape: [[1,1,1],[1,1,1],[1,1,1]], imageUrl: ImageUrls.PUZZLE_CHUA_CHINH_DIEN_URL },
+        { id: 'roof', name: 'Mái chùa', shape: [[1,1,1],[1,1,1],[1,1,1]], imageUrl: ImageUrls.PUZZLE_CHUA_MAI_CHUA_URL },
     ],
     solution: {
         'foundation': { x: 3, y: 5, rotationIndex: 0 },
@@ -492,7 +525,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         'roof':       { x: 3, y: 2, rotationIndex: 0 },
     },
     reward: { id: Items.MO_HINH_CHUA_VAN_XUAN_ARTIFACT_ID, type: 'artifact' },
-  } as ConstructionPuzzleMissionData,
+  },
   'bach-dang-tactical-map': {
       type: 'tacticalMap',
       id: 'bach-dang-tactical-map',
@@ -505,7 +538,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         { id: 'reed_bank', x: 10, y: 40, width: 25, height: 40 },
         { id: 'whirlpool', x: 65, y: 60, width: 15, height: 20 },
       ],
-  } as TacticalMapMissionData,
+  },
   'bach-dang-naval-battle': {
       type: 'navalBattle',
       id: 'bach-dang-naval-battle',
@@ -516,7 +549,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
       shipSpeed: 80, // pixels per second
       tideDuration: 10, // 10 seconds for a full cycle
       reward: { id: Items.COC_GO_BACH_DANG_ARTIFACT_ID, type: 'artifact' },
-  } as NavalBattleMissionData,
+  },
   'find-bach-dang-ambush-spot': {
     type: 'hiddenObject',
     id: 'find-bach-dang-ambush-spot',
@@ -528,5 +561,5 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         { id: 'whirlpool', name: 'Vùng Nước Xoáy', iconUrl: ImageUrls.ICON_VUNG_NUOC_XOAY_URL, details: 'Vùng nước chảy xiết và có xoáy sẽ gây khó khăn cho thuyền lớn của địch khi di chuyển.', coords: { x: 65, y: 60, width: 15, height: 20 } },
     ],
     // No reward, this mission is just a step in a quest.
-  } as HiddenObjectMissionData,
+  },
 };

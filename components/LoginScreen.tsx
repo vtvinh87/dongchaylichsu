@@ -11,6 +11,18 @@ interface LoginScreenProps {
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, appName }) => {
   const [name, setName] = useState('');
   const [gender, setGender] = useState<Gender>('male');
+  const [isAdminDetected, setIsAdminDetected] = useState(false);
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value;
+    setName(newName);
+    // Check for admin name case-insensitively
+    if (newName.toLowerCase() === 'admin') {
+      setIsAdminDetected(true);
+    } else {
+      setIsAdminDetected(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,15 +56,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, appName }) => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={handleNameChange}
           placeholder="Tên Nhà Sử Học Nhí"
           className="w-full px-4 py-3 bg-white dark:bg-stone-700 text-stone-800 dark:text-stone-100 border-2 border-amber-400 dark:border-amber-600 rounded-lg focus:ring-2 focus:ring-amber-600 dark:focus:ring-amber-400 focus:border-amber-600 dark:focus:border-amber-400 outline-none transition-colors duration-300"
           aria-label="Tên Nhà Sử Học Nhí"
         />
+        {isAdminDetected && <p className="text-green-600 dark:text-green-400 font-bold -mt-2">Chế độ Quản trị viên sẽ được kích hoạt.</p>}
         <button
           type="submit"
           className="w-full bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-stone-900 font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:ring-opacity-50"

@@ -72,10 +72,10 @@ const SandboxScreen: React.FC<SandboxScreenProps> = ({
       const y = e.clientY - canvasRect.top - offsetY;
 
       if(type === 'item') {
-        const newPlacedItems = sandboxState.placedItems.map(p => p.instanceId === item.instanceId ? { ...p, x, y } : p);
+        const newPlacedItems = sandboxState.placedItems.map(p => p.instanceId === (item as PlacedItem).instanceId ? { ...p, x, y } : p);
         onUpdateSandboxState({...sandboxState, placedItems: newPlacedItems});
       } else if (type === 'bubble') {
-        const newSpeechBubbles = sandboxState.speechBubbles.map(b => b.id === item.id ? { ...b, x, y } : b);
+        const newSpeechBubbles = sandboxState.speechBubbles.map(b => b.id === (item as SpeechBubble).id ? { ...b, x, y } : b);
         onUpdateSandboxState({...sandboxState, speechBubbles: newSpeechBubbles});
       }
       draggedItemRef.current = null;
@@ -105,7 +105,11 @@ const SandboxScreen: React.FC<SandboxScreenProps> = ({
       
       const targetRect = (e.target as HTMLElement).getBoundingClientRect();
       // The `item` is correctly typed here based on the `type` parameter, so we can cast.
-      draggedItemRef.current = { type, item, offsetX: e.clientX - targetRect.left, offsetY: e.clientY - targetRect.top } as DraggedInfo;
+      if (type === 'item') {
+        draggedItemRef.current = { type, item: item as PlacedItem, offsetX: e.clientX - targetRect.left, offsetY: e.clientY - targetRect.top };
+      } else {
+        draggedItemRef.current = { type, item: item as SpeechBubble, offsetX: e.clientX - targetRect.left, offsetY: e.clientY - targetRect.top };
+      }
       e.dataTransfer.effectAllowed = 'move';
   };
 

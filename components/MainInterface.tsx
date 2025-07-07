@@ -2,20 +2,23 @@
 
 
 
+
+
 import React, { useMemo, useCallback } from 'react';
-import { Hoi, MissionInfo, Artifact, HeroCard, Decoration, AvatarCustomization, Reward } from '../types';
+import { Hoi, MissionInfo, Artifact, HeroCard, Decoration, AvatarCustomization, Reward, MissionData } from '../types';
 import MissionCard from './SagaCard';
 import ArtifactCard from './ArtifactCard';
 import HeroCardDisplay from './HeroCardDisplay'; 
 import DecorationCard from './DecorationCard';
 import AvatarDisplay from './AvatarDisplay';
-import { ALL_MISSIONS, ALL_QUEST_CHAINS } from '../constants';
+import { ALL_QUEST_CHAINS } from '../constants';
 
 interface MainInterfaceProps {
   userName: string;
   gender: 'male' | 'female';
   avatarCustomization: AvatarCustomization;
   hois: Hoi[];
+  missions: Record<string, MissionData>;
   collectedArtifacts: Artifact[];
   collectedHeroCards: HeroCard[]; 
   collectedDecorations: Decoration[];
@@ -26,7 +29,9 @@ interface MainInterfaceProps {
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
   isPremium: boolean;
+  isAdmin: boolean;
   onShowPremium: () => void;
+  onShowAdminPanel: () => void;
   onShowItemDetails: (item: Artifact | HeroCard | Decoration) => void;
   onShowSandbox: () => void;
   onShowCustomization: () => void;
@@ -41,6 +46,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
   gender,
   avatarCustomization,
   hois,
+  missions,
   collectedArtifacts,
   collectedHeroCards, 
   collectedDecorations,
@@ -51,7 +57,9 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
   theme,
   onToggleTheme,
   isPremium,
+  isAdmin,
   onShowPremium,
+  onShowAdminPanel,
   onShowItemDetails,
   onShowSandbox,
   onShowCustomization,
@@ -66,7 +74,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
     const collectedHeroCardIds = useMemo(() => new Set(collectedHeroCards.map(h => h.id)), [collectedHeroCards]);
 
     const isMissionCompleted = useCallback((missionId: string): boolean => {
-        const missionData = ALL_MISSIONS[missionId];
+        const missionData = missions[missionId];
         // If a mission doesn't exist or has no reward, we don't block based on it.
         // This is important for steps in a quest chain that grant no intermediate reward.
         if (!missionData || !missionData.reward) {
@@ -86,10 +94,10 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
             default:
                 return true;
         }
-    }, [collectedArtifactIds, collectedHeroCardIds, inventory]);
+    }, [collectedArtifactIds, collectedHeroCardIds, inventory, missions]);
 
     const hoiUnlockStatus = useMemo(() => {
-        if (isPremium) {
+        if (isPremium || isAdmin) {
             return hois.map(() => true);
         }
         
@@ -125,10 +133,10 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
                     const chain = ALL_QUEST_CHAINS[missionInfo.questChainId];
                     if (!chain) { isPreviousHoiComplete = false; break; }
                     const lastStep = chain.steps[chain.steps.length - 1];
-                    const finalMissionData = ALL_MISSIONS[lastStep.missionId];
+                    const finalMissionData = missions[lastStep.missionId];
                     reward = finalMissionData?.reward;
                 } else {
-                    const missionData = ALL_MISSIONS[missionInfo.missionId];
+                    const missionData = missions[missionInfo.missionId];
                     reward = missionData?.reward;
                 }
     
@@ -162,7 +170,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
             status.push(isPreviousHoiComplete);
         }
         return status;
-    }, [hois, collectedArtifactIds, collectedHeroCardIds, inventory, isPremium]);
+    }, [hois, missions, collectedArtifactIds, collectedHeroCardIds, inventory, isPremium, isAdmin]);
 
 
   return (
@@ -175,6 +183,16 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
           </h1>
         </div>
         <div id="main-header-controls" className="flex items-center gap-2 flex-wrap justify-center">
+            {isAdmin && (
+                <button
+                    onClick={onShowAdminPanel}
+                    className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg flex items-center"
+                    aria-label="Mở Bảng điều khiển Quản trị"
+                >
+                    <span role="img" aria-label="gear icon" className="mr-2 text-xl">⚙️</span>
+                    Admin Panel
+                </button>
+            )}
             <button
               onClick={onToggleSound}
               className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-semibold py-2 px-3 rounded-lg shadow-md"
@@ -190,7 +208,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
             >
               {theme === 'light' ? '🌙' : '☀️'}
             </button>
-             {!isPremium && (
+             {!isPremium && !isAdmin && (
                 <button
                     onClick={onShowPremium}
                     className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg flex items-center"
@@ -262,27 +280,27 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
               <h2 className="text-2xl font-bold text-amber-700 dark:text-amber-300 mb-2 border-b-2 border-amber-200 dark:border-stone-600 pb-2">{hoi.title}</h2>
               <p className="text-stone-600 dark:text-stone-400 mb-6">{hoi.description}</p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {hoi.missions.map(mission => {
-                    if (isPremium) {
+                {hoi.missions.map(missionInfo => {
+                    if (isPremium || isAdmin) {
                         return (
                             <MissionCard 
-                              key={mission.id} 
-                              mission={mission} 
-                              onClick={() => onStartMission(mission)} 
+                              key={missionInfo.id} 
+                              mission={missionInfo} 
+                              onClick={() => onStartMission(missionInfo)} 
                               isLocked={false}
                             />
                           );
                     }
 
-                    const isDependencyLocked = mission.dependsOnMissionId 
-                      ? !isMissionCompleted(mission.dependsOnMissionId)
+                    const isDependencyLocked = missionInfo.dependsOnMissionId 
+                      ? !isMissionCompleted(missionInfo.dependsOnMissionId)
                       : false;
-                    const finalIsLocked = !isChapterUnlocked || isDependencyLocked || (mission.isPremium && !isPremium);
+                    const finalIsLocked = !isChapterUnlocked || isDependencyLocked || (missionInfo.isPremium && !isPremium);
                     return (
                         <MissionCard 
-                          key={mission.id} 
-                          mission={mission} 
-                          onClick={() => onStartMission(mission)} 
+                          key={missionInfo.id} 
+                          mission={missionInfo} 
+                          onClick={() => onStartMission(missionInfo)} 
                           isLocked={finalIsLocked}
                         />
                     );

@@ -17,7 +17,7 @@ export enum Screen {
   CUSTOMIZATION,
   LANDING_PAGE,
   CRAFTING_SCREEN,
-  TRADING_SCREEN,
+  DETECTIVE_SCREEN,
   RHYTHM_MISSION_SCREEN,
   COLORING_MISSION_SCREEN,
   ACHIEVEMENTS,
@@ -35,6 +35,7 @@ export enum Screen {
   CONSTRUCTION_PUZZLE_SCREEN, // New screen for the block puzzle game
   NAVAL_BATTLE_TIMING_SCREEN, // New screen for the naval battle timing game
   LANE_BATTLE_MISSION_SCREEN, // New screen for the lane battle game
+  ADMIN_DASHBOARD, // New screen for the admin panel
 }
 
 export interface Point {
@@ -42,28 +43,42 @@ export interface Point {
   y: number;
 }
 
+// --- Base Item & Mission Types ---
+
+export interface UnlockCondition {
+  type: 'complete_hoi';
+  hoi_id: string;
+}
+
+export type Reward =
+  | { type: 'artifact'; id: string }
+  | { type: 'heroCard'; id: string }
+  | { type: 'fragment'; id: string }
+  | { type: 'decoration'; id: string };
+
+export interface BaseMissionData {
+  id: string;
+  title: string;
+  reward?: Reward;
+}
+
+// --- Collectible Items ---
+
 export interface Artifact {
   id: string;
   name: string;
   imageUrl: string;
-  description?: string; 
-  detailedDescription: string; 
-  craftingRequirements?: string[]; // Array of fragment IDs
+  description: string;
+  detailedDescription: string;
+  craftingRequirements?: string[]; // IDs of memory fragments
 }
 
 export interface MemoryFragment {
-    id: string;
-    name: string;
-    imageUrl: string;
-    description: string;
-    belongsToArtifactId: string; // ID of the artifact this fragment is for
-}
-
-export interface Decoration {
   id: string;
   name: string;
   imageUrl: string;
   description: string;
+  belongsToArtifactId: string;
 }
 
 export interface HeroCard {
@@ -73,20 +88,27 @@ export interface HeroCard {
   description?: string;
 }
 
-// Represents the data for a single clickable mission card on the main interface
+export interface Decoration {
+  id: string;
+  name: string;
+  imageUrl: string;
+  description: string;
+}
+
+// --- Mission Info & Sagas ---
+
 export interface MissionInfo {
   id: string;
   title: string;
   imageUrl: string;
-  description?: string;
-  missionId: string; 
-  questChainId?: string; // ID for quest chains
+  description: string;
+  missionId: string; // The key in ALL_MISSIONS
   isPremium?: boolean;
-  isOptionalForProgression?: boolean; 
-  dependsOnMissionId?: string; // New field for sequential unlocking
+  dependsOnMissionId?: string;
+  isOptionalForProgression?: boolean;
+  questChainId?: string;
 }
 
-// Represents a "Chapter" or "Act" that groups multiple missions
 export interface Hoi {
   id: string;
   title: string;
@@ -95,79 +117,61 @@ export interface Hoi {
   isPremiumChapter?: boolean;
 }
 
+// --- Specific Mission Data Types ---
+
 export interface PuzzlePieceItem {
   id: number;
   imageUrl: string;
-  funFact?: string; // Optional fun fact for the piece
+  funFact?: string;
 }
 
-export type RewardType = 'artifact' | 'heroCard' | 'decoration' | 'fragment';
-export interface Reward {
-    id: string;
-    type: RewardType;
+export interface PuzzleMissionData extends BaseMissionData {
+  type: 'puzzle';
+  puzzleImage: string;
+  pieces: PuzzlePieceItem[];
+  timeLimit?: number;
 }
 
-// --- Narrative Mission Types ---
 export interface NarrativeChoice {
-  text: string;
-  targetNodeId: string;
+    text: string;
+    targetNodeId: string;
 }
 
 export interface NarrativeNode {
-  id: string;
-  title?: string;
-  text: string;
-  choices: NarrativeChoice[];
-  grantsMissionReward?: boolean; 
-  isTerminal?: boolean; 
-  isSuccessOutcome?: boolean; 
+    id: string;
+    title?: string;
+    text: string;
+    choices: NarrativeChoice[];
+    isTerminal?: boolean;
+    isSuccessOutcome?: boolean;
+    grantsMissionReward?: boolean;
 }
 
-// --- Mission Data Base and Specific Types ---
-export interface PuzzleMissionData {
-  type: 'puzzle';
-  id: string;
-  title: string;
-  reward: Reward;
-  puzzleImage: string; // The full image for the puzzle
-  pieces: PuzzlePieceItem[]; // The pieces with their data, including fun facts
-  timeLimit?: number; // Optional time limit in seconds
-}
-
-export interface NarrativeMissionData {
-  type: 'narrative';
-  id: string;
-  title: string;
-  startNodeId: string;
-  nodes: Record<string, NarrativeNode>; 
-  reward?: Reward; // Final step of a quest might not have an inline reward
+export interface NarrativeMissionData extends BaseMissionData {
+    type: 'narrative';
+    startNodeId: string;
+    nodes: Record<string, NarrativeNode>;
 }
 
 export interface TimelineEventItem {
   id: string;
-  text: string; // Title of the event
+  text: string;
+  details: string;
+  imageUrl: string;
   correctOrder: number;
-  imageUrl: string; // New: URL for the event's illustration
-  details: string; // New: Detailed description for the modal
 }
 
-export interface TimelineMissionData {
+export interface TimelineMissionData extends BaseMissionData {
   type: 'timeline';
-  id: string;
-  title: string;
   instructionText: string;
   events: TimelineEventItem[];
-  reward: Reward;
-  timeLimit?: number; // Optional time limit in seconds
+  timeLimit?: number;
 }
 
-export interface ARMissionData {
+export interface ARMissionData extends BaseMissionData {
   type: 'ar';
-  id: string;
-  title: string;
   markerPatternUrl: string;
   modelUrl: string;
-  reward: Reward;
 }
 
 export interface HiddenObjectItem {
@@ -175,21 +179,13 @@ export interface HiddenObjectItem {
   name: string;
   iconUrl: string;
   details: string;
-  coords: { 
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
+  coords: { x: number; y: number; width: number; height: number; };
 }
 
-export interface HiddenObjectMissionData {
+export interface HiddenObjectMissionData extends BaseMissionData {
   type: 'hiddenObject';
-  id: string;
-  title: string;
   backgroundImageUrl: string;
   objectsToFind: HiddenObjectItem[];
-  reward?: Reward;
 }
 
 export interface QuizQuestion {
@@ -198,12 +194,9 @@ export interface QuizQuestion {
   correctAnswer: string;
 }
 
-export interface QuizMissionData {
+export interface QuizMissionData extends BaseMissionData {
   type: 'quiz';
-  id: string;
-  title: string;
   questions: QuizQuestion[];
-  reward: Reward;
 }
 
 export interface Resources {
@@ -211,413 +204,344 @@ export interface Resources {
   stone: number;
 }
 
-export interface ConstructionMissionData {
-    type: 'construction';
-    id: string;
-    title: string;
-    resourceGoal: Resources;
-    buildingCost: Resources;
-    winCondition: number;
-    reward: Reward;
+export interface ConstructionMissionData extends BaseMissionData {
+  type: 'construction';
+  resourceGoal: Resources;
+  buildingCost: Resources;
+  winCondition: number;
 }
 
 export interface DiplomacyChoice {
-    text: string;
-    points: number;
+  text: string;
+  points: number;
 }
 
 export interface DiplomacyRound {
-    npc_dialogue: string;
-    player_choices: DiplomacyChoice[];
+  npc_dialogue: string;
+  player_choices: DiplomacyChoice[];
 }
 
-export interface DiplomacyMissionData {
-    type: 'diplomacy';
-    id: string;
-    title: string;
-    characterName: string;
-    characterImageUrl: string;
-    initialGoodwill: number;
-    targetGoodwill: number;
-    rounds: DiplomacyRound[];
-    reward: Reward;
+export interface DiplomacyMissionData extends BaseMissionData {
+  type: 'diplomacy';
+  characterName: string;
+  characterImageUrl: string;
+  initialGoodwill: number;
+  targetGoodwill: number;
+  rounds: DiplomacyRound[];
 }
 
-// --- Trading Game Types ---
+// --- New Trading Mission Types ---
 export interface TradingGood {
   id: string;
   name: string;
-  basePrice: number;
   iconUrl: string;
+  basePrice: number;
 }
 
 export interface TradingEvent {
   description: string;
   priceModifier: {
     goodId: string;
-    multiplier: number; // e.g., 1.5 for +50%, 0.8 for -20%
+    multiplier: number;
   };
 }
 
-export interface TradingMissionData {
-    type: 'trading';
-    id: string;
-    title: string;
-    initialCapital: number;
-    targetCapital: number;
-    daysLimit: number;
-    goods: TradingGood[];
-    events: TradingEvent[];
-    reward: Reward;
+export interface TradingMissionData extends BaseMissionData {
+  type: 'trading';
+  initialCapital: number;
+  targetCapital: number;
+  daysLimit: number;
+  goods: TradingGood[];
+  events: TradingEvent[];
 }
 
-// --- Rhythm Game Types ---
-export interface RhythmNote {
-  time: number; // in milliseconds from song start
-  lane: number; // e.g., 1, 2, 3
-}
-
-export interface RhythmMissionData {
-  type: 'rhythm';
+// --- New Detective Mission Types ---
+export interface DetectiveClue {
   id: string;
-  title: string;
+  text: string;
+  isTrue: boolean;
+  iconUrl: string;
+  revealedByContradiction?: boolean;
+}
+
+export interface DetectiveNPC {
+  id: string;
+  name: string;
+  avatarUrl: string;
+  position: { top: string; left: string; };
+  initialDialogue: string;
+  clue: DetectiveClue;
+}
+
+export interface DetectiveSuspect {
+  id: string;
+  name: string;
+  portraitUrl: string;
+}
+
+export interface DetectiveMissionData extends BaseMissionData {
+  type: 'detective';
+  backgroundUrl: string;
+  turnLimit: number;
+  npcs: DetectiveNPC[];
+  suspects: DetectiveSuspect[];
+  solution: {
+    culpritId: string;
+    evidenceIds: string[];
+  };
+  contradictions: Record<string, string[]>; // { clueId1: [clueId2, newClueId] }
+  deductionClues: Record<string, DetectiveClue>; // Stores the new clues revealed by contradiction
+}
+
+export interface ColoringMissionData extends BaseMissionData {
+  type: 'coloring';
+  lineArtSVG: string;
+  colorPalette: string[];
+  solution: Record<string, string>;
+}
+
+export interface RhythmNote {
+  time: number;
+  lane: number;
+}
+
+export interface RhythmMissionData extends BaseMissionData {
+  type: 'rhythm';
   songUrl: string;
   noteMap: RhythmNote[];
   targetScore: number;
-  reward: Reward;
 }
 
-// --- Coloring Game Types ---
-export interface ColoringMissionData {
-  type: 'coloring';
-  id: string;
-  title: string;
-  lineArtSVG: string;
-  colorPalette: string[];
-  solution: Record<string, string>; // Maps path ID to correct color hex
-  reward: Reward;
-}
-
-// --- Rally Call Game Types (UPDATED) ---
-
-// This type is a discriminated union to clearly separate the two game modes.
-export interface HichPuzzleData {
-  modifiedText: string;
-  answers: string[];
-  definitions: Record<string, string>;
-}
-
-// For Morale/Icon-based choices
 export interface RallyCallChoice {
-    id: string;
-    text: string;
-    moralePoints: number;
-    iconUrl: string;
+  id: string;
+  text: string;
+  iconUrl: string;
+  moralePoints: number;
 }
 
 export interface RallyCallRound {
-    prompt: string;
-    choices: RallyCallChoice[];
+  prompt: string;
+  choices: RallyCallChoice[];
 }
 
-interface RallyCallMoraleData {
-    rounds: RallyCallRound[];
-    fullText?: never;
-    possibleBlanks?: never;
-    definitions?: never;
+export type RallyCallMissionData = (
+  | {
+      type: 'rallyCall';
+      rounds: RallyCallRound[];
+      fullText?: undefined;
+    }
+  | {
+      type: 'rallyCall';
+      fullText: string;
+      rounds?: undefined;
+    }
+) & BaseMissionData;
+
+export interface ForgingMissionData extends BaseMissionData {
+  type: 'forging';
+  targetProgress: number;
 }
 
-// For Fill-in-the-blank game
-interface RallyCallFillBlankData {
-    fullText: string;
-    possibleBlanks?: string[];
-    definitions?: Record<string, string>;
-    rounds?: never;
-}
-
-export type RallyCallMissionData = {
-    type: 'rallyCall';
-    id: string;
-    title: string;
-    reward: Reward;
-} & (RallyCallMoraleData | RallyCallFillBlankData);
-
-
-// --- Forging Game Types ---
-export interface ForgingMissionData {
-    type: 'forging';
-    id: string;
-    title: string;
-    targetProgress: number;
-    reward: Reward;
-}
-
-// --- Tactical Map Game Types ---
 export interface TacticalMapDropZone {
-  id: string; // matches hidden object ID
-  x: number; // percent
-  y: number; // percent
-  width: number; // percent
-  height: number; // percent
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 }
 
-export interface TacticalMapMissionData {
-    type: 'tacticalMap';
-    id: string;
-    title: string;
-    backgroundUrl: string;
-    stakeImageUrl: string;
-    targetStakes?: number; // Made optional as it's now zone-based
-    reward?: Reward;
-    dropZones?: TacticalMapDropZone[]; // New field
+export interface TacticalMapMissionData extends BaseMissionData {
+  type: 'tacticalMap';
+  backgroundUrl: string;
+  stakeImageUrl: string;
+  dropZones: TacticalMapDropZone[];
 }
 
-// --- Defense Game Types (Updated for turn-based mechanics) ---
-export type MapCellType = 'village' | 'forest' | 'road' | 'empty';
+export type MapCellType = 'road' | 'forest' | 'village' | 'empty';
+export type ExtendedMapCellType = MapCellType | 'mountain' | 'river' | 'crater' | 'broken-bridge' | 'resource-wood' | 'sensor' | 'sensor-disabled' | 'open-path' | 'timed-bomb' | 'rockslide' | 'supply-cache' | 'sebanghieng-river' | 'lao-village' | 'pontoon-bridge' | 'friendly-camp' | 'herb';
+
+
 export type EvacuationUnitType = 'civilian' | 'supplies' | 'wounded';
 
 export interface EvacuationUnit {
   id: string;
   type: EvacuationUnitType;
   gridIndex: number;
-  evacuationCost: number; // Number of turns/action points required
+  evacuationCost: number;
 }
 
-export interface DefenseMissionData {
-    type: 'defense';
-    id:string;
-    title: string;
-    mapLayout: MapCellType[][];
-    units: EvacuationUnit[];
-    turnLimit: number; // Replaces timeLimit
-    enemyProgressBarSegments: number; // Number of steps for enemy advance
-    reward: Reward;
+export interface DefenseMissionData extends BaseMissionData {
+  type: 'defense';
+  mapLayout: MapCellType[][];
+  units: EvacuationUnit[];
+  turnLimit: number;
+  enemyProgressBarSegments: number;
 }
 
-// --- Strategy Map Game Types ---
 export interface DangerZone {
-    x: number; // percent
-    y: number; // percent
-    radius: number; // percent of canvas width
+  x: number;
+  y: number;
+  radius: number;
 }
 
-export interface StrategyMapMissionData {
-    type: 'strategyMap';
-    id: string;
-    title: string;
-    mapImageUrl: string;
-    startPoint: { x: number; y: number }; // percent
-    endPoint: { x: number; y: number }; // percent
-    dangerZones: DangerZone[];
-    reward: Reward;
+export interface StrategyMapMissionData extends BaseMissionData {
+  type: 'strategyMap';
+  mapImageUrl: string;
+  startPoint: Point;
+  endPoint: Point;
+  dangerZones: DangerZone[];
 }
 
-// --- Coin Minting Game Types ---
 export interface CoinMintingOption {
-    id: string;
-    name: string;
-    imageUrl: string;
+  id: string;
+  name: string;
+  imageUrl: string;
 }
 
 export interface CoinMintingTask {
-    id: string;
-    name: string;
-    coinImageUrl: string;
-    requiredMetalId: string;
-    requiredMoldId: string;
-}
-
-export interface CoinMintingMissionData {
-    type: 'coinMinting';
-    id: string;
-    title: string;
-    tasks: CoinMintingTask[];
-    metalOptions: CoinMintingOption[];
-    moldOptions: CoinMintingOption[];
-    reward: Reward;
-}
-
-// --- City Planning Game Types ---
-export interface BuildingPlacement {
-    id: string; // e.g., 'ngo-mon'
-    name: string;
-    iconUrl: string;
-    // Position of the top-left corner of the drop zone, in percentage
-    correctPosition: {
-        x: number;
-        y: number;
-    };
-}
-
-export interface CityPlanningMissionData {
-    type: 'cityPlanning';
-    id: string;
-    title: string;
-    mapImageUrl: string;
-    buildings: BuildingPlacement[];
-    reward: Reward;
-}
-
-// --- Typesetting Game Types ---
-export interface TypesettingMissionData {
-  type: 'typesetting';
   id: string;
-  title: string;
-  targetText: string;
-  availableLetters: string[]; // An array of single characters
-  reward: Reward;
+  name: string;
+  coinImageUrl: string;
+  requiredMetalId: string;
+  requiredMoldId: string;
 }
 
-// --- Adventure Puzzle Game Types ---
+export interface CoinMintingMissionData extends BaseMissionData {
+  type: 'coinMinting';
+  tasks: CoinMintingTask[];
+  metalOptions: CoinMintingOption[];
+  moldOptions: CoinMintingOption[];
+}
+
+export interface BuildingPlacement {
+  id: string;
+  name: string;
+  iconUrl: string;
+  correctPosition: Point;
+}
+
+export interface CityPlanningMissionData extends BaseMissionData {
+  type: 'cityPlanning';
+  mapImageUrl: string;
+  buildings: BuildingPlacement[];
+}
+
+export interface TypesettingMissionData extends BaseMissionData {
+  type: 'typesetting';
+  targetText: string;
+  availableLetters: string[];
+}
+
 export interface AdventurePuzzleRiddle {
   riddleText: string;
   correctAnswer: string;
   hint?: string;
 }
 
-export interface AdventurePuzzleMissionData {
+export interface AdventurePuzzleMissionData extends BaseMissionData {
   type: 'adventurePuzzle';
-  id: string;
-  title: string;
   riddles: AdventurePuzzleRiddle[];
-  reward: Reward;
 }
 
-// --- Strategic Path Mission Types ---
-export interface StrategicPathMissionData {
+export interface StrategicPathMissionData extends BaseMissionData {
   type: 'strategicPath';
-  id: string;
-  title: string;
-  // 0:jungle, 1:mountain, 2:river, 3:crater, 4:broken_bridge, 5:wood, 6:sensor, 7:disabled_sensor, 8:open_path, 9:timed_bomb, 10:rockslide, 11:supply_cache, 12:sebanghieng_river, 13:lao_village, 14:pontoon_bridge, 15:friendly_camp, 16:herb, 17:hidden_sensor, 18:scout
-  mapLayout: number[][]; 
-  start: { x: number; y: number };
-  end: { x: number; y: number };
-  reward?: Reward;
+  start: Point;
+  end: Point;
   initialSupplies: number;
-  unstableMountains?: { x: number, y: number }[];
-  convoyPath?: { x: number, y: number }[];
+  mapLayout: number[][];
+  unstableMountains?: Point[];
+  convoyPath?: Point[];
 }
 
-// --- Construction Puzzle Game Types ---
 export interface ConstructionPuzzlePiece {
-    id: string;
-    shape: number[][];
-    color?: string; // Made optional
-    imageUrl?: string; // Added for thematic pieces
-}
-
-export interface ConstructionPuzzleMissionData {
-    type: 'constructionPuzzle';
-    id: string;
-    title: string;
-    gridSize: { rows: number; cols: number };
-    pieces: ConstructionPuzzlePiece[];
-    solution: Record<string, { x: number; y: number; rotationIndex: number }>;
-    reward: Reward;
-}
-
-// --- Naval Battle Timing Game Types ---
-export interface NavalBattleMissionData {
-    type: 'navalBattle';
-    id: string;
-    title: string;
-    backgroundUrl: string;
-    enemyShipIconUrl: string;
-    trapZone: { start: number; end: number }; // Percentage of width
-    shipSpeed: number; // pixels per second
-    tideDuration: number; // seconds for one full cycle (rise -> fall)
-    reward?: Reward;
-}
-
-// --- Lane Battle Game Types ---
-export interface LaneBattleMissionData {
-    type: 'laneBattle';
-    id: string;
-    title: string;
-    duration: number; // in seconds
-    defensePoints: number;
-    reward: Reward;
-}
-
-
-export type MissionData = PuzzleMissionData | NarrativeMissionData | TimelineMissionData | ARMissionData | HiddenObjectMissionData | QuizMissionData | ConstructionMissionData | DiplomacyMissionData | TradingMissionData | RhythmMissionData | ColoringMissionData | RallyCallMissionData | ForgingMissionData | TacticalMapMissionData | DefenseMissionData | StrategyMapMissionData | CoinMintingMissionData | CityPlanningMissionData | TypesettingMissionData | AdventurePuzzleMissionData | StrategicPathMissionData | ConstructionPuzzleMissionData | NavalBattleMissionData | LaneBattleMissionData;
-
-// --- Quest Chain Types ---
-export interface QuestChainStep {
   id: string;
-  title: string;
-  description: string;
-  missionId: string;
-  iconUrl: string;
+  name: string;
+  shape: number[][];
+  imageUrl: string;
 }
 
-export interface QuestChain {
-  id: string;
-  title: string;
-  description: string;
-  steps: QuestChainStep[];
+export interface ConstructionPuzzleMissionData extends BaseMissionData {
+  type: 'constructionPuzzle';
+  gridSize: { rows: number; cols: number };
+  pieces: ConstructionPuzzlePiece[];
+  solution: Record<string, { x: number; y: number; rotationIndex: number; }>;
 }
 
+export interface NavalBattleMissionData extends BaseMissionData {
+  type: 'navalBattle';
+  backgroundUrl: string;
+  enemyShipIconUrl: string;
+  trapZone: { start: number; end: number };
+  shipSpeed: number;
+  tideDuration: number;
+}
 
-// --- Leaderboard Type ---
+export interface LaneBattleMissionData extends BaseMissionData {
+  type: 'laneBattle';
+  duration: number;
+  defensePoints: number;
+}
+
+export type MissionData =
+  | PuzzleMissionData
+  | NarrativeMissionData
+  | TimelineMissionData
+  | ARMissionData
+  | HiddenObjectMissionData
+  | QuizMissionData
+  | ConstructionMissionData
+  | DiplomacyMissionData
+  | TradingMissionData
+  | DetectiveMissionData
+  | ColoringMissionData
+  | RhythmMissionData
+  | RallyCallMissionData
+  | ForgingMissionData
+  | TacticalMapMissionData
+  | DefenseMissionData
+  | StrategyMapMissionData
+  | CoinMintingMissionData
+  | CityPlanningMissionData
+  | TypesettingMissionData
+  | AdventurePuzzleMissionData
+  | StrategicPathMissionData
+  | ConstructionPuzzleMissionData
+  | NavalBattleMissionData
+  | LaneBattleMissionData;
+
+// --- Player & Game State Types ---
+
 export interface LeaderboardEntry {
   userName: string;
   score: number;
 }
 
-// --- Chatbot Type ---
-export interface ChatMessage {
-  id: string;
-  sender: 'user' | 'bot' | 'system';
-  text: string;
-  timestamp: Date;
-}
-
 export interface AiCharacter {
-  id:string;
+  id: string;
   name: string;
   systemInstruction: string;
   avatarUrl: string;
-  unlockHoiId: string | null; // null means unlocked by default
+  unlockHoiId: string;
   unlockMessage: string;
 }
 
-// --- Gemini Chat History Types ---
-export interface Part {
-  text: string;
-}
-
-export interface Content {
-  role: 'user' | 'model';
-  parts: Part[];
-}
-
-
-// --- Tutorial System Types ---
-export interface TutorialStep {
-    elementSelector?: string;
-    title: string;
+export interface ChatMessage {
+    id: string;
+    sender: 'user' | 'bot' | 'system';
     text: string;
-    position?: 'top' | 'bottom' | 'left' | 'right' | 'center';
+    timestamp: Date;
+}
+
+export interface TutorialStep {
+  elementSelector?: string;
+  title: string;
+  text: string;
+  position: 'top' | 'bottom' | 'left' | 'right';
 }
 
 export interface Tutorial {
-    id: string;
-    steps: TutorialStep[];
-}
-
-// --- Avatar Customization Types ---
-export type CustomizationItemType = 'outfit' | 'hat';
-
-export interface CustomizationItem {
   id: string;
-  name: string;
-  type: CustomizationItemType;
-  imageUrl: string;
-  unlockCondition?: {
-    type: 'complete_hoi';
-    hoi_id: string;
-  };
+  steps: TutorialStep[];
 }
 
 export interface AvatarCustomization {
@@ -625,7 +549,14 @@ export interface AvatarCustomization {
   hat: string | null;
 }
 
-// --- Sandbox 2.0 Types ---
+export interface CustomizationItem {
+  id: string;
+  name: string;
+  type: 'outfit' | 'hat';
+  imageUrl: string;
+  unlockCondition?: UnlockCondition;
+}
+
 export type SandboxItem = (Artifact | Decoration) & { type: 'artifact' | 'decoration' };
 
 export type PlacedItem = SandboxItem & {
@@ -646,23 +577,19 @@ export interface SpeechBubble {
     attachedToInstanceId: string;
 }
 
-export interface SandboxBackground {
-    id: string;
-    name: string;
-    imageUrl: string;
-    unlockCondition: {
-        type: 'complete_hoi';
-        hoi_id: string;
-    } | null;
-}
-
 export interface SandboxState {
-    activeBackgroundId: string;
-    placedItems: PlacedItem[];
-    speechBubbles: SpeechBubble[];
+  activeBackgroundId: string;
+  placedItems: PlacedItem[];
+  speechBubbles: SpeechBubble[];
 }
 
-// --- Achievement Types ---
+export interface SandboxBackground {
+  id: string;
+  name: string;
+  imageUrl: string;
+  unlockCondition: UnlockCondition | null;
+}
+
 export interface Achievement {
   id: string;
   name: string;
@@ -671,19 +598,73 @@ export interface Achievement {
   condition: (gameState: SavedGameState) => boolean;
 }
 
-// --- Notebook Types ---
+export interface HichPuzzleData {
+  modifiedText: string;
+  answers: string[];
+  definitions: Record<string, string>;
+}
+
 export interface NotebookPage {
-  type: 'text' | 'image';
+  type: 'text';
   content: string;
 }
 
-// --- Dialogue & Scripting Types ---
-export type SpeakerKey = 'chi_huy' | 'nhan_vat_chinh' | 'cong_binh' | 'giao_lien' | 'system' | 'co_y_ta' | 'anh_trinh_sat';
+export interface BachDangCampaignState {
+  scoutedLocations: string[];
+  unlockedStage: number;
+  stakesPlacedCorrectly: number;
+}
+
+export interface SavedGameState {
+  userName: string;
+  gender: 'male' | 'female';
+  isPremium: boolean;
+  isAdmin: boolean;
+  dailyChatCount: number;
+  lastChatDate: string;
+  collectedArtifactIds: string[];
+  collectedHeroCardIds: string[];
+  collectedDecorationIds: string[];
+  inventory: Record<string, number>;
+  questProgress: Record<string, number>;
+  tutorialsSeen: string[];
+  seenInstructions: string[];
+  avatarCustomization: AvatarCustomization;
+  unlockedCustomizationItemIds: string[];
+  unlockedCharacterIds: string[];
+  unlockedBackgroundIds: string[];
+  sandboxState: SandboxState;
+  unlockedAchievementIds: string[];
+  unlockedNotebookPages: number[];
+  activeSideQuest: ActiveSideQuestState | null;
+  bachDangCampaign: BachDangCampaignState;
+}
+
+// --- Admin & Analytics Types ---
+export interface PlayEvent {
+  missionId: string;
+  missionTitle: string;
+  userName: string;
+  timestamp: number;
+  outcome: 'win' | 'loss' | 'quit';
+}
+
+export type ConfigOverrides = Record<string, Partial<MissionData>>;
+
+
+// --- Quest & Dialogue Types ---
+
+export type SpeakerKey = 'nhan_vat_chinh' | 'chi_huy' | 'cong_binh' | 'giao_lien' | 'system' | 'co_y_ta' | 'anh_trinh_sat';
+
+export interface Speaker {
+  name: string;
+  avatarUrl: string;
+}
 
 export interface DialogueOption {
   text: string;
-  action: 'accept_quest';
-  questId: string;
+  action: 'accept_quest' | 'continue';
+  questId?: string;
 }
 
 export interface DialogueLine {
@@ -701,26 +682,20 @@ export interface NotebookUnlockEvent {
 
 export type DialogueEntry = DialogueLine | NotebookUnlockEvent;
 
-export interface Speaker {
-    name: string;
-    avatarUrl: string;
-}
 
-// --- Side Quest Types ---
-export interface SideQuestStage {
-  description: string;
-  targetMap: string; // The missionId of the map where this stage takes place
-  target: Point;
-}
-
-export interface SideQuest {
+export interface QuestStepInfo {
   id: string;
   title: string;
-  giver: SpeakerKey;
-  startDialogueKey: string;
-  endDialogueKey: string;
-  stages: SideQuestStage[];
-  reward: Reward | NotebookUnlockEvent; 
+  description: string;
+  missionId: string;
+  iconUrl: string;
+}
+
+export interface QuestChain {
+  id: string;
+  title: string;
+  description: string;
+  steps: QuestStepInfo[];
 }
 
 export interface ActiveSideQuestState {
@@ -728,35 +703,18 @@ export interface ActiveSideQuestState {
   currentStage: number;
 }
 
-// --- Campaign-specific State ---
-export interface BachDangCampaignState {
-  scoutedLocations: string[]; // list of hidden object IDs found
-  unlockedStage: number; // 1: scout, 2: place stakes, 3: battle
-  stakesPlacedCorrectly: number;
+export interface SideQuestStage {
+  description: string;
+  targetMap: string;
+  target: Point;
 }
 
-
-// --- Game State Type ---
-export interface SavedGameState {
-  userName:string;
-  gender: 'male' | 'female';
-  collectedArtifactIds: string[];
-  collectedHeroCardIds: string[];
-  collectedDecorationIds?: string[];
-  inventory: Record<string, number>; // For fragments and trading goods
-  questProgress?: Record<string, number>; // For quest chains, e.g. { 'bach-dang-chien': 1 }
-  isPremium?: boolean;
-  dailyChatCount?: number;
-  lastChatDate?: string;
-  tutorialsSeen?: string[];
-  seenInstructions?: string[]; 
-  avatarCustomization?: AvatarCustomization;
-  unlockedCustomizationItemIds?: string[];
-  unlockedCharacterIds?: string[];
-  unlockedBackgroundIds?: string[];
-  sandboxState?: SandboxState;
-  unlockedAchievementIds?: string[]; // New property for achievements
-  unlockedNotebookPages?: number[]; // New property for the soldier's notebook
-  activeSideQuest?: ActiveSideQuestState | null; // New property for side quests
-  bachDangCampaign?: BachDangCampaignState; // New property for this campaign
+export interface SideQuest {
+    id: string;
+    title: string;
+    giver: SpeakerKey;
+    startDialogueKey: string;
+    endDialogueKey: string;
+    stages: SideQuestStage[];
+    reward: Reward | NotebookUnlockEvent;
 }

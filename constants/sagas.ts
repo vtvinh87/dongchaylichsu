@@ -1,7 +1,5 @@
 
 
-
-
 // constants/sagas.ts
 import { Hoi } from '../types';
 import * as ImageUrls from '../imageUrls';
@@ -37,7 +35,7 @@ export const HOI_DATA: Hoi[] = [
       { id: 'mission_3_1', title: 'Đối thoại với Lý Thái Tổ', imageUrl: ImageUrls.SAGA_DIPLOMACY_URL, description: 'Thuyết phục nhà vua về sự cần thiết của việc dời đô.', missionId: 'diplomacy-ly-thai-to' },
       { id: 'mission_3_2', title: 'Soạn Hịch tướng sĩ', imageUrl: ImageUrls.SAGA_HICH_TUONG_SI_URL, description: 'Giúp Trần Hưng Đạo hoàn thành bài hịch vang dội non sông.', missionId: 'hich-tuong-si-fill-blank', dependsOnMissionId: 'diplomacy-ly-thai-to' },
       { id: 'mission_3_3', title: 'Vườn không nhà trống', imageUrl: ImageUrls.SAGA_VUON_KHONG_NHA_TRONG_URL, description: 'Thực hiện kế sách độc đáo để chống lại quân Mông-Nguyên.', missionId: 'vuon-khong-nha-trong', dependsOnMissionId: 'hich-tuong-si-fill-blank'},
-      { id: 'mission_3_4', title: 'Phiên chợ thời Lý', imageUrl: ImageUrls.SAGA_LY_MARKET_URL, description: 'Khám phá sự sầm uất của kinh thành Thăng Long qua việc tìm các vật phẩm.', missionId: 'hidden-object-ly-market', isOptionalForProgression: true },
+      { id: 'mission_3_4', title: 'Mật Thám Chốn Thị Thành', imageUrl: ImageUrls.SAGA_DETECTIVE_URL, description: 'Một vụ án bí ẩn tại kinh thành. Hãy tìm ra kẻ gian và bằng chứng.', missionId: 'thang_long_spy', isOptionalForProgression: true },
       { id: 'mission_3_5', title: 'Cửa sổ thời gian: Nỏ Thần', imageUrl: ImageUrls.SAGA_AR_URL, description: 'Sử dụng công nghệ AR để khám phá vũ khí huyền thoại.', missionId: 'ar-golden-turtle', isOptionalForProgression: true },
     ]
   },
@@ -77,8 +75,7 @@ export const HOI_DATA: Hoi[] = [
     title: 'Hồi 7: Giao Thời và Hội Nhập',
     description: 'Trải nghiệm sự phát triển thương mại và những biến đổi của xã hội Việt Nam khi tiếp xúc với thế giới thông qua các thương cảng sầm uất.',
     missions: [
-      { id: 'mission_7_1', title: 'Giao thương Hội An', imageUrl: ImageUrls.SAGA_LY_MARKET_URL, description: 'Trở thành một thương nhân, mua bán hàng hóa để làm giàu.', missionId: 'trading-hoi-an' },
-      { id: 'mission_7_2', title: 'Thử tài Sử học', imageUrl: ImageUrls.SAGA_DIPLOMACY_URL, description: 'Kiểm tra kiến thức lịch sử của bạn qua các câu hỏi hóc búa.', missionId: 'quiz-general-knowledge', dependsOnMissionId: 'trading-hoi-an' },
+      { id: 'mission_7_1', title: 'Thử tài Sử học', imageUrl: ImageUrls.SAGA_DIPLOMACY_URL, description: 'Kiểm tra kiến thức lịch sử của bạn qua các câu hỏi hóc búa.', missionId: 'quiz-general-knowledge' },
     ]
   },
 ];
