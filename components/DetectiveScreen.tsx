@@ -529,22 +529,24 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
                 <button className="hint-button" onClick={handleHint} disabled={isGameOver || hintsUsed >= 3 || turnsLeft < 2}>Gợi ý ({3 - hintsUsed}/3)</button>
                 <button className="accuse-button" onClick={handleAccuse}>Buộc tội</button>
               </div>
-
-              {inspectedClue && (
-                <div className="clue-inspector-modal" >
-                    <p className="mb-2 text-sm font-bold">Kéo manh mối hoặc Chọn để đặt:</p>
-                    <div className="clue-item" draggable onDragStart={(e) => handleDragStart(e, inspectedClue)}>
-                        <img src={inspectedClue.iconUrl} alt="clue" className="clue-icon"/>
-                        <span>{inspectedClue.text}</span>
-                    </div>
-                    <div className="actions">
-                        <button className="btn-close" onClick={() => setInspectedClue(null)}>Đóng</button>
-                        <button className="btn-select" onClick={() => handleSelectForPlacement(inspectedClue)}>Chọn để đặt</button>
-                    </div>
-                </div>
-              )}
             </div>
         </div>
+      )}
+
+      {inspectedClue && (
+          <div className="detective-modal-overlay" onClick={() => setInspectedClue(null)}>
+              <div className="clue-inspector-modal" onClick={e => e.stopPropagation()}>
+                  <p className="mb-2 text-sm font-bold">Kéo manh mối hoặc Chọn để đặt:</p>
+                  <div className="clue-item" draggable onDragStart={(e) => handleDragStart(e, inspectedClue)}>
+                      <img src={inspectedClue.iconUrl} alt="clue" className="clue-icon"/>
+                      <span>{inspectedClue.text}</span>
+                  </div>
+                  <div className="actions">
+                      <button className="btn-close" onClick={() => setInspectedClue(null)}>Đóng</button>
+                      <button className="btn-select" onClick={() => handleSelectForPlacement(inspectedClue)}>Chọn để đặt</button>
+                  </div>
+              </div>
+          </div>
       )}
     </div>
   );
