@@ -193,7 +193,12 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         dialogueAvatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-ba-ban-tra-avt.png',
         position: { top: '30%', left: '15%' },
         initialDialogue: "Trà mới đây, trà mới thơm ngon đây! Chà, trông quan nhân có vẻ đang tìm kiếm gì đó thì phải?",
-        clue: { id: 'clue_dialogue_1', text: 'Bà bán trà nghe loáng thoáng có người hẹn gặp ở bến tàu để giao "hàng đặc biệt".', isTrue: false, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-cuoc-hoi-thoai.png' }
+        clue: { id: 'clue_dialogue_1', text: 'Bà bán trà nghe loáng thoáng có người hẹn gặp ở bến tàu để giao "hàng đặc biệt".', isTrue: false, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-cuoc-hoi-thoai.png' },
+        turnCost: 1,
+        professionInfo: {
+          title: "Nghề Bán Trà (Thời Lý)",
+          description: "Ở Thăng Long thời Lý, các quán trà là nơi tụ tập của đủ mọi tầng lớp, từ quan lại đến dân thường. Đây không chỉ là nơi thưởng thức trà mà còn là trung tâm trao đổi thông tin, bàn luận chuyện thời sự. Một người bán trà có thể nghe được rất nhiều bí mật."
+        }
       },
       {
         id: 'nguoi_ban_lua', name: 'Cô bán lụa',
@@ -201,7 +206,12 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         dialogueAvatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-nguoi-ban-lua-avt.png',
         position: { top: '65%', left: '25%' },
         initialDialogue: "Lụa Hà Đông đẹp nhất Thăng Long thành đây, quan nhân muốn mua một tấm không?",
-        clue: { id: 'clue_silk_1', text: 'Cô bán lụa bán một tấm vải đen, dày cho một người đàn ông đi khập khiễng, có vẻ để gói vật nặng.', isTrue: false, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-vai-lua.png' }
+        clue: { id: 'clue_silk_1', text: 'Cô bán lụa bán một tấm vải đen, dày cho một người đàn ông đi khập khiễng, có vẻ để gói vật nặng.', isTrue: false, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-vai-lua.png' },
+        turnCost: 1,
+        professionInfo: {
+          title: "Nghề Bán Lụa (Thời Lý)",
+          description: "Lụa là một mặt hàng xa xỉ và là niềm tự hào của Đại Việt. Các làng nghề dệt lụa nổi tiếng như lụa Vạn Phúc (Hà Đông) đã có từ lâu đời. Các cửa hàng bán lụa ở kinh thành thường giao thương với cả thương nhân trong và ngoài nước."
+        }
       },
       {
         id: 'bac_tho_ren', name: 'Bác thợ rèn',
@@ -209,7 +219,12 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         dialogueAvatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-bac-tho-ren-avt.png',
         position: { top: '50%', left: '70%' },
         initialDialogue: "Búa và đe của tôi lúc nào cũng sẵn sàng. Quan nhân cần rèn thứ gì à?",
-        clue: { id: 'clue_metal_box_1', text: 'Bác thợ rèn được đặt làm một chiếc hộp sắt nhỏ nhưng rất nặng. Người đặt hàng không hề đi khập khiễng.', isTrue: true, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-thanh-sat.png' }
+        clue: { id: 'clue_metal_box_1', text: 'Bác thợ rèn được đặt làm một chiếc hộp sắt nhỏ nhưng rất nặng. Người đặt hàng không hề đi khập khiễng.', isTrue: true, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-thanh-sat.png' },
+        turnCost: 2,
+        professionInfo: {
+          title: "Nghề Thợ Rèn (Thời Lý)",
+          description: "Thợ rèn là một nghề quan trọng, chuyên sản xuất công cụ nông nghiệp và vũ khí. Các lò rèn thường rất ồn ào và tấp nập, là một phần không thể thiếu của cuộc sống thành thị, cung cấp những vật dụng thiết yếu cho cả dân sinh và quân đội."
+        }
       },
       {
         id: 'linh_gac_thanh', name: 'Lính gác thành',
@@ -217,7 +232,12 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         dialogueAvatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-linh-gac-thanh-avt.png',
         position: { top: '10%', left: '85%' },
         initialDialogue: "Cửa Tây nghiêm ngặt, phận sự của ta là đảm bảo không kẻ gian nào lọt qua.",
-        clue: { id: 'clue_gate_1', text: 'Lính gác thành để ý thấy có kẻ lạ mặt lảng vảng gần cửa Tây, có cử chỉ ám muội với một vị thương nhân ngoại quốc.', isTrue: true, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-vu-khi-la.png' }
+        clue: { id: 'clue_gate_1', text: 'Lính gác thành để ý thấy có kẻ lạ mặt lảng vảng gần cửa Tây, có cử chỉ ám muội với một vị thương nhân ngoại quốc.', isTrue: true, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-vu-khi-la.png' },
+        turnCost: 3,
+        professionInfo: {
+          title: "Lính Gác Thành (Cấm quân)",
+          description: "Việc canh gác các cổng thành ở kinh đô Thăng Long là vô cùng trọng yếu. Lính gác (Cấm quân) chịu trách nhiệm kiểm soát người và hàng hóa ra vào, đảm bảo an ninh và ngăn chặn gián điệp. Họ có tai mắt tinh tường và am hiểu các ngõ ngách của kinh thành."
+        }
       },
       {
         id: 'nguoi_ban_hoa_qua', name: 'Chị bán hoa quả',
@@ -225,7 +245,12 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         dialogueAvatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-nguoi-ban-hoa-qua-avt.png',
         position: { top: '75%', left: '55%' },
         initialDialogue: "Mận, đào, mơ tươi ngon! Mời quan nhân nếm thử!",
-        clue: { id: 'clue_fruits_1', text: 'Một vị quý tộc trông có vẻ lo lắng, mua rất nhiều hoa quả rẻ tiền, khác hẳn với thói quen thường ngày.', isTrue: true, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-quan-sat.png' }
+        clue: { id: 'clue_fruits_1', text: 'Một vị quý tộc trông có vẻ lo lắng, mua rất nhiều hoa quả rẻ tiền, khác hẳn với thói quen thường ngày.', isTrue: true, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-quan-sat.png' },
+        turnCost: 1,
+        professionInfo: {
+            title: "Nghề Bán Hàng Rong (Thời Lý)",
+            description: "Chợ búa ở Thăng Long rất sầm uất với nhiều loại hoa quả, nông sản từ các vùng lân cận đổ về. Người bán hàng rong như chị bán hoa quả tiếp xúc với rất nhiều người mỗi ngày và có thể để ý những hành vi bất thường của khách mua."
+        }
       },
       {
         id: 'nguoi_dan_thuong', name: 'Người dân thường',
@@ -233,7 +258,12 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         dialogueAvatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-dan-thuong-avt.png',
         position: { top: '40%', left: '40%' },
         initialDialogue: "Haizz, dạo này sưu cao thuế nặng, cuộc sống khó khăn quá...",
-        clue: { id: 'clue_marina_1', text: 'Người dân thường phàn nàn về việc bến tàu dạo này có nhiều lính canh hơn, kiểm tra hàng hóa rất gắt gao.', isTrue: false, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-ben-tau.png' }
+        clue: { id: 'clue_marina_1', text: 'Người dân thường phàn nàn về việc bến tàu dạo này có nhiều lính canh hơn, kiểm tra hàng hóa rất gắt gao.', isTrue: false, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-ben-tau.png' },
+        turnCost: 1,
+        professionInfo: {
+            title: "Đời sống dân thường (Thời Lý)",
+            description: "Đời sống của dân thường ở kinh thành Thăng Long xoay quanh các phường hội thủ công và buôn bán. Họ là tai mắt của triều đình, những thay đổi nhỏ nhất trong cuộc sống hay sự xuất hiện của những kẻ lạ mặt đều không qua được mắt họ."
+        }
       },
     ],
     suspects: [

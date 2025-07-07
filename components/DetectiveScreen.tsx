@@ -1,6 +1,7 @@
 // components/DetectiveScreen.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { DetectiveMissionData, Reward, DetectiveClue, DetectiveNPC } from '../types';
+import type { ProfessionInfo } from '../types';
 import { playSound } from '../utils/audio';
 
 interface DetectiveScreenProps {
@@ -48,6 +49,10 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
   const [inspectedClue, setInspectedClue] = useState<DetectiveClue | null>(null);
   const [selectedClueForPlacement, setSelectedClueForPlacement] = useState<DetectiveClue | null>(null);
 
+  // New state for hints and historical info
+  const [hintsUsed, setHintsUsed] = useState(0);
+  const [infoModalContent, setInfoModalContent] = useState<ProfessionInfo | null>(null);
+
 
   // Reset state when mission changes
   useEffect(() => {
@@ -65,10 +70,12 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
     setPendingClue(null);
     setInspectedClue(null);
     setSelectedClueForPlacement(null);
+    setHintsUsed(0);
+    setInfoModalContent(null);
   }, [missionData]);
 
-  const spendTurn = useCallback(() => {
-      setTurnsLeft(prev => prev - 1);
+  const spendTurn = useCallback((amount = 1) => {
+      setTurnsLeft(prev => prev - amount);
   }, []);
 
   useEffect(() => {
@@ -94,11 +101,18 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
   
   const handleCollectClue = () => {
       if (!pendingClue) return;
-      playSound('sfx_success');
       const { npc, clue } = pendingClue;
+
+      if (turnsLeft < (npc.turnCost || 1)) {
+        alert("Không đủ lượt đi để hỏi chuyện người này!");
+        playSound('sfx_fail');
+        return;
+      }
+      
+      playSound('sfx_success');
       setCollectedClues(prev => ({ ...prev, [clue.id]: clue }));
       setQuestionedNpcIds(prev => [...prev, npc.id]);
-      spendTurn();
+      spendTurn(npc.turnCost || 1);
       setPendingClue(null);
   }
 
@@ -130,18 +144,32 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
   };
 
   const handleHint = () => {
-    if ((inventory['vat-tu'] || 0) < 20) {
-      alert("Không đủ Vật tư! Cần 20 Vật tư để dùng gợi ý.");
+    if (hintsUsed >= 3) {
+      alert("Bạn đã dùng hết 3 lượt gợi ý.");
       return;
     }
+    if (turnsLeft < 2) {
+      alert("Không đủ lượt đi để dùng gợi ý (cần 2 lượt).");
+      return;
+    }
+
+    spendTurn(2);
+    setHintsUsed(prev => prev + 1);
     
-    const hintNpc = missionData.npcs.find(npc => !questionedNpcIds.includes(npc.id) && npc.clue.isTrue);
-    if (hintNpc) {
-      setInventory(prev => ({...prev, 'vat-tu': (prev['vat-tu'] || 0) - 20}));
-      alert(`Gợi ý: Hãy thử hỏi chuyện ${hintNpc.name}.`);
-      playSound('sfx_unlock');
+    // Hint logic: Reveal a random correct clue that hasn't been used as evidence.
+    const correctClueIds = missionData.solution.evidenceIds;
+    const placedClues = new Set(Object.values(deductionSlots).flat());
+    const unplacedCorrectClues = correctClueIds.filter(id => !placedClues.has(id));
+
+    if (unplacedCorrectClues.length > 0) {
+      const hintClue = collectedClues[unplacedCorrectClues[0]];
+      if (hintClue) {
+        alert(`Gợi ý: Manh mối "${hintClue.text}" là một bằng chứng quan trọng.`);
+      } else {
+        alert("Gợi ý: Hãy hỏi chuyện thêm để tìm các bằng chứng quan trọng.");
+      }
     } else {
-      alert("Không còn gợi ý nào hữu ích lúc này.");
+      alert("Gợi ý: Bạn đã có đủ bằng chứng, hãy sắp xếp chúng cho đúng nghi phạm.");
     }
   };
 
@@ -164,14 +192,16 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
     newSlots[suspectId][slotIndex] = draggedClue.id;
     setDeductionSlots(newSlots);
     setDraggedClue(null);
-    setSelectedClueForPlacement(null); // Also clear tap selection
+    setSelectedClueForPlacement(null); // Clear tap selection on drag/drop
   };
   
   const handleAccuse = () => {
     let accusedSuspectId: string | null = null;
+    let placedCount = 0;
     
     for (const suspectId in deductionSlots) {
       const clues = deductionSlots[suspectId].filter(c => c !== null);
+      placedCount += clues.length;
       if (clues.length > 0) {
         if (accusedSuspectId) {
           alert("Chỉ có thể buộc tội một nghi phạm tại một thời điểm!");
@@ -185,7 +215,13 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
       alert("Bạn phải đặt bằng chứng để buộc tội một nghi phạm!");
       return;
     }
+
+    if(placedCount < missionData.solution.evidenceIds.length) {
+      alert("Bạn chưa đủ bằng chứng để buộc tội nghi phạm!");
+      return;
+    }
     
+    setShowDeductionBoard(false);
     const { culpritId, evidenceIds } = missionData.solution;
     const submittedEvidence = deductionSlots[accusedSuspectId].filter(c => c !== null) as string[];
 
@@ -216,19 +252,15 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
     const newSlots = {...deductionSlots};
     const clueIdInSlot = newSlots[suspectId][slotIndex];
     
-    // If a clue is selected for placement, place it
     if (selectedClueForPlacement) {
-      // Remove from other slots if it exists
       Object.keys(newSlots).forEach(sid => {
           newSlots[sid] = newSlots[sid].map(c => c === selectedClueForPlacement.id ? null : c);
       });
-      // Place it in the new slot
       newSlots[suspectId][slotIndex] = selectedClueForPlacement.id;
       setDeductionSlots(newSlots);
       setSelectedClueForPlacement(null);
       playSound('sfx_click');
     } 
-    // If no clue is selected, and the slot is not empty, remove the clue
     else if (clueIdInSlot) {
       newSlots[suspectId][slotIndex] = null;
       setDeductionSlots(newSlots);
@@ -281,6 +313,7 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
         ))}
         {activeDialogue && (
             <div className="npc-dialogue-box" >
+                {activeDialogue.professionInfo && <button className="profession-info-button" onClick={() => setInfoModalContent(activeDialogue.professionInfo!)}>i</button>}
                 <div className="dialogue-header">
                     <img src={activeDialogue.dialogueAvatarUrl || activeDialogue.avatarUrl} alt={activeDialogue.name} className="dialogue-avatar" />
                     <h4>{activeDialogue.name}</h4>
@@ -288,7 +321,7 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
                 <p className="dialogue-text">"{activeDialogue.initialDialogue}"</p>
                 <div className="dialogue-actions">
                     <button onClick={() => setActiveDialogue(null)}>Thôi</button>
-                    <button onClick={handleQuestionNpc}>Hỏi chuyện</button>
+                    <button onClick={handleQuestionNpc}>Hỏi chuyện (-{activeDialogue.turnCost || 1} lượt)</button>
                 </div>
             </div>
         )}
@@ -305,8 +338,17 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
                     </div>
                     <div className="dialogue-actions">
                         <button onClick={() => setPendingClue(null)}>Bỏ qua</button>
-                        <button onClick={handleCollectClue} style={{backgroundColor: '#16a34a', color: 'white'}}>Thu thập (-1 Lượt)</button>
+                        <button onClick={handleCollectClue} style={{backgroundColor: '#16a34a', color: 'white'}}>Thu thập (-{pendingClue.npc.turnCost || 1} Lượt)</button>
                     </div>
+                </div>
+            </div>
+        )}
+        {infoModalContent && (
+             <div className="detective-modal-overlay" onClick={() => setInfoModalContent(null)}>
+                <div className="detective-modal-content profession-info-modal" onClick={e => e.stopPropagation()}>
+                    <h3>{infoModalContent.title}</h3>
+                    <p>{infoModalContent.description}</p>
+                    <button className="dialogue-actions button" onClick={() => setInfoModalContent(null)}>Đóng</button>
                 </div>
             </div>
         )}
@@ -316,7 +358,6 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
         <div className="hud-buttons">
           <button onClick={() => setShowNotebook(true)} disabled={isGameOver}>Sổ tay</button>
           <button onClick={() => setShowDeductionBoard(true)} disabled={isGameOver}>Bảng Suy luận</button>
-          <button id="hint-button" onClick={handleHint} disabled={isGameOver || (inventory['vat-tu'] || 0) < 20}>Gợi ý (20 Vật tư)</button>
           <button onClick={onReturnToMuseum} disabled={isGameOver}>Rời đi</button>
         </div>
       </div>
@@ -389,7 +430,8 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
                 </div>
               </div>
               <div id="deduction-controls">
-                <button onClick={handleAccuse}>Buộc tội</button>
+                <button className="hint-button" onClick={handleHint} disabled={isGameOver || hintsUsed >= 3 || turnsLeft < 2}>Gợi ý ({3 - hintsUsed}/3)</button>
+                <button className="accuse-button" onClick={handleAccuse}>Buộc tội</button>
               </div>
               <button className="modal-close-button" onClick={() => setShowDeductionBoard(false)}>&times;</button>
 

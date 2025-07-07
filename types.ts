@@ -256,6 +256,11 @@ export interface TradingMissionData extends BaseMissionData {
 }
 
 // --- New Detective Mission Types ---
+export interface ProfessionInfo {
+    title: string;
+    description: string;
+}
+
 export interface DetectiveClue {
   id: string;
   text: string;
@@ -272,6 +277,8 @@ export interface DetectiveNPC {
   position: { top: string; left: string; };
   initialDialogue: string;
   clue: DetectiveClue;
+  turnCost?: number;
+  professionInfo?: ProfessionInfo;
 }
 
 export interface DetectiveSuspect {
