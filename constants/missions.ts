@@ -190,6 +190,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
       {
         id: 'ba_ban_tra', name: 'Bà bán trà',
         avatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-ba-ban-tra.png',
+        dialogueAvatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-ba-ban-tra-avt.png',
         position: { top: '30%', left: '15%' },
         initialDialogue: "Trà mới đây, trà mới thơm ngon đây! Chà, trông quan nhân có vẻ đang tìm kiếm gì đó thì phải?",
         clue: { id: 'clue_dialogue_1', text: 'Bà bán trà nghe loáng thoáng có người hẹn gặp ở bến tàu để giao "hàng đặc biệt".', isTrue: false, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-cuoc-hoi-thoai.png' }
@@ -197,6 +198,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
       {
         id: 'nguoi_ban_lua', name: 'Cô bán lụa',
         avatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-nguoi-ban-lua.png',
+        dialogueAvatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-nguoi-ban-lua-avt.png',
         position: { top: '65%', left: '25%' },
         initialDialogue: "Lụa Hà Đông đẹp nhất Thăng Long thành đây, quan nhân muốn mua một tấm không?",
         clue: { id: 'clue_silk_1', text: 'Cô bán lụa bán một tấm vải đen, dày cho một người đàn ông đi khập khiễng, có vẻ để gói vật nặng.', isTrue: false, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-vai-lua.png' }
@@ -204,6 +206,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
       {
         id: 'bac_tho_ren', name: 'Bác thợ rèn',
         avatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-bac-tho-ren.png',
+        dialogueAvatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-bac-tho-ren-avt.png',
         position: { top: '50%', left: '70%' },
         initialDialogue: "Búa và đe của tôi lúc nào cũng sẵn sàng. Quan nhân cần rèn thứ gì à?",
         clue: { id: 'clue_metal_box_1', text: 'Bác thợ rèn được đặt làm một chiếc hộp sắt nhỏ nhưng rất nặng. Người đặt hàng không hề đi khập khiễng.', isTrue: true, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-thanh-sat.png' }
@@ -211,6 +214,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
       {
         id: 'linh_gac_thanh', name: 'Lính gác thành',
         avatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-linh-gac-thanh.png',
+        dialogueAvatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-linh-gac-thanh-avt.png',
         position: { top: '10%', left: '85%' },
         initialDialogue: "Cửa Tây nghiêm ngặt, phận sự của ta là đảm bảo không kẻ gian nào lọt qua.",
         clue: { id: 'clue_gate_1', text: 'Lính gác thành để ý thấy có kẻ lạ mặt lảng vảng gần cửa Tây, có cử chỉ ám muội với một vị thương nhân ngoại quốc.', isTrue: true, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-vu-khi-la.png' }
@@ -218,6 +222,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
       {
         id: 'nguoi_ban_hoa_qua', name: 'Chị bán hoa quả',
         avatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-nguoi-ban-hoa-qua.png',
+        dialogueAvatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-nguoi-ban-hoa-qua-avt.png',
         position: { top: '75%', left: '55%' },
         initialDialogue: "Mận, đào, mơ tươi ngon! Mời quan nhân nếm thử!",
         clue: { id: 'clue_fruits_1', text: 'Một vị quý tộc trông có vẻ lo lắng, mua rất nhiều hoa quả rẻ tiền, khác hẳn với thói quen thường ngày.', isTrue: true, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-quan-sat.png' }
@@ -225,6 +230,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
       {
         id: 'nguoi_dan_thuong', name: 'Người dân thường',
         avatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-dan-thuong.png',
+        dialogueAvatarUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/NPCs/NPC-dan-thuong-avt.png',
         position: { top: '40%', left: '40%' },
         initialDialogue: "Haizz, dạo này sưu cao thuế nặng, cuộc sống khó khăn quá...",
         clue: { id: 'clue_marina_1', text: 'Người dân thường phàn nàn về việc bến tàu dạo này có nhiều lính canh hơn, kiểm tra hàng hóa rất gắt gao.', isTrue: false, iconUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-ben-tau.png' }

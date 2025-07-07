@@ -268,6 +268,7 @@ export interface DetectiveNPC {
   id: string;
   name: string;
   avatarUrl: string;
+  dialogueAvatarUrl?: string;
   position: { top: string; left: string; };
   initialDialogue: string;
   clue: DetectiveClue;
