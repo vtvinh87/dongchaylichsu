@@ -36,6 +36,8 @@ export enum Screen {
   NAVAL_BATTLE_TIMING_SCREEN, // New screen for the naval battle timing game
   LANE_BATTLE_MISSION_SCREEN, // New screen for the lane battle game
   ADMIN_DASHBOARD, // New screen for the admin panel
+  STRATEGIC_MARCH_MISSION_SCREEN, // New screen for the march game
+  TACTICAL_BATTLE_SCREEN, // New screen for the final battle of Tay Son campaign
 }
 
 export interface Point {
@@ -490,6 +492,65 @@ export interface LaneBattleMissionData extends BaseMissionData {
   defensePoints: number;
 }
 
+// --- New Strategic March Types ---
+export interface StrategicMarchEventChoice {
+  text: string;
+  effects: {
+    time: number;
+    morale: number;
+    manpower: number;
+  };
+}
+
+export interface StrategicMarchEvent {
+  id: string;
+  triggerAtStep: number;
+  prompt: string;
+  choices: StrategicMarchEventChoice[];
+}
+
+export interface StrategicMarchMissionData extends BaseMissionData {
+  type: 'strategicMarch';
+  mapImageUrl: string;
+  armyIconUrl: string;
+  initialTime: number;
+  initialMorale: number;
+  initialManpower: number;
+  path: Point[];
+  events: StrategicMarchEvent[];
+}
+
+// --- New Tactical Battle Types ---
+export interface UnitDefinition {
+  id: string;
+  name: string;
+  iconUrl: string;
+  maxHp: number;
+  attack: number;
+  attackRange: number;
+  moveRange: number;
+  specialAbility?: 'destroy_fortification' | 'charge';
+  description?: string;
+}
+
+export interface PlacedUnit {
+  unitId: string;
+  x: number;
+  y: number;
+  isEnemy: boolean;
+  isFort?: boolean;
+}
+
+export interface TacticalBattleMissionData extends BaseMissionData {
+  type: 'tacticalBattle';
+  mapLayout: MapCellType[][];
+  unitDefinitions: Record<string, UnitDefinition>;
+  playerUnitPool: string[];
+  enemyUnits: PlacedUnit[];
+  deploymentZone: { x_min: number; x_max: number; y_min: number; y_max: number };
+  winCondition: { type: 'defeat_all' } | { type: 'destroy_fort'; position: Point };
+}
+
 export type MissionData =
   | PuzzleMissionData
   | NarrativeMissionData
@@ -515,7 +576,9 @@ export type MissionData =
   | StrategicPathMissionData
   | ConstructionPuzzleMissionData
   | NavalBattleMissionData
-  | LaneBattleMissionData;
+  | LaneBattleMissionData
+  | StrategicMarchMissionData
+  | TacticalBattleMissionData;
 
 // --- Player & Game State Types ---
 
@@ -623,6 +686,12 @@ export interface BachDangCampaignState {
   stakesPlacedCorrectly: number;
 }
 
+export interface TaySonCampaignState {
+  manpower: number;
+  morale: number;
+  unlockedStage: number;
+}
+
 export interface SavedGameState {
   userName: string;
   gender: 'male' | 'female';
@@ -646,6 +715,7 @@ export interface SavedGameState {
   unlockedNotebookPages: number[];
   activeSideQuest: ActiveSideQuestState | null;
   bachDangCampaign: BachDangCampaignState;
+  taySonCampaign: TaySonCampaignState;
 }
 
 // --- Admin & Analytics Types ---

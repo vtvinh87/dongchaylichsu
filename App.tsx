@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useState, useCallback, useEffect, useMemo, useLayoutEffect, useRef } from 'react';
 import LoginScreen from './components/LoginScreen';
 import MainInterface from './components/MainInterface';
@@ -34,8 +30,10 @@ import RallyCallScreen from './components/RallyCallScreen'; // Import Rally Call
 import ForgingScreen from './components/ForgingScreen'; // Import Forging Screen
 import QuestChainScreen from './components/QuestChainScreen'; // Import Quest Chain Screen
 import TacticalMapScreen from './components/TacticalMapScreen'; // Import Tactical Map Screen
+import TacticalBattleScreen from './components/TacticalBattleScreen'; // Import Tactical Battle Screen
 import DefenseScreen from './components/DefenseScreen'; // Import Defense Screen
 import StrategyMapScreen from './components/StrategyMapScreen'; // Import StrategyMap Screen
+import StrategicMarchScreen from './components/StrategicMarchScreen'; // Import Strategic March Screen
 import CoinMintingScreen from './components/CoinMintingScreen'; // Import CoinMinting Screen
 import CityPlanningScreen from './components/CityPlanningScreen'; // Import CityPlanning Screen
 import TypesettingScreen from './components/TypesettingScreen'; // Import Typesetting Screen
@@ -47,7 +45,7 @@ import LaneBattleScreen from './components/LaneBattleScreen';
 import DialogueModal from './components/DialogueModal';
 import AdminDashboard from './components/AdminDashboard'; // Import Admin Dashboard
 import { GoogleGenAI } from "@google/genai";
-import { Screen, Artifact, MissionInfo, HeroCard, MissionData, PuzzleMissionData, NarrativeMissionData, TimelineMissionData, ARMissionData, HiddenObjectMissionData, LeaderboardEntry, AiCharacter, Decoration, QuizMissionData, ConstructionMissionData, Tutorial, SavedGameState, AvatarCustomization, CustomizationItem, DiplomacyMissionData, Reward, MemoryFragment, DetectiveMissionData, ColoringMissionData, RhythmMissionData, SandboxState, SandboxBackground, Achievement, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData, DialogueEntry, ActiveSideQuestState, DialogueOption, NotebookUnlockEvent, ConstructionPuzzleMissionData, NavalBattleMissionData, HichPuzzleData, LaneBattleMissionData, NotebookPage, QuizQuestion, BachDangCampaignState, PlayEvent, ConfigOverrides } from './types';
+import { Screen, Artifact, MissionInfo, HeroCard, MissionData, PuzzleMissionData, NarrativeMissionData, TimelineMissionData, ARMissionData, HiddenObjectMissionData, LeaderboardEntry, AiCharacter, Decoration, QuizMissionData, ConstructionMissionData, Tutorial, SavedGameState, AvatarCustomization, CustomizationItem, DiplomacyMissionData, Reward, MemoryFragment, DetectiveMissionData, ColoringMissionData, RhythmMissionData, SandboxState, SandboxBackground, Achievement, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingMissionData, CityPlanningMissionData, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData, DialogueEntry, ActiveSideQuestState, DialogueOption, NotebookUnlockEvent, ConstructionPuzzleMissionData, NavalBattleMissionData, HichPuzzleData, LaneBattleMissionData, NotebookPage, QuizQuestion, BachDangCampaignState, PlayEvent, ConfigOverrides, StrategicMarchMissionData, TacticalBattleMissionData, TaySonCampaignState } from './types';
 import { 
   HOI_DATA, ALL_MISSIONS, APP_NAME, ALL_HERO_CARDS,
   LEADERBOARD_LOCAL_STORAGE_KEY,
@@ -84,6 +82,7 @@ export const App: React.FC = () => {
   const [arRewardMessage, setArRewardMessage] = useState<string | null>(null);
   const [showPremiumWelcomeModal, setShowPremiumWelcomeModal] = useState<boolean>(false);
   const [itemForDetailModal, setItemForDetailModal] = useState<Artifact | HeroCard | Decoration | null>(null);
+  const [pendingPostMissionAction, setPendingPostMissionAction] = useState<(() => void) | null>(null);
 
   // Freemium & Admin State
   const [isPremium, setIsPremium] = useState<boolean>(false);
@@ -144,6 +143,11 @@ export const App: React.FC = () => {
     scoutedLocations: [],
     unlockedStage: 1,
     stakesPlacedCorrectly: 0,
+  });
+  const [taySonCampaign, setTaySonCampaign] = useState<TaySonCampaignState>({
+    manpower: 0,
+    morale: 0,
+    unlockedStage: 1,
   });
 
 
@@ -273,7 +277,7 @@ export const App: React.FC = () => {
         }
     }
 
-    const nonStandardNavScreens = [Screen.AR_MISSION_SCREEN, Screen.PREMIUM_SCREEN, Screen.SANDBOX, Screen.HIDDEN_OBJECT_SCREEN, Screen.QUIZ_MISSION_SCREEN, Screen.CONSTRUCTION_MISSION_SCREEN, Screen.DIPLOMACY_MISSION_SCREEN, Screen.CUSTOMIZATION, Screen.CRAFTING_SCREEN, Screen.DETECTIVE_SCREEN, Screen.COLORING_MISSION_SCREEN, Screen.RHYTHM_MISSION_SCREEN, Screen.ACHIEVEMENTS, Screen.RALLY_CALL_MISSION_SCREEN, Screen.FORGING_MISSION_SCREEN, Screen.QUEST_CHAIN_SCREEN, Screen.TACTICAL_MAP_MISSION_SCREEN, Screen.DEFENSE_MISSION_SCREEN, Screen.STRATEGY_MAP_MISSION_SCREEN, Screen.COIN_MINTING_MISSION_SCREEN, Screen.CITY_PLANNING_MISSION_SCREEN, Screen.TYPESETTING_MISSION_SCREEN, Screen.ADVENTURE_PUZZLE_SCREEN, Screen.STRATEGIC_PATH_MISSION_SCREEN, Screen.CONSTRUCTION_PUZZLE_SCREEN, Screen.NAVAL_BATTLE_TIMING_SCREEN, Screen.LANE_BATTLE_MISSION_SCREEN, Screen.ADMIN_DASHBOARD];
+    const nonStandardNavScreens = [Screen.AR_MISSION_SCREEN, Screen.PREMIUM_SCREEN, Screen.SANDBOX, Screen.HIDDEN_OBJECT_SCREEN, Screen.QUIZ_MISSION_SCREEN, Screen.CONSTRUCTION_MISSION_SCREEN, Screen.DIPLOMACY_MISSION_SCREEN, Screen.CUSTOMIZATION, Screen.CRAFTING_SCREEN, Screen.DETECTIVE_SCREEN, Screen.COLORING_MISSION_SCREEN, Screen.RHYTHM_MISSION_SCREEN, Screen.ACHIEVEMENTS, Screen.RALLY_CALL_MISSION_SCREEN, Screen.FORGING_MISSION_SCREEN, Screen.QUEST_CHAIN_SCREEN, Screen.TACTICAL_MAP_MISSION_SCREEN, Screen.DEFENSE_MISSION_SCREEN, Screen.STRATEGY_MAP_MISSION_SCREEN, Screen.COIN_MINTING_MISSION_SCREEN, Screen.CITY_PLANNING_MISSION_SCREEN, Screen.TYPESETTING_MISSION_SCREEN, Screen.ADVENTURE_PUZZLE_SCREEN, Screen.STRATEGIC_PATH_MISSION_SCREEN, Screen.CONSTRUCTION_PUZZLE_SCREEN, Screen.NAVAL_BATTLE_TIMING_SCREEN, Screen.LANE_BATTLE_MISSION_SCREEN, Screen.ADMIN_DASHBOARD, Screen.STRATEGIC_MARCH_MISSION_SCREEN, Screen.TACTICAL_BATTLE_SCREEN];
     if (currentScreen !== screen || activeMission?.id !== mission?.id || nonStandardNavScreens.includes(screen)) {
       setTransitionClass('screen-fade-out');
       setTimeout(() => {
@@ -303,7 +307,7 @@ export const App: React.FC = () => {
             collectedDecorationIds: collectedDecorations.map(d => d.id), inventory, questProgress, isPremium, isAdmin,
             dailyChatCount, lastChatDate, tutorialsSeen, seenInstructions, avatarCustomization,
             unlockedCustomizationItemIds, unlockedCharacterIds, unlockedBackgroundIds, sandboxState,
-            unlockedAchievementIds, unlockedNotebookPages, activeSideQuest, bachDangCampaign,
+            unlockedAchievementIds, unlockedNotebookPages, activeSideQuest, bachDangCampaign, taySonCampaign,
         };
         if (achievement.condition(fullGameState as SavedGameState)) {
           newlyUnlocked.push(achievement);
@@ -315,7 +319,7 @@ export const App: React.FC = () => {
       // Show toast for the first new achievement
       setAchievementNotification(newlyUnlocked[0]);
     }
-  }, [unlockedAchievementIds, userName, gender, collectedArtifacts, collectedHeroCards, collectedDecorations, inventory, questProgress, isPremium, isAdmin, dailyChatCount, lastChatDate, tutorialsSeen, seenInstructions, avatarCustomization, unlockedCustomizationItemIds, unlockedCharacterIds, unlockedBackgroundIds, sandboxState, unlockedNotebookPages, activeSideQuest, bachDangCampaign]);
+  }, [unlockedAchievementIds, userName, gender, collectedArtifacts, collectedHeroCards, collectedDecorations, inventory, questProgress, isPremium, isAdmin, dailyChatCount, lastChatDate, tutorialsSeen, seenInstructions, avatarCustomization, unlockedCustomizationItemIds, unlockedCharacterIds, unlockedBackgroundIds, sandboxState, unlockedNotebookPages, activeSideQuest, bachDangCampaign, taySonCampaign]);
   
   useEffect(() => {
     // Check achievements whenever relevant state changes
@@ -371,6 +375,7 @@ export const App: React.FC = () => {
       setUnlockedNotebookPages(savedState.unlockedNotebookPages || [0, 1]);
       setActiveSideQuest(savedState.activeSideQuest || null);
       setBachDangCampaign(savedState.bachDangCampaign || { scoutedLocations: [], unlockedStage: 1, stakesPlacedCorrectly: 0 });
+      setTaySonCampaign(savedState.taySonCampaign || { manpower: 0, morale: 0, unlockedStage: 1 });
 
       const isPremiumUser = savedState.isPremium || false;
       setIsPremium(isPremiumUser);
@@ -394,13 +399,13 @@ export const App: React.FC = () => {
       inventory, questProgress, tutorialsSeen, seenInstructions,
       avatarCustomization, unlockedCustomizationItemIds,
       unlockedCharacterIds, unlockedBackgroundIds, sandboxState,
-      unlockedAchievementIds, unlockedNotebookPages, activeSideQuest, bachDangCampaign,
+      unlockedAchievementIds, unlockedNotebookPages, activeSideQuest, bachDangCampaign, taySonCampaign,
     };
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(gameState));
   }, [userName, gender, isPremium, isAdmin, dailyChatCount, lastChatDate, collectedArtifacts, collectedHeroCards,
       collectedDecorations, inventory, questProgress, tutorialsSeen, seenInstructions, avatarCustomization,
       unlockedCustomizationItemIds, unlockedCharacterIds, unlockedBackgroundIds, sandboxState,
-      unlockedAchievementIds, unlockedNotebookPages, activeSideQuest, bachDangCampaign]);
+      unlockedAchievementIds, unlockedNotebookPages, activeSideQuest, bachDangCampaign, taySonCampaign]);
 
   useEffect(() => { loadGameState(); }, [loadGameState]);
   useEffect(() => { if (currentScreen !== Screen.LANDING_PAGE) saveGameState(); }, [saveGameState, currentScreen]);
@@ -418,30 +423,55 @@ export const App: React.FC = () => {
     alert(`Thử thách hoàn thành! Bạn nhận được thêm ${amount} Vật tư!`);
   };
 
-  const completeMissionLogic = useCallback((reward?: Reward, data?: { foundItemIds?: string[], stakesPlacedCorrectly?: number }) => {
+  const handleArtifactModalClose = () => {
+    setShowSharedArtifactInfoModal(false);
+    setRewardItemForModal(null);
+    if(pendingPostMissionAction) {
+        pendingPostMissionAction();
+        setPendingPostMissionAction(null);
+    }
+  };
+
+  const completeMissionLogic = useCallback((reward?: Reward, data?: { [key: string]: any }) => {
     logPlayEvent('win');
     playSound('sfx_unlock');
     let newItemToShow: Artifact | MemoryFragment | Decoration | null = null;
     let newCharacterUnlocked = false;
     let newBackgroundUnlocked = false;
 
-    // Special logic for Bach Dang campaign steps
-    if (activeMission?.id === 'find-bach-dang-ambush-spot') {
-        setBachDangCampaign({
-            scoutedLocations: data?.foundItemIds || [],
-            unlockedStage: 2,
-            stakesPlacedCorrectly: 0,
-        });
+    // --- Campaign-specific logic ---
+    if (activeQuestChainId === 'tay_son_campaign') {
+      if (activeMission?.id === 'tay_son_march' && data) {
+          setTaySonCampaign({ manpower: data.manpower, morale: data.morale, unlockedStage: 2 });
+      }
+      if (activeMission?.id === 'tay_son_oath' && data) {
+          setTaySonCampaign(prev => ({ ...prev, morale: prev.morale + data.morale, unlockedStage: 3 }));
+      }
+      if (activeMission?.id === 'tay_son_battle') {
+          setPendingPostMissionAction(() => () => {
+              alert("Chiến công của bạn đã vang dội! Hoàng đế Quang Trung đã sẵn sàng 'Đối thoại' cùng bạn.");
+              setUnlockedCharacterIds(prev => [...prev, 'vua-quang-trung']);
+          });
+      }
+    }
+    if (activeQuestChainId === 'bach-dang-chien') {
+      if (activeMission?.id === 'find-bach-dang-ambush-spot') {
+          setBachDangCampaign({
+              scoutedLocations: data?.foundItemIds || [],
+              unlockedStage: 2,
+              stakesPlacedCorrectly: 0,
+          });
+      }
+      if (activeMission?.id === 'bach-dang-tactical-map') {
+          setBachDangCampaign(prev => ({
+              ...prev,
+              stakesPlacedCorrectly: data?.stakesPlacedCorrectly ?? 0,
+              unlockedStage: 3,
+          }));
+      }
     }
 
-    if (activeMission?.id === 'bach-dang-tactical-map') {
-        setBachDangCampaign(prev => ({
-            ...prev,
-            stakesPlacedCorrectly: data?.stakesPlacedCorrectly ?? 0,
-            unlockedStage: 3,
-        }));
-    }
-
+    // --- Standard Reward Logic ---
     if (reward) {
         switch (reward.type) {
             case 'artifact':
@@ -503,11 +533,10 @@ export const App: React.FC = () => {
         if (currentStepIndex + 1 >= chain.steps.length) {
             // Reset campaign state after completion
             if (activeQuestChainId === 'bach-dang-chien') {
-              setBachDangCampaign({
-                scoutedLocations: [],
-                unlockedStage: 1,
-                stakesPlacedCorrectly: 0,
-              });
+              setBachDangCampaign({ scoutedLocations: [], unlockedStage: 1, stakesPlacedCorrectly: 0 });
+            }
+            if (activeQuestChainId === 'tay_son_campaign') {
+              setTaySonCampaign({ manpower: 0, morale: 0, unlockedStage: 1 });
             }
             setActiveQuestChainId(null);
             navigateTo(Screen.MAIN_INTERFACE);
@@ -567,6 +596,10 @@ Format JSON: { "modifiedText": string, "answers": string[], "definitions": Recor
     }
     if (missionInfo.questChainId) {
       setActiveQuestChainId(missionInfo.questChainId);
+      // Reset campaign state if starting a new campaign
+      if(missionInfo.questChainId === 'tay_son_campaign' && (questProgress[missionInfo.questChainId] || 0) === 0) {
+        setTaySonCampaign({ manpower: 0, morale: 0, unlockedStage: 1 });
+      }
       navigateTo(Screen.QUEST_CHAIN_SCREEN);
       return;
     }
@@ -588,6 +621,7 @@ Format JSON: { "modifiedText": string, "answers": string[], "definitions": Recor
           'rallyCall': Screen.RALLY_CALL_MISSION_SCREEN,
           'forging': Screen.FORGING_MISSION_SCREEN,
           'tacticalMap': Screen.TACTICAL_MAP_MISSION_SCREEN,
+          'tacticalBattle': Screen.TACTICAL_BATTLE_SCREEN,
           'defense': Screen.DEFENSE_MISSION_SCREEN,
           'strategyMap': Screen.STRATEGY_MAP_MISSION_SCREEN,
           'coinMinting': Screen.COIN_MINTING_MISSION_SCREEN,
@@ -598,6 +632,7 @@ Format JSON: { "modifiedText": string, "answers": string[], "definitions": Recor
           'constructionPuzzle': Screen.CONSTRUCTION_PUZZLE_SCREEN,
           'navalBattle': Screen.NAVAL_BATTLE_TIMING_SCREEN,
           'laneBattle': Screen.LANE_BATTLE_MISSION_SCREEN,
+          'strategicMarch': Screen.STRATEGIC_MARCH_MISSION_SCREEN,
         };
         const targetScreen = screenMap[missionData.type] || Screen.MAIN_INTERFACE;
         navigateTo(targetScreen, missionData);
@@ -985,6 +1020,17 @@ Format JSON: { "modifiedText": string, "answers": string[], "definitions": Recor
                     />;
         }
         break;
+      case Screen.TACTICAL_BATTLE_SCREEN:
+        if (activeMission && activeMission.type === 'tacticalBattle') {
+            return <TacticalBattleScreen 
+                      missionData={activeMission as TacticalBattleMissionData} 
+                      onReturnToMuseum={handleReturnToMuseum} 
+                      onComplete={completeMissionLogic} 
+                      onFail={handleMissionFail}
+                      campaignState={taySonCampaign}
+                    />;
+        }
+        break;
       case Screen.DEFENSE_MISSION_SCREEN:
         if (activeMission && activeMission.type === 'defense') {
             return <DefenseScreen missionData={activeMission as DefenseMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} onFail={handleMissionFail} />;
@@ -993,6 +1039,11 @@ Format JSON: { "modifiedText": string, "answers": string[], "definitions": Recor
       case Screen.STRATEGY_MAP_MISSION_SCREEN:
         if (activeMission && activeMission.type === 'strategyMap') {
             return <StrategyMapScreen missionData={activeMission as StrategyMapMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} onFail={handleMissionFail} />;
+        }
+        break;
+       case Screen.STRATEGIC_MARCH_MISSION_SCREEN:
+        if (activeMission && activeMission.type === 'strategicMarch') {
+            return <StrategicMarchScreen missionData={activeMission as StrategicMarchMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} onFail={handleMissionFail} />;
         }
         break;
       case Screen.COIN_MINTING_MISSION_SCREEN:
@@ -1120,10 +1171,7 @@ Format JSON: { "modifiedText": string, "answers": string[], "definitions": Recor
         <ArtifactInfoModal 
           item={rewardItemForModal} 
           isOpen={showSharedArtifactInfoModal} 
-          onClose={() => {
-            setShowSharedArtifactInfoModal(false);
-            setRewardItemForModal(null);
-          }} 
+          onClose={handleArtifactModalClose} 
         />
       )}
       {showPremiumWelcomeModal && (

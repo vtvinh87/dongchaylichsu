@@ -1,5 +1,3 @@
-
-
 // imageUrls.ts
 
 // --- Logos & Branding ---
@@ -27,11 +25,17 @@ export const BG_ADVENTURE_PUZZLE_URL = 'https://raw.githubusercontent.com/vtvinh
 export const BG_RIDDLE_DISPLAY_URL = 'https://i.ibb.co/hZ2vPht/parchment-bg.jpg';
 export const BG_NOTEBOOK_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-so-tay.png';
 export const BG_LANE_BATTLE_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-chien-truong-bach-dang.png';
+export const MARCH_MAP_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-hanh-quan.png';
 
 // --- Character & Unit Sprites ---
 export const SPRITE_PLAYER_CHARACTER_LANE_BATTLE_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Character/C-ba-trieu-tren-voi-chien.png';
 export const SPRITE_ENEMY_UNIT_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Character/C-linh-dich.png';
 export const SPRITE_ALLY_UNIT_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-binh-linh.png';
+export const ARMY_ICON_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-quan-doi.png';
+export const ICON_ELEPHANT_UNIT_URL = SPRITE_PLAYER_CHARACTER_LANE_BATTLE_URL; // Re-use Bà Triệu's elephant
+export const ICON_INFANTRY_UNIT_URL = SPRITE_ALLY_UNIT_URL; // Re-use ally icon
+export const ICON_ENEMY_FORT_URL = 'https://i.ibb.co/L5B7D7q/icon-don-dich.png'; // New icon for fort
+
 
 // --- Map Cell Icons ---
 export const ICON_CRATER_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-ho-bom.png';

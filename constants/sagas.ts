@@ -1,5 +1,3 @@
-
-
 // constants/sagas.ts
 import { Hoi } from '../types';
 import * as ImageUrls from '../imageUrls';
@@ -45,8 +43,16 @@ export const HOI_DATA: Hoi[] = [
     description: 'Trải nghiệm một trong những giai đoạn hào hùng nhất của lịch sử dân tộc với cuộc khởi nghĩa Tây Sơn và thiên tài quân sự của Hoàng đế Quang Trung.',
     isPremiumChapter: true,
     missions: [
-      { id: 'mission_4_1', title: 'Hành quân thần tốc', imageUrl: ImageUrls.SAGA_HANH_QUAN_THAN_TOC_URL, description: 'Vạch ra đường hành quân táo bạo từ Phú Xuân đến Thăng Long.', missionId: 'quang-trung-strategy-map' },
-      { id: 'mission_4_2', title: 'Xưởng đúc tiền', imageUrl: ImageUrls.SAGA_COIN_MINTING_URL, description: 'Giúp vua Quang Trung đúc những đồng tiền đầu tiên của triều đại mới.', missionId: 'quang-trung-coin-minting', dependsOnMissionId: 'quang-trung-strategy-map'},
+      {
+        id: 'mission_4_1_campaign',
+        title: 'Chiến Dịch Thần Tốc',
+        imageUrl: ImageUrls.SAGA_HANH_QUAN_THAN_TOC_URL,
+        description: 'Tham gia vào chiến dịch vĩ đại của Hoàng đế Quang Trung, từ Phú Xuân đến Thăng Long.',
+        questChainId: 'tay_son_campaign',
+        missionId: 'tay_son_march', // Match the first step's missionId as a convention
+        isPremium: true
+      },
+      { id: 'mission_4_2', title: 'Xưởng đúc tiền', imageUrl: ImageUrls.SAGA_COIN_MINTING_URL, description: 'Giúp vua Quang Trung đúc những đồng tiền đầu tiên của triều đại mới.', missionId: 'quang-trung-coin-minting', isOptionalForProgression: true, isPremium: true},
       { id: 'mission_4_3', title: 'Giả sử Lịch sử: Hai Bà Trưng', imageUrl: ImageUrls.SAGA_WHAT_IF_URL, description: 'Nếu Hai Bà Trưng không tuẫn tiết, lịch sử sẽ ra sao?', missionId: 'what-if-trung-sisters', isPremium: true, isOptionalForProgression: true},
     ]
   },

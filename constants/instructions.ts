@@ -1,5 +1,3 @@
-
-
 // constants/instructions.ts
 import { Tutorial } from '../types';
 
@@ -71,6 +69,10 @@ export const INSTRUCTION_DATA: Record<string, { title: string; text: string }> =
   strategyMap: {
       title: 'Hành quân thần tốc',
       text: "Vẽ một đường hành quân trên bản đồ từ điểm xuất phát (xanh lá) đến đích (cam), tránh các vùng nguy hiểm của địch. Sau khi vẽ xong, nhấn 'Bắt đầu Hành quân' để xác nhận.",
+  },
+  strategicMarch: {
+    title: 'Hành Quân Thần Tốc',
+    text: "Nhiệm vụ của bạn là dẫn dắt đội quân đến đích. Hãy chú ý đến 3 tài nguyên quan trọng: Thời Gian, Sĩ Khí và Binh Lực. Trên đường đi, bạn sẽ gặp các sự kiện bất ngờ. Hãy đưa ra những lựa chọn khôn ngoan vì chúng sẽ ảnh hưởng trực tiếp đến tài nguyên và sự thành bại của chiến dịch. Chúc may mắn, Tướng quân!",
   },
   coinMinting: {
       title: 'Xưởng đúc tiền',

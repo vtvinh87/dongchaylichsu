@@ -1,6 +1,5 @@
-
 // constants/missions.ts
-import { MissionData, DetectiveMissionData } from '../types';
+import { MissionData, DetectiveMissionData, RallyCallMissionData, TacticalBattleMissionData } from '../types';
 import * as Items from './items';
 import * as ImageUrls from '../imageUrls';
 
@@ -392,20 +391,111 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
     reward: { id: Items.HICH_TUONG_SI_ARTIFACT_ID, type: 'artifact' },
     fullText: `Huống chi, ta cùng các ngươi sinh ra phải thời loạn lạc, lớn lên gặp buổi gian nan. Lén nhìn sứ ngụy đi lại nghênh ngang ngoài đường, uốn tấc lưỡi cú diều mà lăng nhục triều đình; đem tấm thân dê chó mà khinh rẻ tổ phụ. Ỷ mệnh Hốt Tất Liệt mà đòi ngọc lụa để phụng sự lòng tham khôn cùng; khoác hiệu Vân Nam Vương mà hạch bạc vàng, để vét kiệt của kho có hạn. Thật khác nào đem thịt ném cho hổ đói, tránh sao khỏi tai họa về sau.\nTa thường tới bữa quên ăn, nửa đêm vỗ gối, ruột đau như cắt, nước mắt đầm đìa; chỉ giận chưa thể xả thịt, lột da, ăn gan, uống máu quân thù; dẫu cho trăm thân ta phơi ngoài nội cỏ, nghìn thây ta bọc trong da ngựa, cũng nguyện xin làm.`,
   },
-  'quang-trung-strategy-map': {
-      type: 'strategyMap',
-      id: 'quang-trung-strategy-map',
-      title: 'Hành quân thần tốc',
-      mapImageUrl: ImageUrls.STRATEGY_MAP_NGOC_HOI_URL,
-      startPoint: { x: 50, y: 90 }, // Bottom center
-      endPoint: { x: 50, y: 10 }, // Top center
-      dangerZones: [
-          { x: 20, y: 65, radius: 10 },
-          { x: 80, y: 55, radius: 12 },
-          { x: 50, y: 35, radius: 15 },
-      ],
-      reward: { id: Items.AO_BAO_TAY_SON_ARTIFACT_ID, type: 'artifact' },
+  'tay_son_march': {
+    type: 'strategicMarch',
+    id: 'tay_son_march',
+    title: 'Hành Quân Thần Tốc',
+    mapImageUrl: ImageUrls.MARCH_MAP_URL,
+    armyIconUrl: ImageUrls.ARMY_ICON_URL,
+    initialTime: 100,
+    initialMorale: 80,
+    initialManpower: 50000,
+    path: [
+      { x: 50, y: 85 }, { x: 52, y: 78 }, { x: 48, y: 70 },
+      { x: 55, y: 62 }, { x: 60, y: 55 }, { x: 58, y: 48 },
+      { x: 50, y: 40 }, { x: 45, y: 32 }, { x: 48, y: 25 },
+      { x: 50, y: 15 },
+    ],
+    events: [
+      {
+        id: 'event1',
+        triggerAtStep: 2,
+        prompt: "Phía trước là một con sông lớn, nhưng cầu đã bị phá hủy. Chúng ta phải làm gì?",
+        choices: [
+          { text: "Dành thời gian tìm khúc cạn để lội qua. (Tốn Thời Gian, ít rủi ro)", effects: { time: -10, morale: -5, manpower: 0 } },
+          { text: "Chặt tre kết bè để vượt sông nhanh chóng. (Tốn Binh Lực, nhanh hơn)", effects: { time: -5, morale: 5, manpower: -2000 } },
+        ],
+      },
+      {
+        id: 'event2',
+        triggerAtStep: 5,
+        prompt: "Dân địa phương mang lương thực ra ủng hộ quân ta! Họ muốn gia nhập nghĩa quân.",
+        choices: [
+          { text: "Chào đón họ! (Tăng Binh Lực, Sĩ Khí)", effects: { time: 0, morale: 15, manpower: 5000 } },
+          { text: "Cảm ơn nhưng từ chối. Giữ cho đội quân tinh nhuệ. (Tăng Sĩ Khí)", effects: { time: 0, morale: 5, manpower: 0 } },
+        ],
+      },
+      {
+        id: 'event3',
+        triggerAtStep: 8,
+        prompt: "Một toán quân địch nhỏ đang phục kích trong rừng. Ta nên làm gì?",
+        choices: [
+          { text: "Dùng một đội nhỏ đánh lạc hướng và đi đường vòng. (Tốn Thời Gian)", effects: { time: -8, morale: 0, manpower: -500 } },
+          { text: "Tấn công trực diện để dẹp đường. (Tốn Binh Lực, Sĩ Khí)", effects: { time: -2, morale: 10, manpower: -3000 } },
+        ],
+      },
+    ],
   },
+  'tay_son_oath': {
+    type: 'rallyCall',
+    id: 'tay_son_oath',
+    title: 'Hẹn Ước Thăng Long',
+    rounds: [
+        {
+            prompt: "Vua Quang Trung nói: 'Hỡi các tướng sĩ! Giặc Thanh đã chiếm Thăng Long. Nỗi nhục này, ta và các ngươi quyết không đội trời chung!'",
+            choices: [
+                {id: 'oath1_1', text: "Thề quyết một trận tử chiến!", iconUrl: ImageUrls.ICON_POINT_SWORD_URL, moralePoints: 30},
+                {id: 'oath1_2', text: "Xin Bệ hạ hãy cẩn trọng.", iconUrl: ImageUrls.ICON_VOW_PERSONAL_URL, moralePoints: 5},
+                {id: 'oath1_3', text: "Chúng ta cần thêm quân.", iconUrl: ImageUrls.ICON_CALL_SOLDIERS_URL, moralePoints: 10},
+            ]
+        },
+        {
+            prompt: "Nhà vua tiếp lời: 'Ta sẽ tổ chức một bữa tiệc lớn ngay tại Thăng Long vào ngày mùng 7 Tết. Các ngươi có tin ta không?'",
+            choices: [
+                {id: 'oath2_1', text: "Chúng thần tin tưởng tuyệt đối vào Bệ hạ!", iconUrl: ImageUrls.ICON_RAISE_FLAG_URL, moralePoints: 40},
+                {id: 'oath2_2', text: "Đây là một nhiệm vụ khó khăn...", iconUrl: ImageUrls.ICON_VOW_WEALTH_URL, moralePoints: -5},
+                {id: 'oath2_3', text: "Thần sẽ theo Bệ hạ đến cùng!", iconUrl: ImageUrls.ICON_VOW_NATION_URL, moralePoints: 20},
+            ]
+        },
+        {
+            prompt: "Vua Quang Trung dõng dạc: 'Vậy thì, hãy tiến lên! Đánh cho chúng phiến giáp bất hoàn! Đánh cho chúng biết nước Nam anh hùng là có chủ!'",
+            choices: [
+                {id: 'oath3_1', text: "XUNG PHONG!!!", iconUrl: ImageUrls.ICON_CHARGE_URL, moralePoints: 50},
+                {id: 'oath3_2', text: "Vì non sông Đại Việt!", iconUrl: ImageUrls.ICON_RAISE_FLAG_URL, moralePoints: 30},
+                {id: 'oath3_3', text: "Thực hiện kế hoạch thôi.", iconUrl: ImageUrls.ICON_VOW_PERSONAL_URL, moralePoints: 10},
+            ]
+        },
+    ]
+  } as RallyCallMissionData,
+  'tay_son_battle': {
+    type: 'tacticalBattle',
+    id: 'tay_son_battle',
+    title: 'Đại Phá Ngọc Hồi - Đống Đa',
+    reward: { id: Items.AO_BAO_TAY_SON_ARTIFACT_ID, type: 'artifact' },
+    mapLayout: [
+        ['forest', 'forest', 'road', 'road', 'empty', 'empty', 'forest', 'forest', 'forest', 'forest'],
+        ['forest', 'empty', 'road', 'road', 'empty', 'empty', 'road', 'road', 'village', 'forest'],
+        ['empty', 'empty', 'road', 'road', 'empty', 'empty', 'road', 'road', 'empty', 'empty'],
+        ['road', 'road', 'road', 'village', 'empty', 'empty', 'empty', 'village', 'empty', 'empty'],
+        ['road', 'road', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
+        ['road', 'road', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
+    ],
+    unitDefinitions: {
+        'bo_binh_tay_son': { id: 'bo_binh_tay_son', name: 'Bộ Binh Tây Sơn', iconUrl: ImageUrls.ICON_INFANTRY_UNIT_URL, maxHp: 100, attack: 25, attackRange: 1, moveRange: 3, description: "Lực lượng chủ lực, thiện chiến." },
+        'tuong_binh_tay_son': { id: 'tuong_binh_tay_son', name: 'Tượng Binh', iconUrl: ImageUrls.ICON_ELEPHANT_UNIT_URL, maxHp: 250, attack: 40, attackRange: 1, moveRange: 2, specialAbility: 'charge', description: "Sức mạnh đột phá, có thể húc đổ đồn địch." },
+        'quan_thanh_bo': { id: 'quan_thanh_bo', name: 'Bộ Binh Thanh', iconUrl: ImageUrls.SPRITE_ENEMY_UNIT_URL, maxHp: 80, attack: 20, attackRange: 1, moveRange: 2 },
+        'don_ngoc_hoi': { id: 'don_ngoc_hoi', name: 'Đồn Ngọc Hồi', iconUrl: ImageUrls.ICON_ENEMY_FORT_URL, maxHp: 500, attack: 10, attackRange: 2, moveRange: 0 },
+    },
+    playerUnitPool: ['bo_binh_tay_son', 'tuong_binh_tay_son'],
+    enemyUnits: [
+        { unitId: 'quan_thanh_bo', x: 3, y: 1, isEnemy: true },
+        { unitId: 'quan_thanh_bo', x: 6, y: 1, isEnemy: true },
+        { unitId: 'quan_thanh_bo', x: 4, y: 2, isEnemy: true },
+        { unitId: 'don_ngoc_hoi', x: 4, y: 0, isEnemy: true, isFort: true },
+    ],
+    deploymentZone: { x_min: 0, x_max: 9, y_min: 5, y_max: 5 },
+    winCondition: { type: 'destroy_fort', position: {x: 4, y: 0} }
+  } as TacticalBattleMissionData,
   'quang-trung-coin-minting': {
       type: 'coinMinting',
       id: 'quang-trung-coin-minting',

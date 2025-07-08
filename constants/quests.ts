@@ -14,6 +14,16 @@ export const ALL_QUEST_CHAINS: Record<string, QuestChain> = {
       { id: 'step2_bachdang', title: 'Quyết Chiến', description: 'Nhử địch vào trận địa và tổng tấn công khi thủy triều rút.', missionId: 'bach-dang-naval-battle', iconUrl: ImageUrls.QUEST_QUYET_CHIEN_ICON_URL },
     ]
   },
+  'tay_son_campaign': {
+    id: 'tay_son_campaign',
+    title: 'Chiến Dịch Thần Tốc',
+    description: 'Theo chân Hoàng đế Quang Trung trong cuộc hành quân vĩ đại, từ Phú Xuân đến Thăng Long, đánh tan 29 vạn quân Thanh.',
+    steps: [
+      { id: 'step1_tayson', title: 'Hành Quân Thần Tốc', description: 'Quản lý tài nguyên và đưa ra quyết định trên đường hành quân.', missionId: 'tay_son_march', iconUrl: ImageUrls.SAGA_HANH_QUAN_THAN_TOC_URL },
+      { id: 'step2_tayson', title: 'Hẹn Ước Thăng Long', description: 'Khích lệ sĩ khí ba quân bằng một lời hiệu triệu hào hùng.', missionId: 'tay_son_oath', iconUrl: ImageUrls.SAGA_HICH_TUONG_SI_URL },
+      { id: 'step3_tayson', title: 'Đại Phá Ngọc Hồi - Đống Đa', description: 'Điều binh khiển tướng trong trận chiến cuối cùng.', missionId: 'tay_son_battle', iconUrl: ImageUrls.QUEST_QUYET_CHIEN_ICON_URL },
+    ]
+  },
 };
 
 export const SIDE_QUESTS: Record<string, SideQuest> = {

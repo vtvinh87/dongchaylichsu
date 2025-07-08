@@ -10,7 +10,7 @@ type ParsedPart = { type: 'blank'; index: number } | { type: 'word'; text: strin
 interface RallyCallScreenProps {
     missionData: RallyCallMissionData;
     onReturnToMuseum: () => void;
-    onComplete: (reward?: Reward) => void;
+    onComplete: (reward?: Reward, data?: { morale: number }) => void;
     onFail: () => void;
     inventory: Record<string, number>;
     setInventory: React.Dispatch<React.SetStateAction<Record<string, number>>>;
@@ -164,7 +164,7 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
 
     // --- Morale Game Handlers ---
     const handleMoraleChoiceClick = (points: number) => {
-        if (isComplete) return;
+        if (isComplete || !missionData.rounds) return;
 
         const newMorale = morale + points;
         setMorale(newMorale);
@@ -175,15 +175,17 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
             setTimeout(() => setIsShaking(false), 400);
         }
 
-        if (currentRoundIndex < missionData.rounds!.length - 1) {
+        if (currentRoundIndex < missionData.rounds.length - 1) {
             setTimeout(() => setCurrentRoundIndex(prev => prev + 1), 500);
         } else {
             setIsComplete(true);
-            const maxMoralePossible = missionData.rounds!.reduce((acc, round) => acc + Math.max(...round.choices.map(c => c.moralePoints)), 0);
-            if (newMorale >= maxMoralePossible * 0.7) { // 70% threshold to win
+            const maxMoralePossible = missionData.rounds.reduce((acc, round) => acc + Math.max(...round.choices.map(c => c.moralePoints)), 0);
+            const isWin = newMorale >= maxMoralePossible * 0.7; // 70% threshold to win
+            
+            if (isWin) {
                 setOutcome('win');
                 playSound('sfx_unlock');
-                setTimeout(() => onComplete(missionData.reward), 2000);
+                setTimeout(() => onComplete(missionData.reward, { morale: newMorale }), 2000);
             } else {
                 setOutcome('loss');
                 onFail();
