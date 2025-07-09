@@ -1323,7 +1323,7 @@ body {
         border: 2px solid #fcd34d;
         border-radius: 10px;
         padding: 4px;
-        margin-bottom: 1rem;
+        margin-top: 0.25rem;
     }
     .morale-bar-fill {
         height: 20px;
@@ -1861,8 +1861,245 @@ body {
       text-shadow: 0 1px 3px rgba(0,0,0,0.5);
       animation: fadeInDown 0.5s ease-out;
     }
+    
+    /* --- CSS for Coin Minting Mini-game --- */
+    .minting-stage-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background-color: rgba(0,0,0,0.5);
+        border-radius: 0.75rem;
+        position: relative;
+        color: white;
+    }
+    
+    .minting-instructions {
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+        max-width: 600px;
+        text-shadow: 1px 1px 2px black;
+        text-align: center;
+    }
+    
+    .minting-start-button {
+        background: linear-gradient(145deg, #fcd34d, #fbbf24);
+        color: #78350f;
+        font-size: 1.5rem;
+        padding: 0.75rem 2rem;
+        border-radius: 9999px;
+        font-weight: bold;
+        border: 2px solid #fefce8;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        cursor: pointer;
+    }
+    
+    /* Engraving Stage */
+    #engraving-area {
+        width: 500px;
+        height: 200px;
+        background-color: #44403c; /* stone-700 */
+        border: 5px solid #1c1917; /* stone-900 */
+        border-radius: 0.5rem;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 1rem;
+    }
+    .char-mold {
+        width: 100px;
+        height: 100px;
+        background-color: #292524; /* stone-800 */
+        position: relative;
+        border: 2px solid #1c1917;
+    }
+    .char-mold.completed {
+        background-color: #166534; /* green-800 */
+        box-shadow: 0 0 15px #4ade80; /* green-400 */
+    }
+    .engraving-dot {
+        fill: #a1a1aa; /* stone-400 */
+        cursor: pointer;
+        transition: fill 0.2s;
+    }
+    .engraving-dot.clicked {
+        fill: #facc15; /* amber-400 */
+    }
+    .engraving-dot.next-dot {
+        fill: #fde047; /* yellow-200 */
+        animation: pulse-yellow-glow 1.5s infinite;
+    }
+    .engraving-line {
+        stroke: #facc15; /* amber-400 */
+        stroke-width: 4;
+        stroke-linecap: round;
+    }
+    
+    @keyframes pulse-yellow-glow {
+      0% { filter: drop-shadow(0 0 2px #fef08a); }
+      50% { filter: drop-shadow(0 0 8px #fde047); }
+      100% { filter: drop-shadow(0 0 2px #fef08a); }
+    }
+    
+    /* Smelting Stage */
+    #smelting-area {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+    #furnace-visual {
+        width: 150px;
+        height: 150px;
+        background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/main/pictures/icon/icon-lo-luyen-kim.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        position: relative;
+    }
+    #furnace-visual.heating::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        height: 50%;
+        background: radial-gradient(ellipse at bottom, #f97316, transparent 70%);
+        animation: flicker 0.2s infinite;
+    }
+    @keyframes flicker {
+        0% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+        50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+        100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+    }
+    #temp-gauge {
+        width: 60px;
+        height: 300px;
+        background-color: #1f2937; /* gray-800 */
+        border: 2px solid #4b5563;
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+    }
+    #temp-indicator {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, #f87171, #facc15, #4ade80, #facc15, #f87171);
+        transition: height 0.1s linear;
+    }
+    #temp-green-zone {
+        position: absolute;
+        left: 0;
+        right: 0;
+        background-color: rgba(34, 197, 94, 0.3);
+        border-top: 2px dashed #22c55e;
+        border-bottom: 2px dashed #22c55e;
+    }
+    #smelting-progress-bar {
+        width: 100%;
+        height: 20px;
+        background-color: #4b5563;
+        border-radius: 10px;
+        margin-top: 1rem;
+    }
+    #smelting-progress-fill {
+        height: 100%;
+        background-color: #f59e0b;
+        border-radius: 10px;
+        transition: width 0.2s linear;
+    }
 
-    /* --- CSS for Typesetting Mission --- */
+    #bellows-container {
+        position: relative;
+        width: 250px;
+        height: 250px;
+        background-color: rgba(0,0,0,0.2);
+        border-radius: 0.5rem;
+        border: 2px dashed #a16207; /* amber-700 */
+        flex-shrink: 0;
+    }
+
+    .bellows-button {
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #f97316, #ef4444); /* orange-500 to red-500 */
+        color: white;
+        font-size: 2.5rem;
+        line-height: 1;
+        font-weight: bold;
+        border: 3px solid #fefce8; /* amber-50 */
+        box-shadow: 0 5px 15px rgba(0,0,0,0.4), inset 0 -4px 8px rgba(0,0,0,0.3);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        transform: translate(-50%, -50%);
+        transition: all 0.2s ease-out;
+    }
+    
+    .bellows-button:hover {
+        transform: translate(-50%, -50%) scale(1.1);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 -4px 8px rgba(0,0,0,0.3), 0 0 15px #f97316;
+        background: linear-gradient(145deg, #fb923c, #f87171);
+    }
+    
+    .bellows-button:active {
+        transform: translate(-50%, -50%) scale(1.05);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.5), inset 0 -2px 5px rgba(0,0,0,0.3);
+    }
+    
+    /* Casting Stage */
+    #casting-bar {
+        width: 100%;
+        max-width: 600px;
+        height: 50px;
+        background-color: #4b5563; /* gray-600 */
+        border-radius: 10px;
+        position: relative;
+        border: 2px solid #1f2937;
+        overflow: hidden;
+        cursor: pointer;
+    }
+    #casting-sweet-spot {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        background-color: rgba(34, 197, 94, 0.5);
+    }
+    #casting-indicator {
+        position: absolute;
+        top: -5px;
+        bottom: -5px;
+        width: 8px;
+        background-color: #fefce8;
+        box-shadow: 0 0 8px white;
+        animation-name: move-casting-marker;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+    }
+    
+    @keyframes move-casting-marker {
+      from { left: 0%; }
+      to { left: calc(100% - 8px); }
+    }
+    
+    .minting-hud {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px black;
+    }
+
+    /* --- Typesetting Screen Specific Styles --- */
 #typesetting-screen {
   background: #3a2e20; /* dark wood color */
   background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
@@ -2749,7 +2986,7 @@ body {
     height: 100%;
     padding: 1rem;
     overflow-y: auto;
-    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-phien-cho-thoi-ly.png');
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-phien-cho-thoi-Ly.png');
     background-size: cover;
     background-position: center;
     position: relative;
@@ -3413,4 +3650,197 @@ body {
     color: #3a2e20;
     opacity: 0.7;
     z-index: 3;
+}
+/* --- Tactical Battle Screen --- */
+.tactical-battle-screen {
+    width: 100%;
+    max-width: 1280px;
+    height: 90vh; /* Make it take up most of the viewport height */
+    padding: 1rem;
+    background-color: #1c1917; /* stone-900 */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.grid-container {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 2px;
+    border: 3px solid #4a2c13; /* Dark brown */
+    background-color: transparent;
+    height: 100%;
+    width: 100%;
+    border-radius: 0.5rem; /* Add rounding for aesthetics */
+}
+.tile {
+    position: relative;
+    transition: background-color 0.2s;
+}
+.tile.forest { background-color: rgba(22, 101, 52, 0.2); }
+.tile.road { background-color: rgba(120, 53, 15, 0.2); }
+.tile.village { background-color: rgba(161, 98, 7, 0.2); }
+.tile.empty { background-color: transparent; }
+
+.tile.highlight-move::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(59, 130, 246, 0.4); /* blue-500 */
+    border: 2px solid #2563eb;
+    cursor: pointer;
+    z-index: 1;
+}
+.tile.highlight-attack::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(239, 68, 68, 0.4); /* red-500 */
+    border: 2px solid #dc2626;
+    cursor: crosshair;
+    z-index: 1;
+}
+
+.unit {
+    position: absolute;
+    width: 10%;
+    height: calc(100% / 6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    transition: all 0.3s ease;
+    z-index: 5;
+    cursor: pointer;
+}
+.unit.enemy { filter: drop-shadow(0 0 5px #ef4444); }
+.unit.player { filter: drop-shadow(0 0 5px #3b82f6); }
+.unit.selected {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px #facc15); /* amber-400 */
+    z-index: 10;
+}
+.unit img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+}
+.hp-bar-bg {
+    width: 80%;
+    height: 8px;
+    background-color: rgba(0,0,0,0.5);
+    border: 1px solid #4b5563;
+    border-radius: 4px;
+}
+.hp-bar-fill {
+    height: 100%;
+    background-color: #22c55e;
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+.unit.enemy .hp-bar-fill {
+    background-color: #ef4444;
+}
+
+.hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 0.5rem;
+}
+.hud button {
+    background-color: #f59e0b;
+    color: #4a2c13;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    border: none;
+    cursor: pointer;
+}
+.hud button:disabled {
+    background-color: #6b7280;
+    cursor: not-allowed;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    font-size: 4rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 5px black;
+}
+.overlay.win { background-color: rgba(34, 197, 94, 0.7); }
+.overlay.loss { background-color: rgba(239, 68, 68, 0.7); }
+
+/* Landmark Modal */
+.landmark-modal-content {
+    background-color: #fdf6e3;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 4px solid #3a2e20;
+    width: 90vw;
+    max-width: 450px;
+    height: 90vw; /* Make it square */
+    max-height: 450px; /* Max height */
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+}
+.dark .landmark-modal-content {
+    background-color: #44403c;
+    border-color: #d97706;
+}
+.landmark-modal-content h3 {
+    font-family: 'Special Elite', cursive;
+    font-size: 1.75rem;
+    color: #5d4a36;
+    flex-shrink: 0;
+}
+.dark .landmark-modal-content h3 {
+    color: #fcd34d;
+}
+.landmark-modal-content img {
+    width: 6rem;
+    height: 6rem;
+    margin: 0 auto;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+.landmark-modal-content .overflow-y-auto {
+    flex-grow: 1;
+    text-align: left;
+    overflow-y: auto;
+}
+.landmark-modal-content .overflow-y-auto p {
+    font-family: 'Nunito', sans-serif;
+    color: #333;
+    line-height: 1.6;
+}
+.dark .landmark-modal-content .overflow-y-auto p {
+    color: #f5f5f4;
+}
+.landmark-modal-content button {
+    background-color: #a16207;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    flex-shrink: 0;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+.dark .landmark-modal-content button {
+    background-color: #f59e0b;
+    color: #3a2e20;
 }

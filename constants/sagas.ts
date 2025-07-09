@@ -46,7 +46,7 @@ export const HOI_DATA: Hoi[] = [
       {
         id: 'mission_4_1_campaign',
         title: 'Chiến Dịch Thần Tốc',
-        imageUrl: ImageUrls.SAGA_HANH_QUAN_THAN_TOC_URL,
+        imageUrl: ImageUrls.QUEST_CHAIN_TAY_SON_BANNER_URL,
         description: 'Tham gia vào chiến dịch vĩ đại của Hoàng đế Quang Trung, từ Phú Xuân đến Thăng Long.',
         questChainId: 'tay_son_campaign',
         missionId: 'tay_son_march', // Match the first step's missionId as a convention

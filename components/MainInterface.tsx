@@ -1,8 +1,4 @@
-
-
-
-
-
+// components/MainInterface.tsx
 
 import React, { useMemo, useCallback } from 'react';
 import { Hoi, MissionInfo, Artifact, HeroCard, Decoration, AvatarCustomization, Reward, MissionData } from '../types';
@@ -39,6 +35,8 @@ interface MainInterfaceProps {
   onShowAchievements: () => void;
   isSoundEnabled: boolean;
   onToggleSound: () => void;
+  questProgress: Record<string, number>;
+  isTaySonCampaignComplete: boolean;
 }
 
 const MainInterface: React.FC<MainInterfaceProps> = ({
@@ -67,6 +65,8 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
   onShowAchievements,
   isSoundEnabled,
   onToggleSound,
+  questProgress,
+  isTaySonCampaignComplete,
 }) => {
 
     // Memoize sets of collected IDs for efficient O(1) lookups.
@@ -295,7 +295,14 @@ const MainInterface: React.FC<MainInterfaceProps> = ({
                     const isDependencyLocked = missionInfo.dependsOnMissionId 
                       ? !isMissionCompleted(missionInfo.dependsOnMissionId)
                       : false;
-                    const finalIsLocked = !isChapterUnlocked || isDependencyLocked || (missionInfo.isPremium && !isPremium);
+                    
+                    let finalIsLocked = !isChapterUnlocked || isDependencyLocked || (missionInfo.isPremium && !isPremium);
+                    
+                    // Override lock status if Tay Son campaign is complete and mission is part of it
+                    if (missionInfo.questChainId === 'tay_son_campaign' && isTaySonCampaignComplete) {
+                        finalIsLocked = false;
+                    }
+
                     return (
                         <MissionCard 
                           key={missionInfo.id} 

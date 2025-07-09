@@ -327,6 +327,7 @@ export interface RallyCallChoice {
   text: string;
   iconUrl: string;
   moralePoints: number;
+  historicalNote?: string;
 }
 
 export interface RallyCallRound {
@@ -500,6 +501,7 @@ export interface StrategicMarchEventChoice {
     morale: number;
     manpower: number;
   };
+  historicalNote?: string;
 }
 
 export interface StrategicMarchEvent {
@@ -507,6 +509,15 @@ export interface StrategicMarchEvent {
   triggerAtStep: number;
   prompt: string;
   choices: StrategicMarchEventChoice[];
+  imageUrl?: string;
+}
+
+export interface Landmark {
+  id: string;
+  name: string;
+  description: string;
+  position: Point;
+  iconUrl: string;
 }
 
 export interface StrategicMarchMissionData extends BaseMissionData {
@@ -518,6 +529,7 @@ export interface StrategicMarchMissionData extends BaseMissionData {
   initialManpower: number;
   path: Point[];
   events: StrategicMarchEvent[];
+  landmarks?: Landmark[];
 }
 
 // --- New Tactical Battle Types ---

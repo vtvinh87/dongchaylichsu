@@ -1,7 +1,9 @@
+
 // components/TacticalBattleScreen.tsx
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { TacticalBattleMissionData, TaySonCampaignState, Reward, PlacedUnit, UnitDefinition } from '../types';
 import { playSound } from '../utils/audio';
+import * as ImageUrls from '../imageUrls';
 
 interface GameUnit extends PlacedUnit {
   instanceId: string;
@@ -28,7 +30,38 @@ const TacticalBattleScreen: React.FC<{
   const [highlightedTiles, setHighlightedTiles] = useState<Record<string, 'move' | 'attack'>>({});
   const [turn, setTurn] = useState<'player' | 'enemy'>('player');
   const [gameState, setGameState] = useState<'playing' | 'win' | 'loss'>('playing');
+
+  // New states for historical context
+  const [selectedUnitInfo, setSelectedUnitInfo] = useState<UnitDefinition | null>(null);
+  const [showVictoryModal, setShowVictoryModal] = useState(false);
   
+  const checkWinLoss = useCallback((currentUnits: GameUnit[]) => {
+    const playerUnits = currentUnits.filter(u => !u.isEnemy);
+    if (playerUnits.length === 0) {
+      setGameState('loss');
+      onFail();
+      return;
+    }
+
+    if (missionData.winCondition.type === 'destroy_fort') {
+      const fort = currentUnits.find(u => u.isFort);
+      if (!fort) {
+        setGameState('win');
+        playSound('sfx_unlock');
+        setShowVictoryModal(true); // Show historical victory modal instead of completing directly
+        return;
+      }
+    }
+    
+    // Default fallback / other win conditions
+    const enemyUnits = currentUnits.filter(u => u.isEnemy);
+    if (enemyUnits.length === 0) {
+      setGameState('win');
+      playSound('sfx_unlock');
+      onComplete(missionData.reward);
+    }
+  }, [onFail, onComplete, missionData]);
+
   // Initialize game state
   useEffect(() => {
     const playerUnits: GameUnit[] = [];
@@ -42,31 +75,32 @@ const TacticalBattleScreen: React.FC<{
     // Apply morale buff
     const moraleBuff = baseMorale > 150 ? 1.2 : 1.0;
 
-    let unitsToPlace = infantryCount + elephantCount;
+    const { x_min, y_min, x_max, y_max } = missionData.deploymentZone;
+    const zoneWidth = x_max - x_min + 1;
+    const zoneHeight = y_max - y_min + 1;
+    const maxDeployableUnits = zoneWidth * zoneHeight;
     let placedCount = 0;
     
     // Create player units
-    for(let i = 0; i < infantryCount && placedCount < 5; i++) {
+    for(let i = 0; i < infantryCount && placedCount < maxDeployableUnits; i++) {
         const def = missionData.unitDefinitions.bo_binh_tay_son;
+        const placeX = x_min + (placedCount % zoneWidth);
+        const placeY = y_min + Math.floor(placedCount / zoneWidth);
         playerUnits.push({
-            ...def,
-            instanceId: `p_inf_${i}`,
-            unitId: 'bo_binh_tay_son',
-            currentHp: def.maxHp,
-            attack: Math.round(def.attack * moraleBuff),
-            x: placedCount % 10, y: 5, isEnemy: false, hasMoved: false, hasAttacked: false
+            ...def, instanceId: `p_inf_${i}`, unitId: 'bo_binh_tay_son',
+            currentHp: def.maxHp, attack: Math.round(def.attack * moraleBuff),
+            x: placeX, y: placeY, isEnemy: false, hasMoved: false, hasAttacked: false
         });
         placedCount++;
     }
-     for(let i = 0; i < elephantCount && placedCount < 5; i++) {
+     for(let i = 0; i < elephantCount && placedCount < maxDeployableUnits; i++) {
         const def = missionData.unitDefinitions.tuong_binh_tay_son;
+        const placeX = x_min + (placedCount % zoneWidth);
+        const placeY = y_min + Math.floor(placedCount / zoneWidth);
         playerUnits.push({
-            ...def,
-            instanceId: `p_ele_${i}`,
-            unitId: 'tuong_binh_tay_son',
-            currentHp: def.maxHp,
-            attack: Math.round(def.attack * moraleBuff),
-            x: placedCount % 10, y: 5, isEnemy: false, hasMoved: false, hasAttacked: false
+            ...def, instanceId: `p_ele_${i}`, unitId: 'tuong_binh_tay_son',
+            currentHp: def.maxHp, attack: Math.round(def.attack * moraleBuff),
+            x: placeX, y: placeY, isEnemy: false, hasMoved: false, hasAttacked: false
         });
         placedCount++;
     }
@@ -82,21 +116,55 @@ const TacticalBattleScreen: React.FC<{
     setUnits([...playerUnits, ...enemyUnits]);
     setTurn('player');
     setGameState('playing');
+    setShowVictoryModal(false);
+    setSelectedUnitInfo(null);
   }, [missionData, campaignState]);
 
   const handleUnitClick = (unit: GameUnit) => {
-    if (turn !== 'player' || unit.isEnemy || gameState !== 'playing') return;
-    
+    if (turn !== 'player' || gameState !== 'playing') return;
+
+    // If an enemy unit is clicked and a player unit is already selected
+    if (unit.isEnemy && selectedUnitId) {
+        const attacker = units.find(u => u.instanceId === selectedUnitId);
+        if (!attacker || attacker.isEnemy || attacker.hasAttacked) return;
+        
+        const tileKey = `${unit.y}-${unit.x}`;
+        if (highlightedTiles[tileKey] === 'attack') {
+            const newHp = unit.currentHp - attacker.attack;
+            const newUnits = units.map(u => {
+                if (u.instanceId === unit.instanceId) return { ...u, currentHp: newHp };
+                if (u.instanceId === selectedUnitId) return { ...u, hasAttacked: true };
+                return u;
+            }).filter(u => u.currentHp > 0);
+            
+            setUnits(newUnits);
+            setSelectedUnitId(null);
+            setHighlightedTiles({});
+            setSelectedUnitInfo(null);
+            playSound('sfx_explosion');
+            checkWinLoss(newUnits);
+            return;
+        }
+    }
+
+    if (unit.isEnemy) {
+        setSelectedUnitId(null);
+        setSelectedUnitInfo(null);
+        setHighlightedTiles({});
+        return;
+    }
+
     if (selectedUnitId === unit.instanceId) {
       setSelectedUnitId(null);
+      setSelectedUnitInfo(null);
       setHighlightedTiles({});
       return;
     }
 
     setSelectedUnitId(unit.instanceId);
+    setSelectedUnitInfo(missionData.unitDefinitions[unit.unitId]); // Set info for display
     
     const newHighlights: Record<string, 'move' | 'attack'> = {};
-    // Highlight move tiles
     if (!unit.hasMoved) {
         for(let y = 0; y < missionData.mapLayout.length; y++) {
             for(let x = 0; x < missionData.mapLayout[0].length; x++) {
@@ -107,7 +175,6 @@ const TacticalBattleScreen: React.FC<{
             }
         }
     }
-    // Highlight attack tiles
     if (!unit.hasAttacked) {
         units.filter(u => u.isEnemy).forEach(enemy => {
             const distance = Math.abs(unit.x - enemy.x) + Math.abs(unit.y - enemy.y);
@@ -122,39 +189,36 @@ const TacticalBattleScreen: React.FC<{
   const handleTileClick = (x: number, y: number) => {
     if (!selectedUnitId || gameState !== 'playing') return;
     
-    const selectedUnit = units.find(u => u.instanceId === selectedUnitId);
-    if (!selectedUnit) return;
+    const attacker = units.find(u => u.instanceId === selectedUnitId);
+    if (!attacker) return;
     
     const tileKey = `${y}-${x}`;
     const tileType = highlightedTiles[tileKey];
     
-    if (tileType === 'move') {
+    if (tileType === 'move' && !attacker.hasMoved) {
       const newUnits = units.map(u => u.instanceId === selectedUnitId ? { ...u, x, y, hasMoved: true } : u);
       setUnits(newUnits);
       setSelectedUnitId(null);
       setHighlightedTiles({});
+      setSelectedUnitInfo(null);
       playSound('sfx_click');
-    } else if (tileType === 'attack') {
-      const targetUnit = units.find(u => u.x === x && u.y === y && u.isEnemy);
-      if (targetUnit) {
-        // Attack logic
-        const newHp = targetUnit.currentHp - selectedUnit.attack;
-        const newUnits = units.map(u => {
-          if (u.instanceId === targetUnit.instanceId) {
-            return { ...u, currentHp: newHp };
-          }
-          if (u.instanceId === selectedUnitId) {
-            return { ...u, hasAttacked: true };
-          }
-          return u;
-        }).filter(u => u.currentHp > 0);
-        
-        setUnits(newUnits);
-        setSelectedUnitId(null);
-        setHighlightedTiles({});
-        playSound('sfx_explosion');
-        checkWinLoss(newUnits);
-      }
+    } else if (tileType === 'attack' && !attacker.hasAttacked) {
+        const targetUnit = units.find(u => u.x === x && u.y === y && u.isEnemy);
+        if(targetUnit) {
+            const newHp = targetUnit.currentHp - attacker.attack;
+            const newUnits = units.map(u => {
+                if (u.instanceId === targetUnit.instanceId) return { ...u, currentHp: newHp };
+                if (u.instanceId === selectedUnitId) return { ...u, hasAttacked: true };
+                return u;
+            }).filter(u => u.currentHp > 0);
+            
+            setUnits(newUnits);
+            setSelectedUnitId(null);
+            setHighlightedTiles({});
+            setSelectedUnitInfo(null);
+            playSound('sfx_explosion');
+            checkWinLoss(newUnits);
+        }
     }
   };
 
@@ -162,96 +226,74 @@ const TacticalBattleScreen: React.FC<{
     if (turn !== 'player' || gameState !== 'playing') return;
     setSelectedUnitId(null);
     setHighlightedTiles({});
-    // Reset player unit states
+    setSelectedUnitInfo(null);
+    // Reset player unit states for the next turn
     setUnits(prev => prev.map(u => u.isEnemy ? u : { ...u, hasMoved: false, hasAttacked: false }));
     setTurn('enemy');
   };
-
-  const checkWinLoss = useCallback((currentUnits: GameUnit[]) => {
-    const playerUnits = currentUnits.filter(u => !u.isEnemy);
-    const enemyUnits = currentUnits.filter(u => u.isEnemy);
-
-    if(playerUnits.length === 0) {
-      setGameState('loss');
-      onFail();
-    } else if (enemyUnits.length === 0) {
-      setGameState('win');
-      onComplete(missionData.reward);
-    }
-  }, [onFail, onComplete, missionData.reward]);
   
-  // Minimal Enemy AI
+  // Enemy AI
   useEffect(() => {
-    if (turn === 'enemy' && gameState === 'playing') {
-      let currentUnits = [...units];
-      let hasActions = true;
+    if (turn !== 'enemy' || gameState !== 'playing') return;
 
-      const performEnemyActions = () => {
-        if (!hasActions) {
-          setTurn('player');
-          return;
+    const enemyTurnTimeout = setTimeout(() => {
+        let tempUnits = [...units];
+        const playerUnits = tempUnits.filter(u => !u.isEnemy);
+        if (playerUnits.length === 0) {
+            setTurn('player');
+            return;
         }
-        
-        const enemyUnits = currentUnits.filter(u => u.isEnemy && (!u.hasMoved || !u.hasAttacked));
-        if (enemyUnits.length === 0) {
-          hasActions = false;
-          setUnits(prev => prev.map(u => u.isEnemy ? { ...u, hasMoved: false, hasAttacked: false } : u));
-          setTurn('player');
-          return;
-        }
-        
-        const enemy = enemyUnits[0];
-        // ... (simplified AI logic)
-        // Find nearest player unit
-        const playerUnits = currentUnits.filter(u => !u.isEnemy);
-        if (playerUnits.length === 0) return; // Should be handled by win/loss check but good practice
-        
-        let target = playerUnits[0];
-        let minDistance = Infinity;
-        
-        playerUnits.forEach(p => {
-            const dist = Math.abs(p.x - enemy.x) + Math.abs(p.y - enemy.y);
-            if(dist < minDistance) {
-                minDistance = dist;
-                target = p;
+
+        const enemiesToAct = tempUnits.filter(u => u.isEnemy);
+
+        enemiesToAct.forEach(enemy => {
+            // Re-fetch current state of units for each enemy's action
+            const currentPlayers = tempUnits.filter(u => !u.isEnemy);
+            if (currentPlayers.length === 0) return;
+
+            // Simple AI: find closest player
+            let target = currentPlayers[0];
+            let minDistance = Infinity;
+            currentPlayers.forEach(p => {
+                const dist = Math.abs(p.x - enemy.x) + Math.abs(p.y - enemy.y);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    target = p;
+                }
+            });
+
+            // Attack if in range
+            if (minDistance <= enemy.attackRange) {
+                const newHp = target.currentHp - enemy.attack;
+                tempUnits = tempUnits.map(u => u.instanceId === target.instanceId ? { ...u, currentHp: newHp } : u);
+            } 
+            // Else, move
+            else if (enemy.moveRange > 0) {
+                let newX = enemy.x;
+                let newY = enemy.y;
+                if (Math.abs(target.x - enemy.x) > Math.abs(target.y - enemy.y)) {
+                    newX += Math.sign(target.x - enemy.x);
+                } else {
+                    newY += Math.sign(target.y - enemy.y);
+                }
+                
+                // Check if target tile is empty
+                if (!tempUnits.some(u => u.x === newX && u.y === newY)) {
+                    tempUnits = tempUnits.map(u => u.instanceId === enemy.instanceId ? { ...u, x: newX, y: newY } : u);
+                }
             }
         });
-        
-        // Attack if in range
-        if(minDistance <= enemy.attackRange && !enemy.hasAttacked) {
-             const newHp = target.currentHp - enemy.attack;
-             currentUnits = currentUnits.map(u => {
-                 if(u.instanceId === target.instanceId) return {...u, currentHp: newHp};
-                 if(u.instanceId === enemy.instanceId) return {...u, hasAttacked: true};
-                 return u;
-             }).filter(u => u.currentHp > 0);
-        } 
-        // Move if not in range
-        else if(!enemy.hasMoved) {
-            let newX = enemy.x;
-            let newY = enemy.y;
-            if(enemy.x < target.x) newX++;
-            else if (enemy.x > target.x) newX--;
-            else if (enemy.y < target.y) newY++;
-            else if (enemy.y > target.y) newY--;
-            
-            if(!currentUnits.some(u => u.x === newX && u.y === newY)) {
-                currentUnits = currentUnits.map(u => u.instanceId === enemy.instanceId ? {...u, x: newX, y: newY, hasMoved: true} : u);
-            } else {
-                 currentUnits = currentUnits.map(u => u.instanceId === enemy.instanceId ? {...u, hasMoved: true} : u);
-            }
-        } else {
-            // Cannot move or attack, mark as done
-            currentUnits = currentUnits.map(u => u.instanceId === enemy.instanceId ? {...u, hasAttacked: true} : u);
-        }
-        setUnits(currentUnits);
-        checkWinLoss(currentUnits);
-        setTimeout(performEnemyActions, 500); // Next enemy action
-      };
-      
-      setTimeout(performEnemyActions, 500);
-    }
-  }, [turn, gameState, units, checkWinLoss]);
+
+        // Filter out defeated units at the end
+        const finalUnits = tempUnits.filter(u => u.currentHp > 0);
+        setUnits(finalUnits);
+        checkWinLoss(finalUnits);
+        setTurn('player');
+
+    }, 1000);
+
+    return () => clearTimeout(enemyTurnTimeout);
+  }, [turn, gameState, checkWinLoss, units]);
   
   const getTileClass = (x: number, y: number) => {
       let className = 'tile ';
@@ -264,37 +306,87 @@ const TacticalBattleScreen: React.FC<{
   }
   
   const renderOverlay = () => {
-    if(gameState === 'win') return <div className="overlay win">CHIẾN THẮNG!</div>;
+    if(gameState === 'win' && !showVictoryModal) return <div className="overlay win">CHIẾN THẮNG!</div>;
     if(gameState === 'loss') return <div className="overlay loss">THẤT BẠI!</div>;
     return null;
   };
   
+  const handleVictoryModalClose = () => {
+    setShowVictoryModal(false);
+    onComplete(missionData.reward);
+  };
+  
   return (
     <div className="tactical-battle-screen">
-      {renderOverlay()}
-      <div className="grid-container">
-        {missionData.mapLayout.map((row, y) => (
-          row.map((_, x) => (
-            <div key={`${y}-${x}`} className={getTileClass(x, y)} onClick={() => handleTileClick(x, y)} />
-          ))
-        ))}
-        {units.map(unit => (
-          <div 
-            key={unit.instanceId}
-            className={`unit ${unit.isEnemy ? 'enemy' : 'player'} ${selectedUnitId === unit.instanceId ? 'selected' : ''}`}
-            style={{ top: `${unit.y * (100 / missionData.mapLayout.length)}%`, left: `${unit.x * (100 / missionData.mapLayout[0].length)}%` }}
-            onClick={() => handleUnitClick(unit)}
-          >
-            <img src={unit.iconUrl} alt={unit.name}/>
-            <div className="hp-bar-bg"><div className="hp-bar-fill" style={{width: `${(unit.currentHp / unit.maxHp) * 100}%`}}></div></div>
+      {showVictoryModal && (
+          <div className="absolute inset-0 bg-black/70 flex justify-center items-center z-30 p-4">
+              <div className="bg-amber-100 dark:bg-stone-800 p-6 rounded-lg shadow-xl max-w-lg w-full text-center animate-fadeInScaleUp">
+                  <h3 className="text-2xl font-bold text-green-600 dark:text-green-400">Chiến Thắng Lịch Sử!</h3>
+                  <p className="text-stone-800 dark:text-stone-200 my-4">
+                      Đồn Ngọc Hồi đã bị hạ! Đây là một bước ngoặt quyết định trong trận chiến lịch sử, mở đường cho quân ta tiến thẳng về giải phóng Thăng Long.
+                  </p>
+                  <button onClick={handleVictoryModalClose} className="bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md">
+                      Tuyệt vời!
+                  </button>
+              </div>
           </div>
-        ))}
-      </div>
-      <div className="hud">
-        <button onClick={onReturnToMuseum} className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg shadow-md">
-            Rời trận
-        </button>
-        <button onClick={endTurn} disabled={turn !== 'player' || gameState !== 'playing'}>Kết thúc lượt</button>
+      )}
+      <div className="flex flex-col md:flex-row gap-4 w-full h-full">
+          <div 
+              className="flex-grow grid-container"
+              style={{ 
+                  backgroundImage: `url(${ImageUrls.TACTICAL_BATTLE_BACKGROUND_URL})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+              }}
+          >
+            {renderOverlay()}
+            {missionData.mapLayout.map((row, y) => (
+              row.map((_, x) => (
+                <div key={`${y}-${x}`} className={getTileClass(x, y)} onClick={() => handleTileClick(x, y)} />
+              ))
+            ))}
+            {units.map(unit => (
+              <div 
+                key={unit.instanceId}
+                className={`unit ${unit.isEnemy ? 'enemy' : 'player'} ${selectedUnitId === unit.instanceId ? 'selected' : ''}`}
+                style={{ top: `${unit.y * (100 / missionData.mapLayout.length)}%`, left: `${unit.x * (100 / missionData.mapLayout[0].length)}%` }}
+                onClick={(e) => { e.stopPropagation(); handleUnitClick(unit); }}
+              >
+                <img src={unit.iconUrl} alt={unit.name}/>
+                <div className="hp-bar-bg"><div className="hp-bar-fill" style={{width: `${(unit.currentHp / unit.maxHp) * 100}%`}}></div></div>
+              </div>
+            ))}
+          </div>
+
+          <div id="info-panel" className="w-full md:w-80 flex-shrink-0 bg-black/50 p-4 rounded-lg flex flex-col gap-4">
+             <div id="turn-indicator" className="text-center">
+                <h3 className="text-xl font-bold">{turn === 'player' ? 'Lượt của bạn' : 'Lượt của địch'}</h3>
+                {turn === 'player' && gameState === 'playing' && (
+                    <button onClick={endTurn} disabled={turn !== 'player' || gameState !== 'playing'} className="mt-2 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg shadow-md">
+                        Kết thúc lượt
+                    </button>
+                )}
+             </div>
+             <div id="campaign-stats" className="text-sm">
+                <p>Binh lực ban đầu: <span className="font-bold">{campaignState.manpower.toLocaleString()}</span></p>
+                <p>Sĩ khí ban đầu: <span className="font-bold">{campaignState.morale}</span></p>
+                {campaignState.morale > 150 && <p className="text-green-400 font-semibold">Sĩ khí cao giúp tăng 20% sát thương!</p>}
+             </div>
+             <div id="unit-info" className="flex-grow bg-white/10 p-3 rounded-md">
+                <h4 className="font-bold text-lg border-b border-white/20 pb-1 mb-2">Thông tin Đơn vị</h4>
+                {selectedUnitInfo ? (
+                    <div>
+                        <p><span className="font-semibold">Tên:</span> {selectedUnitInfo.name}</p>
+                        <p><span className="font-semibold">HP:</span> {units.find(u => u.instanceId === selectedUnitId)?.currentHp} / {selectedUnitInfo.maxHp}</p>
+                        <p><span className="font-semibold">Tấn công:</span> {selectedUnitInfo.attack}</p>
+                        <p><span className="font-semibold">Tầm đánh:</span> {selectedUnitInfo.attackRange}</p>
+                        <p><span className="font-semibold">Tầm di chuyển:</span> {selectedUnitInfo.moveRange}</p>
+                        {selectedUnitInfo.description && <p className="mt-2 text-sm italic text-amber-200">{selectedUnitInfo.description}</p>}
+                    </div>
+                ) : <p className="italic text-gray-400">Chọn một đơn vị để xem chi tiết.</p>}
+             </div>
+          </div>
       </div>
     </div>
   );

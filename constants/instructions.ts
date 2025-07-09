@@ -62,6 +62,10 @@ export const INSTRUCTION_DATA: Record<string, { title: string; text: string }> =
     title: 'Bố Trí Trận Địa Cọc',
     text: "Đây là trận địa sông Bạch Đằng. Hãy nhấp vào các vị trí trên bản đồ để đóng cọc, chuẩn bị cho trận thủy chiến lịch sử. Đóng đủ số cọc yêu cầu để hoàn thành.",
   },
+  tacticalBattle: {
+    title: 'Đại Phá Ngọc Hồi - Đống Đa',
+    text: "Chỉ huy quân đội của bạn trong trận chiến theo lượt này. Sức mạnh và số lượng quân của bạn phụ thuộc vào kết quả của các giai đoạn trước. Nhấp vào một đơn vị của bạn để xem các nước đi có thể (màu xanh lam) hoặc các mục tiêu tấn công (màu đỏ). Phá hủy đồn địch để giành chiến thắng!",
+  },
   defense: {
       title: 'Vườn không nhà trống',
       text: "Sơ tán các đơn vị khỏi khu vực nguy hiểm bằng cách kéo họ vào các ô rừng cây. Mỗi hành động sẽ tốn một số lượt đi nhất định. Hãy hoàn thành việc sơ tán trước khi quân địch đến!",
@@ -75,8 +79,8 @@ export const INSTRUCTION_DATA: Record<string, { title: string; text: string }> =
     text: "Nhiệm vụ của bạn là dẫn dắt đội quân đến đích. Hãy chú ý đến 3 tài nguyên quan trọng: Thời Gian, Sĩ Khí và Binh Lực. Trên đường đi, bạn sẽ gặp các sự kiện bất ngờ. Hãy đưa ra những lựa chọn khôn ngoan vì chúng sẽ ảnh hưởng trực tiếp đến tài nguyên và sự thành bại của chiến dịch. Chúc may mắn, Tướng quân!",
   },
   coinMinting: {
-      title: 'Xưởng đúc tiền',
-      text: "Chọn đúng loại kim loại và khuôn đúc được yêu cầu để tạo ra đồng tiền chính xác. Hoàn thành nhiệm vụ để khẳng định chủ quyền và kinh tế của triều đại!",
+      title: 'Xưởng Đúc Tiền Hoàng Gia',
+      text: "Chào mừng đến Xưởng đúc tiền! Nhiệm vụ của bạn gồm 3 giai đoạn. Giai đoạn 1 - Khắc Khuôn: Hãy nhấp vào các điểm phát sáng theo đúng thứ tự để khắc chữ lên khuôn. Giai đoạn 2 - Luyện Kim: Nhấn nút 'Thổi Bễ' liên tục để giữ nhiệt độ trong vùng màu xanh lá. Giai đoạn 3 - Đúc Tiền: Nhấp chuột thật chính xác khi thanh chỉ báo đi vào vùng hoàn hảo để đúc ra đồng tiền cuối cùng. Chúc may mắn!",
   },
   cityPlanning: {
       title: 'Xây dựng Kinh thành',

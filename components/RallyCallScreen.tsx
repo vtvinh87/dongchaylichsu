@@ -1,6 +1,7 @@
 
+
 import React, { useState, useEffect, useMemo } from 'react';
-import { RallyCallMissionData, Reward, HichPuzzleData } from '../types';
+import { RallyCallMissionData, RallyCallChoice, Reward, HichPuzzleData } from '../types';
 import { playSound } from '../utils/audio';
 import { ALL_FRAGMENTS_MAP, ALL_ARTIFACTS_MAP, HICH_TUONG_SI_EXTRA_DEFINITIONS } from '../constants';
 import * as ImageUrls from '../imageUrls';
@@ -47,6 +48,7 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
     const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
     const [morale, setMorale] = useState(0);
     const [isShaking, setIsShaking] = useState(false);
+    const [historicalNote, setHistoricalNote] = useState<string | null>(null); // New state for notes
 
     // --- State for Fill-in-the-Blank Game ---
     const [isLoadingPuzzle, setIsLoadingPuzzle] = useState(true);
@@ -144,6 +146,7 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
             // Setup for morale game
             setCurrentRoundIndex(0);
             setMorale(0);
+            setHistoricalNote(null);
             setIsLoadingPuzzle(false);
         }
     }, [missionData, isFillBlankGame, prefetchedPuzzlePromise]);
@@ -163,13 +166,19 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
 
 
     // --- Morale Game Handlers ---
-    const handleMoraleChoiceClick = (points: number) => {
+    const handleMoraleChoiceClick = (choice: RallyCallChoice) => {
         if (isComplete || !missionData.rounds) return;
+        const points = choice.moralePoints;
 
         const newMorale = morale + points;
         setMorale(newMorale);
         playSound(points > 10 ? 'sfx_success' : 'sfx_click');
         
+        if (choice.historicalNote) {
+            setHistoricalNote(choice.historicalNote);
+            setTimeout(() => setHistoricalNote(null), 5000); // Note disappears
+        }
+
         if (points > 20) { // Shake screen on big morale boosts
             setIsShaking(true);
             setTimeout(() => setIsShaking(false), 400);
@@ -331,7 +340,7 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
         const maxMoralePossible = missionData.rounds!.reduce((acc, round) => acc + Math.max(...round.choices.map(c => c.moralePoints)), 0);
         const moralePercentage = maxMoralePossible > 0 ? (morale / maxMoralePossible) * 100 : 0;
         let moraleBarColor = 'bg-red-500';
-        if (moralePercentage > 70) moraleBarColor = 'bg-yellow-400';
+        if (moralePercentage > 70) moraleBarColor = 'bg-green-500'; // Changed to green for > 70%
         else if (moralePercentage > 35) moraleBarColor = 'bg-yellow-500';
 
         return (
@@ -340,15 +349,18 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
                     <button onClick={onReturnToMuseum} className="absolute top-4 left-4 bg-amber-800/70 hover:bg-amber-700/80 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-colors duration-300 z-10">Quay về</button>
                     <header className="text-center mb-4">
                         <h2 className="text-3xl font-bold text-amber-200 mb-2 font-serif text-shadow-lg">{missionData.title}</h2>
-                        <label htmlFor="morale-bar" className="block text-sm font-semibold text-amber-100 mb-1">SĨ KHÍ</label>
+                        <div className="flex justify-between items-center px-1">
+                            <label htmlFor="morale-bar" className="block text-sm font-semibold text-amber-100">SĨ KHÍ</label>
+                            <span className="text-lg font-bold text-white">{morale} / {maxMoralePossible}</span>
+                        </div>
                         <div className="morale-bar-container"><div id="morale-bar" className={`morale-bar-fill ${moraleBarColor}`} style={{ width: `${moralePercentage}%` }}></div></div>
                     </header>
                     {!isComplete && currentRound && (
                         <>
                             <div className="oath-prompt"><p>{currentRound.prompt}</p></div>
                             <div className="oath-choices-grid">
-                                {currentRound.choices.map((choice, index) => (
-                                    <button key={choice.id} onClick={() => handleMoraleChoiceClick(choice.moralePoints)} className="oath-choice-button p-4 rounded-lg text-lg">
+                                {currentRound.choices.map((choice) => (
+                                    <button key={choice.id} onClick={() => handleMoraleChoiceClick(choice)} className="oath-choice-button p-4 rounded-lg text-lg">
                                         <img src={choice.iconUrl} alt="" />
                                         <span>{choice.text}</span>
                                     </button>
@@ -357,6 +369,11 @@ const RallyCallScreen: React.FC<RallyCallScreenProps> = ({
                         </>
                     )}
                 </div>
+                {historicalNote && (
+                    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 bg-yellow-100 text-yellow-800 p-3 rounded-lg shadow-lg z-30 animate-fadeInScaleUp">
+                        <strong>💡 Bạn có biết?</strong> {historicalNote}
+                    </div>
+                )}
                 {renderOutcomeOverlay(
                     outcome === 'win' ? 'Thành công!' : 'Thất bại!',
                     outcome === 'win' ? 'Lời hiệu triệu đã vang dội non sông!' : 'Cần thêm khí thế! Hãy thử lại.'

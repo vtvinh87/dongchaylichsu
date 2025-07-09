@@ -184,7 +184,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
     id: 'thang_long_spy',
     title: 'Mật Thám Chốn Thị Thành',
     reward: { id: Items.LY_DYNASTY_COIN_ARTIFACT_ID, type: 'artifact' },
-    backgroundUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-phien-cho-thoi-ly.png',
+    backgroundUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-phien-cho-thoi-Ly.png',
     turnLimit: 12,
     npcs: [
       {
@@ -396,7 +396,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
     id: 'tay_son_march',
     title: 'Hành Quân Thần Tốc',
     mapImageUrl: ImageUrls.MARCH_MAP_URL,
-    armyIconUrl: ImageUrls.ARMY_ICON_URL,
+    armyIconUrl: ImageUrls.ARMY_ICON_TAY_SON_URL,
     initialTime: 100,
     initialMorale: 80,
     initialManpower: 50000,
@@ -411,29 +411,38 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         id: 'event1',
         triggerAtStep: 2,
         prompt: "Phía trước là một con sông lớn, nhưng cầu đã bị phá hủy. Chúng ta phải làm gì?",
+        imageUrl: ImageUrls.EVENT_INTEL_URL,
         choices: [
-          { text: "Dành thời gian tìm khúc cạn để lội qua. (Tốn Thời Gian, ít rủi ro)", effects: { time: -10, morale: -5, manpower: 0 } },
-          { text: "Chặt tre kết bè để vượt sông nhanh chóng. (Tốn Binh Lực, nhanh hơn)", effects: { time: -5, morale: 5, manpower: -2000 } },
+          { text: "Dành thời gian tìm khúc cạn để lội qua. (Tốn Thời Gian, ít rủi ro)", effects: { time: -10, morale: -5, manpower: 0 }, historicalNote: "Sự kiên nhẫn và tìm đường an toàn thể hiện sự thận trọng của một vị tướng, bảo toàn lực lượng cho trận đánh lớn." },
+          { text: "Chặt tre kết bè để vượt sông nhanh chóng. (Tốn Binh Lực, nhanh hơn)", effects: { time: -5, morale: 5, manpower: -2000 }, historicalNote: "Quân Tây Sơn nổi tiếng với khả năng hành quân linh hoạt, tận dụng mọi phương tiện để vượt địa hình, tạo nên yếu tố 'thần tốc'." },
         ],
       },
       {
         id: 'event2',
         triggerAtStep: 5,
         prompt: "Dân địa phương mang lương thực ra ủng hộ quân ta! Họ muốn gia nhập nghĩa quân.",
+        imageUrl: ImageUrls.EVENT_RECRUIT_URL,
         choices: [
-          { text: "Chào đón họ! (Tăng Binh Lực, Sĩ Khí)", effects: { time: 0, morale: 15, manpower: 5000 } },
-          { text: "Cảm ơn nhưng từ chối. Giữ cho đội quân tinh nhuệ. (Tăng Sĩ Khí)", effects: { time: 0, morale: 5, manpower: 0 } },
+          { text: "Chào đón họ! (Tăng Binh Lực, Sĩ Khí)", effects: { time: 0, morale: 15, manpower: 5000 }, historicalNote: "Vua Quang Trung được lòng dân sâu sắc. Đi đến đâu, ông cũng được nhân dân ủng hộ, gia nhập nghĩa quân, tạo nên sức mạnh to lớn." },
+          { text: "Cảm ơn nhưng từ chối. Giữ cho đội quân tinh nhuệ. (Tăng Sĩ Khí)", effects: { time: 0, morale: 5, manpower: 0 }, historicalNote: "Giữ vững kỷ luật và đảm bảo đội quân tinh gọn cũng là một chiến lược quan trọng để duy trì tốc độ và khả năng chiến đấu." },
         ],
       },
       {
         id: 'event3',
         triggerAtStep: 8,
         prompt: "Một toán quân địch nhỏ đang phục kích trong rừng. Ta nên làm gì?",
+        imageUrl: ImageUrls.EVENT_INTEL_URL,
         choices: [
-          { text: "Dùng một đội nhỏ đánh lạc hướng và đi đường vòng. (Tốn Thời Gian)", effects: { time: -8, morale: 0, manpower: -500 } },
-          { text: "Tấn công trực diện để dẹp đường. (Tốn Binh Lực, Sĩ Khí)", effects: { time: -2, morale: 10, manpower: -3000 } },
+          { text: "Dùng một đội nhỏ đánh lạc hướng và đi đường vòng. (Tốn Thời Gian)", effects: { time: -8, morale: 0, manpower: -500 }, historicalNote: "Chiến thuật 'nghi binh' thường được sử dụng để tránh những cuộc đụng độ không cần thiết và bảo toàn lực lượng cho mục tiêu chính." },
+          { text: "Tấn công trực diện để dẹp đường. (Tốn Binh Lực, Sĩ Khí)", effects: { time: -2, morale: 10, manpower: -3000 }, historicalNote: "Những chiến thắng nhỏ trên đường đi giúp củng cố tinh thần quân sĩ, thể hiện uy thế và sức mạnh của đội quân Tây Sơn." },
         ],
       },
+    ],
+    landmarks: [
+        { id: 'tam_diep', name: 'Phòng tuyến Tam Điệp', description: 'Đây là nơi vua Quang Trung cho dừng quân, chỉnh đốn lại đội ngũ và tổ chức lễ duyệt binh lớn để củng cố tinh thần quân sĩ trước khi tiến ra Thăng Long.', position: { x: 58, y: 48 }, iconUrl: ImageUrls.ICON_PHONG_TUYEN_TAM_DIEP_URL },
+        { id: 'nghe_an', name: 'Nghệ An', description: 'Nghệ An là vùng đất "địa linh nhân kiệt", nơi vua Quang Trung đã dừng chân để tuyển mộ thêm hàng vạn binh lính, chuẩn bị cho cuộc đại phá quân Thanh.', position: { x: 60, y: 78 }, iconUrl: ImageUrls.ICON_NGHE_AN_URL },
+        { id: 'song_gian', name: 'Sông Gián', description: 'Một trận thủy chiến nhỏ nhưng quan trọng đã diễn ra tại đây, tiêu diệt một phần lực lượng của quân Thanh, làm chậm bước tiến của chúng và tạo lợi thế cho quân ta.', position: { x: 40, y: 40 }, iconUrl: ImageUrls.ICON_SONG_GIAN_URL },
+        { id: 'dong_da', name: 'Gò Đống Đa', description: 'Đây là một trong những chiến trường ác liệt nhất, nơi quân Tây Sơn đã làm nên một chiến thắng vang dội, thiêu rụi đồn trại của quân Thanh, góp phần quyết định vào thắng lợi cuối cùng của chiến dịch.', position: { x: 55, y: 15 }, iconUrl: ImageUrls.ICON_GO_DONG_DA_URL },
     ],
   },
   'tay_son_oath': {
@@ -444,7 +453,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         {
             prompt: "Vua Quang Trung nói: 'Hỡi các tướng sĩ! Giặc Thanh đã chiếm Thăng Long. Nỗi nhục này, ta và các ngươi quyết không đội trời chung!'",
             choices: [
-                {id: 'oath1_1', text: "Thề quyết một trận tử chiến!", iconUrl: ImageUrls.ICON_POINT_SWORD_URL, moralePoints: 30},
+                {id: 'oath1_1', text: "Thề quyết một trận tử chiến!", iconUrl: ImageUrls.ICON_POINT_SWORD_URL, moralePoints: 30, historicalNote: "Tinh thần quyết chiến của binh lính là yếu tố quan trọng nhất trong các trận đánh của quân Tây Sơn."},
                 {id: 'oath1_2', text: "Xin Bệ hạ hãy cẩn trọng.", iconUrl: ImageUrls.ICON_VOW_PERSONAL_URL, moralePoints: 5},
                 {id: 'oath1_3', text: "Chúng ta cần thêm quân.", iconUrl: ImageUrls.ICON_CALL_SOLDIERS_URL, moralePoints: 10},
             ]
@@ -452,7 +461,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         {
             prompt: "Nhà vua tiếp lời: 'Ta sẽ tổ chức một bữa tiệc lớn ngay tại Thăng Long vào ngày mùng 7 Tết. Các ngươi có tin ta không?'",
             choices: [
-                {id: 'oath2_1', text: "Chúng thần tin tưởng tuyệt đối vào Bệ hạ!", iconUrl: ImageUrls.ICON_RAISE_FLAG_URL, moralePoints: 40},
+                {id: 'oath2_1', text: "Chúng thần tin tưởng tuyệt đối vào Bệ hạ!", iconUrl: ImageUrls.ICON_RAISE_FLAG_URL, moralePoints: 40, historicalNote: "Niềm tin vào vị chủ soái là sức mạnh vô địch. Lời hẹn ước này đã trở thành một giai thoại lịch sử, thể hiện tài thao lược và sự tự tin của Quang Trung."},
                 {id: 'oath2_2', text: "Đây là một nhiệm vụ khó khăn...", iconUrl: ImageUrls.ICON_VOW_WEALTH_URL, moralePoints: -5},
                 {id: 'oath2_3', text: "Thần sẽ theo Bệ hạ đến cùng!", iconUrl: ImageUrls.ICON_VOW_NATION_URL, moralePoints: 20},
             ]
@@ -460,7 +469,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         {
             prompt: "Vua Quang Trung dõng dạc: 'Vậy thì, hãy tiến lên! Đánh cho chúng phiến giáp bất hoàn! Đánh cho chúng biết nước Nam anh hùng là có chủ!'",
             choices: [
-                {id: 'oath3_1', text: "XUNG PHONG!!!", iconUrl: ImageUrls.ICON_CHARGE_URL, moralePoints: 50},
+                {id: 'oath3_1', text: "XUNG PHONG!!!", iconUrl: ImageUrls.ICON_CHARGE_URL, moralePoints: 50, historicalNote: "Lời hịch ngắn gọn, đanh thép của Quang Trung có sức mạnh hiệu triệu to lớn, biến đội quân thành một cơn bão quét sạch quân thù."},
                 {id: 'oath3_2', text: "Vì non sông Đại Việt!", iconUrl: ImageUrls.ICON_RAISE_FLAG_URL, moralePoints: 30},
                 {id: 'oath3_3', text: "Thực hiện kế hoạch thôi.", iconUrl: ImageUrls.ICON_VOW_PERSONAL_URL, moralePoints: 10},
             ]
@@ -481,10 +490,10 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         ['road', 'road', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
     ],
     unitDefinitions: {
-        'bo_binh_tay_son': { id: 'bo_binh_tay_son', name: 'Bộ Binh Tây Sơn', iconUrl: ImageUrls.ICON_INFANTRY_UNIT_URL, maxHp: 100, attack: 25, attackRange: 1, moveRange: 3, description: "Lực lượng chủ lực, thiện chiến." },
-        'tuong_binh_tay_son': { id: 'tuong_binh_tay_son', name: 'Tượng Binh', iconUrl: ImageUrls.ICON_ELEPHANT_UNIT_URL, maxHp: 250, attack: 40, attackRange: 1, moveRange: 2, specialAbility: 'charge', description: "Sức mạnh đột phá, có thể húc đổ đồn địch." },
-        'quan_thanh_bo': { id: 'quan_thanh_bo', name: 'Bộ Binh Thanh', iconUrl: ImageUrls.SPRITE_ENEMY_UNIT_URL, maxHp: 80, attack: 20, attackRange: 1, moveRange: 2 },
-        'don_ngoc_hoi': { id: 'don_ngoc_hoi', name: 'Đồn Ngọc Hồi', iconUrl: ImageUrls.ICON_ENEMY_FORT_URL, maxHp: 500, attack: 10, attackRange: 2, moveRange: 0 },
+        'bo_binh_tay_son': { id: 'bo_binh_tay_son', name: 'Bộ Binh Tây Sơn', iconUrl: ImageUrls.SPRITE_INFANTRY_ELITE_URL, maxHp: 100, attack: 25, attackRange: 1, moveRange: 3, description: "Lực lượng chủ lực, đặc biệt là lính từ Thanh - Nghệ, nổi tiếng thiện chiến, kỷ luật và có tinh thần chiến đấu cao." },
+        'tuong_binh_tay_son': { id: 'tuong_binh_tay_son', name: 'Tượng Binh', iconUrl: ImageUrls.SPRITE_ELEPHANT_URL, maxHp: 250, attack: 40, attackRange: 1, moveRange: 2, specialAbility: 'charge', description: "Sức mạnh đột phá, có thể húc đổ đồn địch. Tượng binh là một trong những vũ khí lợi hại nhất của quân Tây Sơn, chuyên dùng để phá vỡ đội hình và gây hoảng loạn cho quân địch trong các trận đánh lớn." },
+        'quan_thanh_bo': { id: 'quan_thanh_bo', name: 'Bộ Binh Thanh', iconUrl: ImageUrls.SPRITE_ENEMY_UNIT_URL, maxHp: 80, attack: 20, attackRange: 1, moveRange: 2, description: "Quân chính quy của nhà Thanh, được trang bị tốt nhưng sĩ khí kém." },
+        'don_ngoc_hoi': { id: 'don_ngoc_hoi', name: 'Đồn Ngọc Hồi', iconUrl: ImageUrls.ICON_ENEMY_FORT_URL, maxHp: 500, attack: 10, attackRange: 2, moveRange: 0, description: "Một trong những đồn lũy kiên cố nhất của quân Thanh, phòng thủ vòng ngoài cho Thăng Long." },
     },
     playerUnitPool: ['bo_binh_tay_son', 'tuong_binh_tay_son'],
     enemyUnits: [

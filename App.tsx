@@ -826,6 +826,8 @@ Format JSON: { "modifiedText": string, "answers": string[], "definitions": Recor
   }, [logPlayEvent]);
 
   const renderScreen = () => {
+    const isTaySonCampaignComplete = (questProgress['tay_son_campaign'] || 0) >= (ALL_QUEST_CHAINS['tay_son_campaign']?.steps.length || 3);
+    
     switch (currentScreen) {
       case Screen.LANDING_PAGE:
         return <LandingScreen onStartAdventure={handleStartAdventure} />;
@@ -860,6 +862,8 @@ Format JSON: { "modifiedText": string, "answers": string[], "definitions": Recor
               onShowAchievements={() => navigateTo(Screen.ACHIEVEMENTS)}
               isSoundEnabled={isSoundEnabled}
               onToggleSound={handleToggleSound}
+              questProgress={questProgress}
+              isTaySonCampaignComplete={isTaySonCampaignComplete}
             />
             {activeTutorial && (
               <TutorialOverlay 
@@ -1129,6 +1133,8 @@ Format JSON: { "modifiedText": string, "answers": string[], "definitions": Recor
               onShowAchievements={() => navigateTo(Screen.ACHIEVEMENTS)}
               isSoundEnabled={isSoundEnabled}
               onToggleSound={handleToggleSound}
+              questProgress={questProgress}
+              isTaySonCampaignComplete={isTaySonCampaignComplete}
             />;
     }
     // Default break handler for cases that fall through due to invalid state
@@ -1159,6 +1165,8 @@ Format JSON: { "modifiedText": string, "answers": string[], "definitions": Recor
         onShowAchievements={() => navigateTo(Screen.ACHIEVEMENTS)}
         isSoundEnabled={isSoundEnabled}
         onToggleSound={handleToggleSound}
+        questProgress={questProgress}
+        isTaySonCampaignComplete={isTaySonCampaignComplete}
     />;
   };
 
