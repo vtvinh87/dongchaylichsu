@@ -574,18 +574,20 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
           </div>
       )}
       {showIntroModal && (
-            <div className="detective-modal-overlay" style={{ zIndex: 30 }}>
-                <div className="detective-modal-content" style={{ maxWidth: '600px', textAlign: 'center' }}>
-                    <h3 style={{ fontFamily: "'Special Elite', cursive", fontSize: '2rem', color: '#5d4a36', marginBottom: '1rem' }}>Vụ Án Mật Thám</h3>
-                    <p style={{ fontFamily: "'Nunito', sans-serif", color: '#333', textAlign: 'left', lineHeight: 1.6, marginBottom: '1.5rem', whiteSpace: 'pre-wrap' }}>
-                      {"Khẩn cấp, mật thám!\n\nMột tài liệu tối quan trọng - bản đồ phòng thủ mới của thành Thăng Long - đã bị đánh cắp khỏi hoàng cung.\n\nChúng tôi tin rằng một gián điệp ngoại quốc, với sự trợ giúp của một kẻ phản bội trong thành, đang âm mưu tuồn bản đồ này ra ngoài. Manh mối rất mong manh, và thời gian không còn nhiều.\n\nNhiệm vụ của bạn:\n- Thẩm vấn các nhân vật trong thành để thu thập manh mối.\n- Tìm ra những mâu thuẫn trong lời khai của họ.\n- Xác định chính xác kẻ gián điệp và bằng chứng chống lại chúng.\n\nVận mệnh của Thăng Long đang nằm trong tay bạn. Hãy hành động cẩn trọng và sáng suốt!"}
-                    </p>
+            <div className="detective-modal-overlay" style={{ zIndex: 30 }} onClick={() => setShowIntroModal(false)}>
+                <div className="detective-modal-content" style={{ maxWidth: '600px', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+                    <h3 style={{ fontFamily: "'Special Elite', cursive", fontSize: '2rem', color: '#5d4a36', marginBottom: '1rem', flexShrink: 0 }}>Vụ Án Mật Thám</h3>
+                    <div className="overflow-y-auto pr-2" style={{ flexGrow: 1, minHeight: 0 }}>
+                        <p style={{ fontFamily: "'Nunito', sans-serif", color: '#333', textAlign: 'left', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                          {"Khẩn cấp, mật thám!\n\nMột tài liệu tối quan trọng - bản đồ phòng thủ mới của thành Thăng Long - đã bị đánh cắp khỏi hoàng cung.\n\nChúng tôi tin rằng một gián điệp ngoại quốc, với sự trợ giúp của một kẻ phản bội trong thành, đang âm mưu tuồn bản đồ này ra ngoài. Manh mối rất mong manh, và thời gian không còn nhiều.\n\nNhiệm vụ của bạn là:\n- Thẩm vấn các nhân vật trong thành để thu thập manh mối.\n- Tìm ra những mâu thuẫn trong lời khai của họ.\n- Xác định chính xác kẻ gián điệp và bằng chứng chống lại chúng.\n\nVận mệnh của Thăng Long đang nằm trong tay bạn. Hãy hành động cẩn trọng và sáng suốt!"}
+                        </p>
+                    </div>
                     <button
                         onClick={() => {
                             playSound('sfx_click');
                             setShowIntroModal(false);
                         }}
-                        className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg text-lg"
+                        className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg text-lg mt-4 flex-shrink-0"
                     >
                         Bắt đầu Điều tra
                     </button>
