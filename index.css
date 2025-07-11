@@ -1,5 +1,6 @@
 
 
+
 body {
       font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0; /* Ensure no default margin */
@@ -1460,7 +1461,7 @@ body {
         cursor: not-allowed;
     }
 
-    /* --- CSS for Defense Mission --- */
+    /* --- CSS cho Defense Mission --- */
     #defense-map-grid {
         background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-chien-dich-thang-long.png');
         background-size: cover;
@@ -1862,7 +1863,7 @@ body {
       animation: fadeInDown 0.5s ease-out;
     }
     
-    /* --- CSS for Coin Minting Mini-game --- */
+    /* --- CSS cho Coin Minting Mini-game --- */
     .minting-stage-container {
         width: 100%;
         height: 100%;
@@ -1897,18 +1898,6 @@ body {
         cursor: pointer;
     }
     
-    /* Engraving Stage */
-    #engraving-area {
-        width: 500px;
-        height: 200px;
-        background-color: #44403c; /* stone-700 */
-        border: 5px solid #1c1917; /* stone-900 */
-        border-radius: 0.5rem;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        padding: 1rem;
-    }
     .char-mold {
         width: 100px;
         height: 100px;
@@ -1938,21 +1927,7 @@ body {
         stroke-linecap: round;
     }
     
-    @keyframes pulse-yellow-glow {
-      0% { filter: drop-shadow(0 0 2px #fef08a); }
-      50% { filter: drop-shadow(0 0 8px #fde047); }
-      100% { filter: drop-shadow(0 0 2px #fef08a); }
-    }
-    
-    /* Smelting Stage */
-    #smelting-area {
-        display: flex;
-        align-items: center;
-        gap: 2rem;
-    }
     #furnace-visual {
-        width: 150px;
-        height: 150px;
         background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/main/pictures/icon/icon-lo-luyen-kim.png');
         background-size: contain;
         background-repeat: no-repeat;
@@ -1974,8 +1949,6 @@ body {
         100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
     }
     #temp-gauge {
-        width: 60px;
-        height: 300px;
         background-color: #1f2937; /* gray-800 */
         border: 2px solid #4b5563;
         border-radius: 10px;
@@ -2000,6 +1973,7 @@ body {
     }
     #smelting-progress-bar {
         width: 100%;
+        max-width: 500px;
         height: 20px;
         background-color: #4b5563;
         border-radius: 10px;
@@ -2014,8 +1988,6 @@ body {
 
     #bellows-container {
         position: relative;
-        width: 250px;
-        height: 250px;
         background-color: rgba(0,0,0,0.2);
         border-radius: 0.5rem;
         border: 2px dashed #a16207; /* amber-700 */
@@ -2024,12 +1996,9 @@ body {
 
     .bellows-button {
         position: absolute;
-        width: 80px;
-        height: 80px;
         border-radius: 50%;
         background: linear-gradient(145deg, #f97316, #ef4444); /* orange-500 to red-500 */
         color: white;
-        font-size: 2.5rem;
         line-height: 1;
         font-weight: bold;
         border: 3px solid #fefce8; /* amber-50 */

@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { CoinMintingMissionData, Reward } from '../types';
 import { playSound } from '../utils/audio';
@@ -289,7 +290,7 @@ const CoinMintingScreen: React.FC<{
             case 'engraving': return (
                 <div className="minting-stage-container animate-fadeInScaleUp">
                     <p className="minting-instructions">Giai đoạn 1: Khắc Khuôn. Nhấp vào điểm đang phát sáng để khắc chữ.</p>
-                    <div id="engraving-area">
+                    <div className="w-full max-w-lg flex flex-wrap justify-center items-center gap-2 md:gap-4 p-4 bg-stone-700 border-4 border-stone-900 rounded-lg">
                         {ENGRAVING_CHARS.map((charData, charIdx) => (
                             <div key={charIdx} className={`char-mold ${currentCharIndex > charIdx ? 'completed' : ''}`}>
                                 {currentCharIndex > charIdx ? (
@@ -332,16 +333,16 @@ const CoinMintingScreen: React.FC<{
             case 'smelting': return (
                 <div className="minting-stage-container animate-fadeInScaleUp">
                      <p className="minting-instructions">Giai đoạn 2: Luyện Kim. Nhấn nút để thổi bễ, giữ nhiệt độ trong vùng màu xanh lá cây.</p>
-                     <div id="smelting-area">
-                        <div id="furnace-visual" className={temperature > 60 ? 'heating' : ''}></div>
-                        <div id="temp-gauge">
+                     <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+                        <div id="furnace-visual" className={`w-28 h-28 md:w-36 md:h-36 ${temperature > 60 ? 'heating' : ''}`}></div>
+                        <div id="temp-gauge" className="w-12 h-56 md:w-16 md:h-72">
                             <div id="temp-indicator" style={{ height: `${temperature}%` }}></div>
                             <div id="temp-green-zone" style={{ bottom: `${SMELTING_GREEN_ZONE.bottom}%`, height: `${SMELTING_GREEN_ZONE.top - SMELTING_GREEN_ZONE.bottom}%` }}></div>
                         </div>
-                        <div id="bellows-container">
+                        <div id="bellows-container" className="w-48 h-48 md:w-64 md:h-64">
                            <button
                              onClick={pumpBellows}
-                             className="bellows-button"
+                             className="bellows-button w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl"
                              style={{ top: bellowsPosition.top, left: bellowsPosition.left }}
                              title="Thổi Bễ"
                              aria-label="Thổi Bễ"
