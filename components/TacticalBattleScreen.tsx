@@ -1,4 +1,3 @@
-
 // components/TacticalBattleScreen.tsx
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { TacticalBattleMissionData, TaySonCampaignState, Reward, PlacedUnit, UnitDefinition } from '../types';
@@ -44,8 +43,8 @@ const TacticalBattleScreen: React.FC<{
     }
 
     if (missionData.winCondition.type === 'destroy_fort') {
-      const fort = currentUnits.find(u => u.isFort);
-      if (!fort) {
+      const mainFort = currentUnits.find(u => u.unitId === 'don_ngoc_hoi');
+      if (!mainFort) {
         setGameState('win');
         playSound('sfx_unlock');
         setShowVictoryModal(true); // Show historical victory modal instead of completing directly
@@ -61,64 +60,128 @@ const TacticalBattleScreen: React.FC<{
       onComplete(missionData.reward);
     }
   }, [onFail, onComplete, missionData]);
+  
+  const calculateFortAttack = useCallback((currentUnits: GameUnit[]) => {
+    const fortDef = missionData.unitDefinitions['don_ngoc_hoi'];
+    if (!fortDef) return 0;
+
+    const baseFortAttack = fortDef.attack;
+    const enemySoldiers = currentUnits.filter(u => u.unitId === 'quan_thanh_bo' && u.isEnemy);
+    const totalSoldierAttackPower = enemySoldiers.reduce((sum, soldier) => sum + missionData.unitDefinitions[soldier.unitId].attack, 0);
+    
+    return baseFortAttack + (5 * totalSoldierAttackPower);
+  }, [missionData.unitDefinitions]);
+
+  const handleAttackAction = useCallback((attacker: GameUnit, target: GameUnit) => {
+    if (attacker.hasAttacked) return;
+
+    const newHp = target.currentHp - attacker.attack;
+    
+    let nextUnits = units.map(u => {
+        if (u.instanceId === target.instanceId) return { ...u, currentHp: newHp };
+        if (u.instanceId === attacker.instanceId) return { ...u, hasAttacked: true };
+        return u;
+    });
+
+    // If an enemy soldier was defeated, recalculate fort attack
+    if (target.isEnemy && target.unitId === 'quan_thanh_bo' && newHp <= 0) {
+        const remainingUnitsForCalc = nextUnits.filter(u => u.currentHp > 0);
+        const newFortAttack = calculateFortAttack(remainingUnitsForCalc);
+        nextUnits = nextUnits.map(u => {
+            if (u.unitId === 'don_ngoc_hoi') {
+                return { ...u, attack: newFortAttack };
+            }
+            return u;
+        });
+    }
+    
+    const finalUnits = nextUnits.filter(u => u.currentHp > 0);
+
+    playSound('sfx_explosion');
+    setUnits(finalUnits);
+    setSelectedUnitId(null);
+    setHighlightedTiles({});
+    setSelectedUnitInfo(null);
+    checkWinLoss(finalUnits);
+  }, [units, calculateFortAttack, checkWinLoss]);
 
   // Initialize game state
   useEffect(() => {
-    const playerUnits: GameUnit[] = [];
-    const baseMorale = campaignState.morale > 0 ? campaignState.morale : 100; // Default morale if none
-    const baseManpower = campaignState.manpower > 0 ? campaignState.manpower : 20000; // Default manpower
+    let playerUnits: GameUnit[];
 
-    // Determine unit count based on manpower
-    const infantryCount = Math.floor(baseManpower / 10000);
-    const elephantCount = baseManpower > 30000 ? 1 : 0;
-    
-    // Apply morale buff
+    const baseMorale = campaignState.morale > 0 ? campaignState.morale : 100;
     const moraleBuff = baseMorale > 150 ? 1.2 : 1.0;
 
-    const { x_min, y_min, x_max, y_max } = missionData.deploymentZone;
-    const zoneWidth = x_max - x_min + 1;
-    const zoneHeight = y_max - y_min + 1;
-    const maxDeployableUnits = zoneWidth * zoneHeight;
-    let placedCount = 0;
-    
-    // Create player units
-    for(let i = 0; i < infantryCount && placedCount < maxDeployableUnits; i++) {
-        const def = missionData.unitDefinitions.bo_binh_tay_son;
-        const placeX = x_min + (placedCount % zoneWidth);
-        const placeY = y_min + Math.floor(placedCount / zoneWidth);
-        playerUnits.push({
-            ...def, instanceId: `p_inf_${i}`, unitId: 'bo_binh_tay_son',
-            currentHp: def.maxHp, attack: Math.round(def.attack * moraleBuff),
-            x: placeX, y: placeY, isEnemy: false, hasMoved: false, hasAttacked: false
+    if (missionData.playerUnits) {
+        // Use fixed deployment from mission data
+        playerUnits = missionData.playerUnits.map((u, i) => {
+            const def = missionData.unitDefinitions[u.unitId];
+            return {
+                ...u, ...def, instanceId: `p_${u.unitId}_${i}`, 
+                currentHp: def.maxHp, 
+                attack: Math.round(def.attack * moraleBuff), // Still apply morale buff
+                hasMoved: false, hasAttacked: false
+            }
         });
-        placedCount++;
-    }
-     for(let i = 0; i < elephantCount && placedCount < maxDeployableUnits; i++) {
-        const def = missionData.unitDefinitions.tuong_binh_tay_son;
-        const placeX = x_min + (placedCount % zoneWidth);
-        const placeY = y_min + Math.floor(placedCount / zoneWidth);
-        playerUnits.push({
-            ...def, instanceId: `p_ele_${i}`, unitId: 'tuong_binh_tay_son',
-            currentHp: def.maxHp, attack: Math.round(def.attack * moraleBuff),
-            x: placeX, y: placeY, isEnemy: false, hasMoved: false, hasAttacked: false
-        });
-        placedCount++;
+    } else {
+        // Fallback to old dynamic logic
+        const dynamicPlayerUnits: GameUnit[] = [];
+        const baseManpower = campaignState.manpower > 0 ? campaignState.manpower : 20000;
+        const infantryCount = Math.floor(baseManpower / 10000);
+        const elephantCount = baseManpower > 30000 ? 1 : 0;
+        const { x_min, y_min, x_max, y_max } = missionData.deploymentZone;
+        const zoneWidth = x_max - x_min + 1;
+        const zoneHeight = y_max - y_min + 1;
+        const maxDeployableUnits = zoneWidth * zoneHeight;
+        let placedCount = 0;
+        
+        for(let i = 0; i < infantryCount && placedCount < maxDeployableUnits; i++) {
+            const def = missionData.unitDefinitions.bo_binh_tay_son;
+            const placeX = x_min + (placedCount % zoneWidth);
+            const placeY = y_min + Math.floor(placedCount / zoneWidth);
+            dynamicPlayerUnits.push({
+                ...def, instanceId: `p_inf_${i}`, unitId: 'bo_binh_tay_son',
+                currentHp: def.maxHp, attack: Math.round(def.attack * moraleBuff),
+                x: placeX, y: placeY, isEnemy: false, hasMoved: false, hasAttacked: false
+            });
+            placedCount++;
+        }
+         for(let i = 0; i < elephantCount && placedCount < maxDeployableUnits; i++) {
+            const def = missionData.unitDefinitions.tuong_binh_tay_son;
+            const placeX = x_min + (placedCount % zoneWidth);
+            const placeY = y_min + Math.floor(placedCount / zoneWidth);
+            dynamicPlayerUnits.push({
+                ...def, instanceId: `p_ele_${i}`, unitId: 'tuong_binh_tay_son',
+                currentHp: def.maxHp, attack: Math.round(def.attack * moraleBuff),
+                x: placeX, y: placeY, isEnemy: false, hasMoved: false, hasAttacked: false
+            });
+            placedCount++;
+        }
+        playerUnits = dynamicPlayerUnits;
     }
 
-    // Create enemy units
-    const enemyUnits: GameUnit[] = missionData.enemyUnits.map((u, i) => {
+    // Create enemy units and calculate initial fort attack
+    const enemyUnitsRaw: GameUnit[] = missionData.enemyUnits.map((u, i) => {
       const def = missionData.unitDefinitions[u.unitId];
       return {
         ...u, ...def, instanceId: `e_${u.unitId}_${i}`, currentHp: def.maxHp, hasMoved: false, hasAttacked: false
       }
     });
+
+    const fortAttack = calculateFortAttack(enemyUnitsRaw);
+    const finalEnemyUnits = enemyUnitsRaw.map(u => {
+        if(u.unitId === 'don_ngoc_hoi') {
+            return { ...u, attack: fortAttack };
+        }
+        return u;
+    });
     
-    setUnits([...playerUnits, ...enemyUnits]);
+    setUnits([...playerUnits, ...finalEnemyUnits]);
     setTurn('player');
     setGameState('playing');
     setShowVictoryModal(false);
     setSelectedUnitInfo(null);
-  }, [missionData, campaignState]);
+  }, [missionData, campaignState, calculateFortAttack]);
 
   const handleUnitClick = (unit: GameUnit) => {
     if (turn !== 'player' || gameState !== 'playing') return;
@@ -130,19 +193,7 @@ const TacticalBattleScreen: React.FC<{
         
         const tileKey = `${unit.y}-${unit.x}`;
         if (highlightedTiles[tileKey] === 'attack') {
-            const newHp = unit.currentHp - attacker.attack;
-            const newUnits = units.map(u => {
-                if (u.instanceId === unit.instanceId) return { ...u, currentHp: newHp };
-                if (u.instanceId === selectedUnitId) return { ...u, hasAttacked: true };
-                return u;
-            }).filter(u => u.currentHp > 0);
-            
-            setUnits(newUnits);
-            setSelectedUnitId(null);
-            setHighlightedTiles({});
-            setSelectedUnitInfo(null);
-            playSound('sfx_explosion');
-            checkWinLoss(newUnits);
+            handleAttackAction(attacker, unit);
             return;
         }
     }
@@ -205,19 +256,7 @@ const TacticalBattleScreen: React.FC<{
     } else if (tileType === 'attack' && !attacker.hasAttacked) {
         const targetUnit = units.find(u => u.x === x && u.y === y && u.isEnemy);
         if(targetUnit) {
-            const newHp = targetUnit.currentHp - attacker.attack;
-            const newUnits = units.map(u => {
-                if (u.instanceId === targetUnit.instanceId) return { ...u, currentHp: newHp };
-                if (u.instanceId === selectedUnitId) return { ...u, hasAttacked: true };
-                return u;
-            }).filter(u => u.currentHp > 0);
-            
-            setUnits(newUnits);
-            setSelectedUnitId(null);
-            setHighlightedTiles({});
-            setSelectedUnitInfo(null);
-            playSound('sfx_explosion');
-            checkWinLoss(newUnits);
+            handleAttackAction(attacker, targetUnit);
         }
     }
   };
@@ -318,6 +357,14 @@ const TacticalBattleScreen: React.FC<{
   
   return (
     <div className="tactical-battle-screen">
+       <button
+        onClick={onReturnToMuseum}
+        className="absolute top-6 right-6 bg-amber-700 hover:bg-amber-800 text-white font-semibold py-2 px-4 rounded-lg shadow-md z-20"
+        aria-label="Rời đi"
+      >
+        Rời đi
+      </button>
+
       {showVictoryModal && (
           <div className="absolute inset-0 bg-black/70 flex justify-center items-center z-30 p-4">
               <div className="bg-amber-100 dark:bg-stone-800 p-6 rounded-lg shadow-xl max-w-lg w-full text-center animate-fadeInScaleUp">
@@ -331,9 +378,9 @@ const TacticalBattleScreen: React.FC<{
               </div>
           </div>
       )}
-      <div className="flex flex-col md:flex-row gap-4 w-full h-full">
+      <div className="tactical-battle-layout">
           <div 
-              className="flex-grow grid-container"
+              className="grid-container"
               style={{ 
                   backgroundImage: `url(${ImageUrls.TACTICAL_BATTLE_BACKGROUND_URL})`,
                   backgroundSize: 'cover',
@@ -353,13 +400,14 @@ const TacticalBattleScreen: React.FC<{
                 style={{ top: `${unit.y * (100 / missionData.mapLayout.length)}%`, left: `${unit.x * (100 / missionData.mapLayout[0].length)}%` }}
                 onClick={(e) => { e.stopPropagation(); handleUnitClick(unit); }}
               >
+                <div className="unit-base"></div>
                 <img src={unit.iconUrl} alt={unit.name}/>
                 <div className="hp-bar-bg"><div className="hp-bar-fill" style={{width: `${(unit.currentHp / unit.maxHp) * 100}%`}}></div></div>
               </div>
             ))}
           </div>
 
-          <div id="info-panel" className="w-full md:w-80 flex-shrink-0 bg-black/50 p-4 rounded-lg flex flex-col gap-4">
+          <div id="info-panel">
              <div id="turn-indicator" className="text-center">
                 <h3 className="text-xl font-bold">{turn === 'player' ? 'Lượt của bạn' : 'Lượt của địch'}</h3>
                 {turn === 'player' && gameState === 'playing' && (
@@ -379,7 +427,7 @@ const TacticalBattleScreen: React.FC<{
                     <div>
                         <p><span className="font-semibold">Tên:</span> {selectedUnitInfo.name}</p>
                         <p><span className="font-semibold">HP:</span> {units.find(u => u.instanceId === selectedUnitId)?.currentHp} / {selectedUnitInfo.maxHp}</p>
-                        <p><span className="font-semibold">Tấn công:</span> {selectedUnitInfo.attack}</p>
+                        <p><span className="font-semibold">Tấn công:</span> {units.find(u => u.instanceId === selectedUnitId)?.attack || selectedUnitInfo.attack}</p>
                         <p><span className="font-semibold">Tầm đánh:</span> {selectedUnitInfo.attackRange}</p>
                         <p><span className="font-semibold">Tầm di chuyển:</span> {selectedUnitInfo.moveRange}</p>
                         {selectedUnitInfo.description && <p className="mt-2 text-sm italic text-amber-200">{selectedUnitInfo.description}</p>}

@@ -39,6 +39,7 @@ export const ICON_INFANTRY_UNIT_URL = SPRITE_ALLY_UNIT_URL; // Re-use ally icon
 export const ICON_ENEMY_FORT_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Sprite/S-don-dich.png';
 export const SPRITE_ELEPHANT_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Sprite/S-tuong-binh.png';
 export const SPRITE_INFANTRY_ELITE_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Sprite/S-bo-binh-tinh-nhue.png';
+export const SPRITE_CONG_SU_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Sprite/S-cong-su.png';
 
 
 // --- Map Cell Icons ---

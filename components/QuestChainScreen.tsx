@@ -16,8 +16,10 @@ const QuestChainScreen: React.FC<QuestChainScreenProps> = ({
   onReturnToMuseum,
 }) => {
 
+  const isCampaignComplete = progress >= questChain.steps.length;
+
   const handleStepClick = (missionId: string, stepIndex: number) => {
-    if (stepIndex === progress) {
+    if (isCampaignComplete || stepIndex === progress) {
         playSound('sfx_click');
         onStartStep(missionId);
     }
@@ -41,16 +43,22 @@ const QuestChainScreen: React.FC<QuestChainScreenProps> = ({
         <div className="stage-connector"></div>
         {questChain.steps.map((step, index) => {
           let status: 'completed' | 'active' | 'locked' = 'locked';
-          if (index < progress) status = 'completed';
-          if (index === progress) status = 'active';
+          if (isCampaignComplete) {
+              status = 'completed'; // Visually they are all done.
+          } else {
+              if (index < progress) status = 'completed';
+              if (index === progress) status = 'active';
+          }
+          
+          const isClickable = isCampaignComplete || status === 'active';
 
           return (
-            <div key={step.id} className={`stage-card ${status}`} onClick={() => handleStepClick(step.missionId, index)}>
+            <div key={step.id} className={`stage-card ${status} ${isClickable ? 'active' : ''}`} onClick={() => handleStepClick(step.missionId, index)}>
                 <img src={step.iconUrl} alt={step.title} className="stage-icon"/>
                 <h3>{step.title}</h3>
                 <p>{step.description}</p>
                 {status === 'locked' && <div className="lock-icon">🔒</div>}
-                {status === 'completed' && <div className="lock-icon" style={{fontSize: '3rem', color: '#047857', opacity: 1}}>✓</div>}
+                {(status === 'completed') && <div className="lock-icon" style={{fontSize: '3rem', color: '#047857', opacity: 1}}>✓</div>}
             </div>
           );
         })}

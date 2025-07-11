@@ -558,6 +558,7 @@ export interface TacticalBattleMissionData extends BaseMissionData {
   mapLayout: MapCellType[][];
   unitDefinitions: Record<string, UnitDefinition>;
   playerUnitPool: string[];
+  playerUnits?: PlacedUnit[];
   enemyUnits: PlacedUnit[];
   deploymentZone: { x_min: number; x_max: number; y_min: number; y_max: number };
   winCondition: { type: 'defeat_all' } | { type: 'destroy_fort'; position: Point };

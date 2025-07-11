@@ -494,12 +494,29 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         'tuong_binh_tay_son': { id: 'tuong_binh_tay_son', name: 'Tượng Binh', iconUrl: ImageUrls.SPRITE_ELEPHANT_URL, maxHp: 250, attack: 40, attackRange: 1, moveRange: 2, specialAbility: 'charge', description: "Sức mạnh đột phá, có thể húc đổ đồn địch. Tượng binh là một trong những vũ khí lợi hại nhất của quân Tây Sơn, chuyên dùng để phá vỡ đội hình và gây hoảng loạn cho quân địch trong các trận đánh lớn." },
         'quan_thanh_bo': { id: 'quan_thanh_bo', name: 'Bộ Binh Thanh', iconUrl: ImageUrls.SPRITE_ENEMY_UNIT_URL, maxHp: 80, attack: 20, attackRange: 1, moveRange: 2, description: "Quân chính quy của nhà Thanh, được trang bị tốt nhưng sĩ khí kém." },
         'don_ngoc_hoi': { id: 'don_ngoc_hoi', name: 'Đồn Ngọc Hồi', iconUrl: ImageUrls.ICON_ENEMY_FORT_URL, maxHp: 500, attack: 10, attackRange: 2, moveRange: 0, description: "Một trong những đồn lũy kiên cố nhất của quân Thanh, phòng thủ vòng ngoài cho Thăng Long." },
+        'cong_su': { id: 'cong_su', name: 'Công sự', iconUrl: ImageUrls.SPRITE_CONG_SU_URL, maxHp: 150, attack: 0, attackRange: 0, moveRange: 0, description: "Hàng rào phòng thủ, chặn đường di chuyển của quân bộ." },
     },
     playerUnitPool: ['bo_binh_tay_son', 'tuong_binh_tay_son'],
+    playerUnits: [
+        { unitId: 'tuong_binh_tay_son', x: 4, y: 5, isEnemy: false },
+        { unitId: 'bo_binh_tay_son', x: 2, y: 5, isEnemy: false },
+        { unitId: 'bo_binh_tay_son', x: 3, y: 5, isEnemy: false },
+        { unitId: 'bo_binh_tay_son', x: 5, y: 5, isEnemy: false },
+        { unitId: 'bo_binh_tay_son', x: 6, y: 5, isEnemy: false },
+    ],
     enemyUnits: [
+        // Infantry line
+        { unitId: 'quan_thanh_bo', x: 2, y: 1, isEnemy: true },
         { unitId: 'quan_thanh_bo', x: 3, y: 1, isEnemy: true },
         { unitId: 'quan_thanh_bo', x: 6, y: 1, isEnemy: true },
-        { unitId: 'quan_thanh_bo', x: 4, y: 2, isEnemy: true },
+        { unitId: 'quan_thanh_bo', x: 7, y: 1, isEnemy: true },
+        // Fortification line
+        { unitId: 'cong_su', x: 2, y: 2, isEnemy: true, isFort: true },
+        { unitId: 'cong_su', x: 3, y: 2, isEnemy: true, isFort: true },
+        { unitId: 'cong_su', x: 5, y: 2, isEnemy: true, isFort: true },
+        { unitId: 'cong_su', x: 6, y: 2, isEnemy: true, isFort: true },
+        { unitId: 'cong_su', x: 7, y: 2, isEnemy: true, isFort: true },
+        // Main Fort
         { unitId: 'don_ngoc_hoi', x: 4, y: 0, isEnemy: true, isFort: true },
     ],
     deploymentZone: { x_min: 0, x_max: 9, y_min: 5, y_max: 5 },
