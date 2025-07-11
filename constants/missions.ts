@@ -539,17 +539,39 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
       ],
       reward: { id: Items.DONG_TIEN_QUANG_TRUNG_ARTIFACT_ID, type: 'artifact' },
   },
-  'hue-city-planning': {
-    type: 'cityPlanning',
-    id: 'hue-city-planning',
-    title: 'Xây dựng Kinh thành Huế',
-    mapImageUrl: ImageUrls.MAP_KINH_THANH_HUE_URL,
-    buildings: [
-        { id: 'ngo-mon', name: 'Ngọ Môn', iconUrl: ImageUrls.ICON_NGO_MON_URL, correctPosition: { x: 45, y: 75 } },
-        { id: 'thai-hoa', name: 'Điện Thái Hòa', iconUrl: ImageUrls.ICON_THAI_HOA_URL, correctPosition: { x: 45, y: 45 } },
-        { id: 'the-mieu', name: 'Thế Miếu', iconUrl: ImageUrls.ICON_THE_MIEU_URL, correctPosition: { x: 15, y: 60 } },
-    ],
+  'hue-imperial-city-construction': {
+    type: 'hueConstruction',
+    id: 'hue-imperial-city-construction',
+    title: 'Thuận Thiên Ý - Kiến Tạo Kinh Thành',
     reward: { id: Items.MO_HINH_CUU_DINH_ARTIFACT_ID, type: 'artifact' },
+    mapImageUrl: ImageUrls.BG_HUE_PLANNING_URL,
+    initialVatTu: 500,
+    buildings: [
+        { id: 'ky_dai', name: 'Kỳ Đài', cost: 100, phase: 1, iconUrl: ImageUrls.ICON_KY_DAI_URL, width: 8, height: 10 },
+        { id: 'ngo_mon', name: 'Ngọ Môn Quan', cost: 150, phase: 1, iconUrl: ImageUrls.ICON_NGO_MON_QUAN_URL, width: 20, height: 15 },
+        { id: 'thai_hoa', name: 'Điện Thái Hòa & Sân Đại Triều', cost: 200, phase: 2, iconUrl: ImageUrls.ICON_THAI_HOA_DAI_URL, width: 25, height: 25 },
+        { id: 'the_mieu', name: 'Thế Tổ Miếu', cost: 120, phase: 3, iconUrl: ImageUrls.ICON_THE_TO_MIEU_URL, width: 18, height: 30 },
+        { id: 'hien_lam', name: 'Hiển Lâm Các', cost: 120, phase: 3, iconUrl: ImageUrls.ICON_HIEN_LAM_CAC_URL, width: 12, height: 18 },
+        { id: 'cuu_dinh', name: 'Cửu Đỉnh', cost: 80, phase: 3, iconUrl: ImageUrls.ICON_CUU_DINH_NHO_URL, width: 15, height: 8 },
+    ],
+    dropZones: [
+        { id: 'ngo_mon', x: 40, y: 75, width: 20, height: 15, phase: 1, thanDaoBonus: 50 },
+        { id: 'ky_dai', x: 46, y: 90, width: 8, height: 10, phase: 1, phongThuyBonus: 20 },
+        { id: 'thai_hoa', x: 37.5, y: 45, width: 25, height: 25, phase: 2, thanDaoBonus: 50, phongThuyBonus: 50 },
+        { id: 'the_mieu', x: 15, y: 35, width: 18, height: 30, phase: 3, phongThuyBonus: 30 },
+        { id: 'hien_lam', x: 38, y: 25, width: 12, height: 18, phase: 3, thanDaoBonus: 30 },
+        { id: 'cuu_dinh', x: 42, y: 35, width: 15, height: 8, phase: 3, thanDaoBonus: 30 },
+    ],
+    phaseGoals: [
+        { phase: 1, uyNghiRequired: 200 },
+        { phase: 2, uyNghiRequired: 450 },
+        { phase: 3, uyNghiRequired: 700 },
+    ],
+    advisorTips: {
+        1: { title: "Giai Đoạn 1: Nền Móng", text: "Tâu Bệ hạ, để đặt nền móng cho Kinh thành, trước hết cần xây dựng Ngọ Môn Quan để thể hiện uy nghi và Kỳ Đài để treo cờ hiệu. Đây là những công trình án ngữ mặt tiền, vô cùng quan trọng." },
+        2: { title: "Giai Đoạn 2: Trung Tâm Quyền Lực", text: "Bẩm, nền móng đã vững. Nay xin Bệ hạ cho xây Điện Thái Hòa và Sân Đại Triều. Đây là nơi thiết triều, trung tâm của cả quốc gia, phải đặt ở chính giữa theo trục Thần đạo." },
+        3: { title: "Giai Đoạn 3: Tưởng Vọng Tiên Tổ", text: "Muôn tâu, đại sự sắp thành! Giờ là lúc xây dựng Thế Tổ Miếu để thờ các vị vua triều Nguyễn, cùng với Hiển Lâm Các và Cửu Đỉnh để ghi nhớ công đức, thể hiện sự trường tồn của vương triều." },
+    }
   },
   'quoc-ngu-typesetting': {
     type: 'typesetting',

@@ -27,6 +27,8 @@ export const BG_NOTEBOOK_URL = 'https://raw.githubusercontent.com/vtvinh87/dongc
 export const BG_LANE_BATTLE_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-chien-truong-bach-dang.png';
 export const MARCH_MAP_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-ban-do-hanh-quan.png';
 export const TACTICAL_BATTLE_BACKGROUND_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-ban-co-chien-thuat.png';
+export const BG_HUE_PLANNING_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-nen-quy-hoach-Hue.png';
+export const PATTERN_CUNG_DINH_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Pattern/P-hoa-van-cung-dinh.png';
 
 
 // --- Character & Unit Sprites ---
@@ -78,7 +80,7 @@ export const TRUNG_NU_VUONG_SEAL_URL = "https://raw.githubusercontent.com/vtvinh
 export const GOLDEN_TURTLE_MODEL_IMAGE_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Hoan_Kiem_turtle_specimen.jpeg/800px-Hoan_Kiem_turtle_specimen.jpeg";
 export const LY_DYNASTY_COIN_URL = "https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Medal/M-dong-tien-thoi-ly.png";
 export const BUT_LONG_NGHIEN_MUC_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Inkstone_and_Calligraphy_Brushes.jpg/640px-Inkstone_and_Calligraphy_Brushes.jpg";
-export const NO_THAN_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/N%E1%BB%8F_th%E1%ba%A7n_c%E1%BB%A7a_An_D%C6%B0%C6%A1ng_V%C6%B0%C6%A1ng.jpg/640px-N%E1%BB%8F_th%E1%ba%A7n_c%E1%BB%A7a_An_D%C6%B0%C6%A1ng_V%C6%B0%C6%A1ng.jpg";
+export const NO_THAN_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/N%E1%BB%8F_th%E1%BA%A7n_c%E1%BB%A7a_An_D%C6%B0%C6%A1ng_V%C6%B0%C6%A1ng.jpg/640px-N%E1%BB%8F_th%E1%ba%A7n_c%E1%BB%A7a_An_D%C6%B0%C6%A1ng_V%C6%B0%C6%A1ng.jpg";
 export const CHIEU_DOI_DO_URL = "https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Medal/M-chieu-doi-do.png";
 export const TIEN_QUANG_TRUNG_URL = "https://upload.wikimedia.org/wikipedia/commons/f/f1/Annam_coin_-_Quang_Trung_Thong_Bao_02.jpg";
 export const DAN_NGUYET_URL = "https://i.ibb.co/1f0wX2zC/dan-nguyet.png";
@@ -121,6 +123,15 @@ export const HAI_BA_TRUNG_HERO_CARD_URL = 'https://i.ibb.co/VvzC67d/hero-hai-ba-
 export const GOLDEN_THRONE_URL = 'https://i.ibb.co/yQJmH0g/decoration-throne.png';
 
 // --- UI & Icon Images ---
+export const ICON_KY_DAI_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-ky-dai.png';
+export const ICON_NGO_MON_QUAN_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-ngo-mon-quan.png';
+export const ICON_THAI_HOA_DAI_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-thai-hoa-dai.png';
+export const ICON_THE_TO_MIEU_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-the-to-mieu.png';
+export const ICON_HIEN_LAM_CAC_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-hien-lam-cac.png';
+export const ICON_CUU_DINH_NHO_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-cuu-dinh-nho.png';
+export const ICON_UY_NGHI_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-uy-nghi.png';
+export const ICON_PHONG_THUY_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-phong-thuy.png';
+export const ICON_DUNG_DAO_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-dung-dao.png';
 export const ICON_RAISE_FLAG_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-co-hieu-khoi-nghia.png';
 export const ICON_BEAT_DRUM_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-trong-tran.png';
 export const ICON_POUR_WINE_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-chen-ruou-the.png';
@@ -168,7 +179,6 @@ export const ARMY_ICON_TAY_SON_URL = 'https://raw.githubusercontent.com/vtvinh87
 // --- Newly Added URLs to Fix Errors ---
 export const LY_THAI_TO_AVATAR_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Avatars/Avt-ly-thai-to.png';
 export const STRATEGY_MAP_NGOC_HOI_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-chien-truong-ngoc-hoi.png';
-export const MAP_KINH_THANH_HUE_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-kinh-thanh-hue.png';
 export const SAGA_KHAI_QUOC_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Quest/Q-thap-sang-hoa-van.png';
 export const SAGA_HUNG_VUONG_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Quest/Q-dong-thoi-gian-hung-vuong.png';
 export const SAGA_HOI_LANG_NGAY_MUA_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Quest/Q-hoi-lang-ngay-mua.png';

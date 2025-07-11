@@ -1,0 +1,505 @@
+/* hue-construction-game.css */
+
+.text-shadow-glow {
+    text-shadow: 0 0 5px #fef08a, 0 0 10px #fde047;
+}
+
+#hue-construction-screen {
+    width: 100%;
+    max-width: 1400px;
+    height: 95vh;
+    padding: 1rem;
+    background-color: #fdf2e2; /* A light, parchment-like color */
+    color: #4a2c13; /* Dark brown */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border: 4px solid #4a2c13;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+#construction-hud {
+    flex-shrink: 0;
+    padding: 0.5rem 1.5rem; /* Reduced padding slightly */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #b19470;
+    background-color: #eaddc7;
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Pattern/P-hoa-van-cung-dinh.png');
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+#construction-hud h2 {
+    text-shadow: 0 2px 3px rgba(0,0,0,0.4);
+}
+
+.hud-stat {
+    font-family: 'Special Elite', cursive;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: rgba(74, 44, 19, 0.4); /* dark brown with opacity */
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 999px; /* pill shape */
+    border: 1px solid rgba(253, 242, 226, 0.5); /* light parchment border */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+}
+.hud-stat span {
+    font-weight: bold;
+    font-family: 'Nunito', sans-serif;
+}
+
+#game-body {
+    flex-grow: 1;
+    display: flex;
+    gap: 1rem;
+    overflow: hidden;
+}
+
+#building-palette {
+    width: 280px;
+    flex-shrink: 0;
+    background-color: rgba(228, 221, 199, 0.8);
+    border: 2px solid #b19470;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+}
+
+#palette-title {
+    font-family: 'Special Elite', cursive;
+    font-size: 1.5rem;
+    text-align: center;
+    border-bottom: 2px solid #b19470;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+#palette-items {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-right: 0.5rem;
+}
+
+.palette-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    background-color: #fdf2e2;
+    border: 3px solid #b19470;
+    border-radius: 0.5rem;
+    cursor: grab;
+    transition: all 0.2s ease-out;
+}
+.palette-item.selected-for-placement {
+    border-color: #3b82f6; /* blue-500 */
+    box-shadow: 0 0 10px #3b82f6;
+    transform: scale(1.05);
+}
+
+.palette-item.disabled {
+    filter: grayscale(1) opacity(0.6);
+    cursor: not-allowed;
+}
+.palette-item:not(.disabled):hover {
+    transform: scale(1.03);
+    border-color: #785a3a;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.palette-item img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+.palette-item .item-info {
+    text-align: left;
+}
+
+#hue-planning-grid {
+    flex-grow: 1;
+    position: relative;
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-nen-quy-hoach-Hue.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: 3px solid #4a2c13;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.drop-zone {
+    position: absolute;
+    border: 2px dashed rgba(120, 90, 58, 0.7);
+    background-color: rgba(253, 242, 226, 0.3);
+    transition: background-color 0.2s;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.drop-zone.drag-over {
+    background-color: rgba(74, 222, 128, 0.5);
+    border-color: #16a34a;
+    border-style: solid;
+}
+
+.placed-building {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    animation: place-building-anim 0.5s ease-out forwards;
+    pointer-events: none;
+}
+@keyframes place-building-anim {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+#advisor-modal {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeInScreen 0.3s forwards;
+}
+.advisor-content {
+    background-color: #fdf2e2;
+    padding: 2rem;
+    border: 4px solid #4a2c13;
+    border-radius: 1rem;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    position: relative;
+    animation: fadeInScaleUp 0.4s ease-out forwards;
+}
+.advisor-content h3 {
+    font-family: 'Special Elite', cursive;
+    font-size: 2rem;
+    color: #4a2c13;
+    margin-bottom: 1rem;
+}
+.advisor-content p {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+.advisor-content button {
+    background-color: #785a3a;
+    color: white;
+    font-weight: bold;
+    padding: 0.75rem 2rem;
+    border-radius: 999px;
+    border: 2px solid #4a2c13;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.advisor-content button:hover {
+    background-color: #5e482e;
+}
+
+.score-popup {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: score-popup-anim 1.5s ease-out forwards;
+  pointer-events: none;
+  z-index: 100;
+}
+@keyframes score-popup-anim {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
+}
+
+#phase-indicator {
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0,0,0,0.7);
+    color: #fcd34d;
+    padding: 0.5rem 1.5rem;
+    border-radius: 999px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    z-index: 5;
+    animation: fadeInDown 0.5s;
+}
+
+#completion-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255, 237, 186, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 200;
+    animation: fadeInScreen 0.5s forwards;
+}
+#completion-overlay h2 {
+    font-size: 3rem;
+    font-family: 'Special Elite', cursive;
+    color: #4a2c13;
+    margin-bottom: 1rem;
+}
+
+/* Styles for the Historical Event Modal */
+#historical-event-modal {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeInScreen 0.3s forwards;
+}
+
+.event-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.event-choices button {
+    background-color: #854d0e; /* amber-800 */
+    color: white;
+    padding: 0.75rem 1rem;
+    border: 2px solid #b19470;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.event-choices button:hover {
+    background-color: #a16207; /* amber-700 */
+    border-color: #fde68a;
+}
+
+/* --- Results Modal Styles --- */
+#results-screen-modal {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0,0,0,0.75);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeInScreen 0.4s forwards;
+}
+
+.results-content {
+    background-color: #fdf2e2;
+    padding: 2rem;
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 600px;
+    border: 4px solid #4a2c13;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Pattern/P-hoa-van-cung-dinh.png');
+    animation: fadeInScaleUp 0.5s ease-out forwards;
+    text-align: center;
+    color: #4a2c13;
+}
+
+.results-box {
+    background-color: rgba(253, 242, 226, 0.85); /* Slightly translucent parchment */
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid #b19470;
+    margin-bottom: 2rem;
+}
+
+.results-box h2 {
+    font-size: 2rem;
+    font-family: 'Special Elite', cursive;
+}
+
+.results-box h3 {
+    font-size: 1.25rem;
+    margin-top: 0.5rem;
+}
+
+#player-rank {
+    font-weight: 800;
+    font-size: 1.75rem;
+}
+
+.dark #player-rank.text-amber-700 { color: #f59e0b; }
+.dark #player-rank.text-red-600 { color: #ef4444; }
+
+
+#score-breakdown-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 0 0;
+    text-align: left;
+}
+
+#score-breakdown-list li {
+    padding: 0.5rem;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px dashed #b19470;
+}
+
+#score-breakdown-list li:last-child {
+    border-bottom: none;
+    font-weight: bold;
+    font-size: 1.25rem;
+    margin-top: 0.5rem;
+}
+
+#final-reward-text {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-top: 1.5rem;
+}
+
+.results-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.results-buttons button {
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    border: 2px solid;
+    transition: all 0.2s;
+}
+
+.results-buttons .play-again-btn {
+    background-color: #dbeafe; /* blue-100 */
+    color: #1e40af; /* blue-800 */
+    border-color: #1d4ed8; /* blue-700 */
+}
+.results-buttons .play-again-btn:hover {
+    background-color: #bfdbfe; /* blue-200 */
+}
+
+.results-buttons .return-museum-btn {
+    background-color: #fef9c3; /* yellow-100 */
+    color: #854d0e; /* amber-800 */
+    border-color: #b45309; /* amber-700 */
+}
+.results-buttons .return-museum-btn:hover {
+    background-color: #fef08a; /* yellow-200 */
+}
+
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media (max-width: 800px) {
+    #hue-construction-screen {
+        padding: 0.5rem;
+        height: 100vh; /* Full screen on mobile */
+    }
+
+    #game-body {
+        flex-direction: column-reverse; /* Stack palette below grid */
+    }
+    
+    #hue-planning-grid {
+        min-height: 0; /* Allow grid to shrink */
+        flex-grow: 1;
+    }
+
+    #building-palette {
+        width: 100%;
+        height: auto;
+        flex-shrink: 0;
+        padding: 0.5rem;
+    }
+    
+    #palette-title {
+        font-size: 1.2rem;
+        padding-bottom: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    #palette-items {
+        flex-direction: row; /* Horizontal scroll */
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 8px; /* For scrollbar */
+        gap: 0.5rem;
+    }
+
+    .palette-item {
+        flex-direction: column; /* Stack image over text */
+        width: 110px;
+        flex-shrink: 0; /* Prevent items from shrinking */
+        gap: 0.25rem;
+        padding: 0.5rem;
+    }
+
+    .palette-item .item-info {
+        text-align: center;
+    }
+    
+    #construction-hud {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+    
+    #construction-hud h2 {
+        width: 100%;
+        text-align: center;
+        order: -1; /* Make title appear on top */
+        font-size: 1.2rem;
+    }
+    
+    .hud-stat {
+        font-size: 1.1rem; /* Slightly smaller on mobile */
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .advisor-content {
+        padding: 1rem;
+    }
+    .advisor-content h3 {
+        font-size: 1.5rem;
+    }
+    .advisor-content p {
+        font-size: 1rem;
+    }
+    
+    .results-content {
+        padding: 1rem;
+    }
+    .results-box {
+        padding: 1rem;
+    }
+    .results-box h2 {
+        font-size: 1.5rem;
+    }
+}

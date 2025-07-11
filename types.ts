@@ -28,7 +28,7 @@ export enum Screen {
   DEFENSE_MISSION_SCREEN, // New screen for the defense game
   STRATEGY_MAP_MISSION_SCREEN, // New screen for the strategy map game
   COIN_MINTING_MISSION_SCREEN, // New screen for the coin minting game
-  CITY_PLANNING_MISSION_SCREEN, // New screen for the city planning game
+  HUE_CONSTRUCTION_MISSION_SCREEN, // New screen for the Hue city construction game
   TYPESETTING_MISSION_SCREEN, // New screen for the typesetting game
   ADVENTURE_PUZZLE_SCREEN,
   STRATEGIC_PATH_MISSION_SCREEN,
@@ -424,18 +424,37 @@ export interface CoinMintingMissionData extends BaseMissionData {
   moldOptions: CoinMintingOption[];
 }
 
-export interface BuildingPlacement {
+export interface HueBuilding {
   id: string;
   name: string;
+  cost: number;
+  phase: number;
   iconUrl: string;
-  correctPosition: Point;
+  width: number; // in grid cells
+  height: number; // in grid cells
 }
 
-export interface CityPlanningMissionData extends BaseMissionData {
-  type: 'cityPlanning';
-  mapImageUrl: string;
-  buildings: BuildingPlacement[];
+export interface HueDropZone {
+    id: string; // matches building id
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    phase: number;
+    phongThuyBonus?: number;
+    thanDaoBonus?: number;
 }
+
+export interface HueConstructionMissionData extends BaseMissionData {
+  type: 'hueConstruction';
+  mapImageUrl: string;
+  buildings: HueBuilding[];
+  dropZones: HueDropZone[];
+  initialVatTu: number;
+  phaseGoals: { phase: number; uyNghiRequired: number }[];
+  advisorTips: Record<number, { title: string; text: string }>;
+}
+
 
 export interface TypesettingMissionData extends BaseMissionData {
   type: 'typesetting';
@@ -583,7 +602,7 @@ export type MissionData =
   | DefenseMissionData
   | StrategyMapMissionData
   | CoinMintingMissionData
-  | CityPlanningMissionData
+  | HueConstructionMissionData
   | TypesettingMissionData
   | AdventurePuzzleMissionData
   | StrategicPathMissionData

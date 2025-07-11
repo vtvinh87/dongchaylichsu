@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { CityPlanningMissionData, Reward, BuildingPlacement } from '../types';
+import { HueConstructionMissionData, Reward, HueBuilding } from '../types';
 import { playSound } from '../utils/audio';
 import { ALL_ARTIFACTS_MAP } from '../constants';
 
 interface CityPlanningScreenProps {
-  missionData: CityPlanningMissionData;
+  missionData: HueConstructionMissionData;
   onReturnToMuseum: () => void;
   onComplete: (reward: Reward) => void;
 }
@@ -15,7 +16,7 @@ const CityPlanningScreen: React.FC<CityPlanningScreenProps> = ({
   onComplete,
 }) => {
   const [placedBuildings, setPlacedBuildings] = useState<Record<string, boolean>>({});
-  const [draggedBuilding, setDraggedBuilding] = useState<BuildingPlacement | null>(null);
+  const [draggedBuilding, setDraggedBuilding] = useState<HueBuilding | null>(null);
   const [dragOverZone, setDragOverZone] = useState<string | null>(null);
   const [isComplete, setIsComplete] = useState(false);
   const rewardImageUrl = useMemo(() => {
@@ -34,7 +35,7 @@ const CityPlanningScreen: React.FC<CityPlanningScreenProps> = ({
     setIsComplete(false);
   }, [missionData]);
 
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, building: BuildingPlacement) => {
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, building: HueBuilding) => {
     setDraggedBuilding(building);
     // Use a custom drag image to make it look nicer if desired, for now default is fine
   };
@@ -88,26 +89,32 @@ const CityPlanningScreen: React.FC<CityPlanningScreenProps> = ({
           className="flex-grow"
           style={{ backgroundImage: `url(${missionData.mapImageUrl})` }}
         >
-          {missionData.buildings.map(building => (
+          {missionData.dropZones.map(zone => (
             <div
-              key={building.id}
-              className={`building-drop-zone ${dragOverZone === building.id ? 'drag-over' : ''}`}
-              style={{ top: `${building.correctPosition.y}%`, left: `${building.correctPosition.x}%` }}
-              onDragOver={(e) => handleDragOver(e, building.id)}
+              key={zone.id}
+              className={`building-drop-zone ${dragOverZone === zone.id ? 'drag-over' : ''}`}
+              style={{ top: `${zone.y}%`, left: `${zone.x}%`, width: `${zone.width}%`, height: `${zone.height}%` }}
+              onDragOver={(e) => handleDragOver(e, zone.id)}
               onDragLeave={() => setDragOverZone(null)}
-              onDrop={(e) => handleDrop(e, building.id)}
+              onDrop={(e) => handleDrop(e, zone.id)}
             >
-               {!placedBuildings[building.id] && <span className="text-white text-shadow-lg font-bold text-sm hidden sm:block">{building.name}</span>}
+               {!placedBuildings[zone.id] && <span className="text-white text-shadow-lg font-bold text-sm hidden sm:block">{missionData.buildings.find(b => b.id === zone.id)?.name}</span>}
             </div>
           ))}
-          {missionData.buildings.map(building => placedBuildings[building.id] && (
-            <img
-                key={`placed-${building.id}`}
-                src={building.iconUrl}
-                alt={building.name}
-                className="placed-building-icon visible"
-                style={{ top: `${building.correctPosition.y}%`, left: `${building.correctPosition.x}%` }}
-            />
+          {missionData.dropZones.map(zone => placedBuildings[zone.id] && (
+            (() => {
+                const building = missionData.buildings.find(b => b.id === zone.id);
+                if (!building) return null;
+                return (
+                    <img
+                        key={`placed-${building.id}`}
+                        src={building.iconUrl}
+                        alt={building.name}
+                        className="placed-building-icon visible"
+                        style={{ top: `${zone.y}%`, left: `${zone.x}%`, width: `${zone.width}%`, height: `${zone.height}%` }}
+                    />
+                );
+            })()
           ))}
            {isComplete && (
             <div className="absolute inset-0 bg-black/70 flex flex-col justify-center items-center text-white z-20 animate-fadeInScaleUp rounded-md">

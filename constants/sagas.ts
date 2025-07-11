@@ -61,8 +61,8 @@ export const HOI_DATA: Hoi[] = [
     title: 'Hồi 5: Vận Nước Đổi Thay',
     description: 'Tìm hiểu về triều đại phong kiến cuối cùng của Việt Nam, sự ra đời của chữ Quốc ngữ và những bước chân đầu tiên trên hành trình cứu nước.',
     missions: [
-      { id: 'mission_5_1', title: 'Xây dựng Kinh thành Huế', imageUrl: ImageUrls.SAGA_KINH_THANH_HUE_URL, description: 'Giúp vua Gia Long quy hoạch và đặt các công trình chính của Kinh thành.', missionId: 'hue-city-planning' },
-      { id: 'mission_5_2', title: 'In báo Chữ Quốc Ngữ', imageUrl: ImageUrls.SAGA_TYPESETTING_URL, description: 'Sắp chữ để in tờ báo Quốc ngữ đầu tiên - Gia Định Báo.', missionId: 'quoc-ngu-typesetting', dependsOnMissionId: 'hue-city-planning'},
+      { id: 'mission_5_1', title: 'Thuận Thiên Ý - Kiến Tạo Kinh Thành', imageUrl: ImageUrls.SAGA_KINH_THANH_HUE_URL, description: 'Quy hoạch và xây dựng các công trình trọng điểm của Kinh thành Huế theo đúng Phong thủy và Dũng đạo.', missionId: 'hue-imperial-city-construction' },
+      { id: 'mission_5_2', title: 'In báo Chữ Quốc Ngữ', imageUrl: ImageUrls.SAGA_TYPESETTING_URL, description: 'Sắp chữ để in tờ báo Quốc ngữ đầu tiên - Gia Định Báo.', missionId: 'quoc-ngu-typesetting', dependsOnMissionId: 'hue-imperial-city-construction'},
       { id: 'mission_5_3', title: 'Vượt biển Đông Du', imageUrl: ImageUrls.SAGA_DONG_DU_URL, description: 'Giải các câu đố để tìm đường sang Nhật Bản an toàn.', missionId: 'dong-du-adventure-puzzle', dependsOnMissionId: 'quoc-ngu-typesetting'},
     ]
   },

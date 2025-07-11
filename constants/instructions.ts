@@ -82,9 +82,9 @@ export const INSTRUCTION_DATA: Record<string, { title: string; text: string }> =
       title: 'Xưởng Đúc Tiền Hoàng Gia',
       text: "Chào mừng đến Xưởng đúc tiền! Nhiệm vụ của bạn gồm 3 giai đoạn. Giai đoạn 1 - Khắc Khuôn: Hãy nhấp vào các điểm phát sáng theo đúng thứ tự để khắc chữ lên khuôn. Giai đoạn 2 - Luyện Kim: Nhấn nút 'Thổi Bễ' liên tục để giữ nhiệt độ trong vùng màu xanh lá. Giai đoạn 3 - Đúc Tiền: Nhấp chuột thật chính xác khi thanh chỉ báo đi vào vùng hoàn hảo để đúc ra đồng tiền cuối cùng. Chúc may mắn!",
   },
-  cityPlanning: {
-      title: 'Xây dựng Kinh thành',
-      text: "Kéo các công trình kiến trúc từ danh sách bên cạnh và thả vào đúng vị trí của chúng trên bản đồ quy hoạch Kinh thành Huế.",
+  hueConstruction: {
+      title: 'Thuận Thiên Ý - Kiến Tạo Kinh Thành',
+      text: "Tâu Bệ hạ! Nhiệm vụ của ngài là quy hoạch và xây dựng các công trình trọng điểm của Kinh thành. Hãy chú ý đến tài nguyên 'Vật tư' và điểm 'Uy Nghi'. Kéo các công trình từ bảng bên phải vào đúng vị trí trên bản đồ. Đặt đúng vị trí sẽ nhận được nhiều điểm thưởng Phong Thủy và Thần Đạo. Hãy lắng nghe lời của Triều thần Cố vấn để hoàn thành kinh thành vĩ đại qua từng giai đoạn!",
   },
   typesetting: {
       title: 'In báo Chữ Quốc Ngữ',
