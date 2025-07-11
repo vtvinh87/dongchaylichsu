@@ -186,7 +186,19 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     position: relative;
     animation: fadeInScaleUp 0.4s ease-out forwards;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
 }
+
+.advisor-scroll-content {
+    overflow-y: auto;
+    flex-grow: 1;
+    text-align: left;
+    margin-bottom: 1rem;
+    padding-right: 0.5rem; /* space for scrollbar */
+}
+
 .advisor-content h3 {
     font-family: 'Special Elite', cursive;
     font-size: 2rem;
@@ -207,6 +219,7 @@
     border: 2px solid #4a2c13;
     cursor: pointer;
     transition: all 0.2s;
+    flex-shrink: 0;
 }
 .advisor-content button:hover {
     background-color: #5e482e;
@@ -502,4 +515,171 @@
     .results-box h2 {
         font-size: 1.5rem;
     }
+}
+
+
+/* --- NEW SECRET LETTER STYLES --- */
+.secret-letter {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-tinh-bao.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    z-index: 50;
+    animation: pulse-glow 1.5s infinite alternate, fadeInLetter 0.5s forwards;
+    transition: transform 0.2s ease-out;
+}
+
+.secret-letter:hover {
+    transform: scale(1.15);
+}
+
+@keyframes pulse-glow {
+    from {
+        filter: drop-shadow(0 0 5px #fde047);
+    }
+    to {
+        filter: drop-shadow(0 0 15px #fef08a);
+    }
+}
+
+@keyframes fadeInLetter {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* --- NEW QUIZ MODAL STYLES --- */
+#quiz-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeInScreen 0.3s forwards;
+}
+
+.quiz-modal-content {
+    background-color: #fdf2e2;
+    padding: 2rem;
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 700px;
+    border: 4px solid #4a2c13;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    animation: fadeInScaleUp 0.4s ease-out forwards;
+    text-align: center;
+    color: #4a2c13;
+    position: relative;
+}
+
+.quiz-timer {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #785a3a;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border: 2px solid #fde68a;
+    box-shadow: 0 0 10px #fde68a;
+}
+
+.quiz-question {
+    font-family: 'Special Elite', cursive;
+    font-size: 1.5rem;
+    min-height: 100px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quiz-options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.quiz-option-btn {
+    background-color: #eaddc7;
+    color: #4a2c13;
+    border: 2px solid #b19470;
+    padding: 1rem;
+    font-weight: bold;
+    font-size: 1.1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quiz-option-btn:not([disabled]):hover {
+    background-color: #d8c9b3;
+    transform: translateY(-2px);
+}
+
+.quiz-option-btn.correct {
+    background-color: #16a34a;
+    color: white;
+    border-color: #15803d;
+    transform: scale(1.02);
+}
+
+.quiz-option-btn.incorrect {
+    background-color: #b91c1c;
+    color: white;
+    border-color: #991b1b;
+}
+
+.quiz-option-btn.disabled {
+    filter: grayscale(80%) opacity(0.6);
+    cursor: not-allowed;
+}
+
+.quiz-option-btn.disabled:not(.correct):not(.incorrect) {
+    background-color: #d1d5db;
+    border-color: #9ca3af;
+    color: #4b5563;
+}
+
+.quiz-option-btn.fifty-fifty-disabled {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.quiz-modal-footer {
+    margin-top: 1.5rem;
+    border-top: 1px dashed #b19470;
+    padding-top: 1rem;
+}
+
+.quiz-help-btn {
+    background-color: #0e7490; /* cyan-700 */
+    color: white;
+    border: 2px solid #0891b2;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.quiz-help-btn:hover:not(:disabled) {
+    background-color: #06b6d4;
+}
+
+.quiz-help-btn:disabled {
+    background-color: #6b7280;
+    border-color: #4b5563;
+    opacity: 0.7;
+    cursor: not-allowed;
 }

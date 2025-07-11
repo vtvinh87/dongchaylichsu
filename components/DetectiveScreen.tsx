@@ -120,28 +120,49 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
 
   const handleClueSelection = (clueId: string) => {
     if (selectedClueId === clueId) {
-        setSelectedClueId(null); // Deselect
+        setSelectedClueId(null); // Deselect if clicking the same clue again
         return;
     }
 
+    // If a clue is already selected, check for contradiction with the newly clicked clue.
     if (selectedClueId) {
-      const contradictionPair = missionData.contradictions[selectedClueId];
-      if (contradictionPair && contradictionPair[0] === clueId) {
-        const newClueId = contradictionPair[1];
-        const newClue = missionData.deductionClues[newClueId];
-        if (newClue && !collectedClues[newClueId]) {
-          playSound('sfx_unlock');
-          alert(`Mâu thuẫn! Bạn đã phát hiện ra một manh mối mới: ${newClue.text}`);
-          setCollectedClues(prev => ({...prev, [newClueId]: newClue}));
-          spendTurn();
+        let newClueId: string | undefined;
+
+        // Check direction 1: selectedClueId -> clueId
+        const contradictionPair1 = missionData.contradictions[selectedClueId];
+        if (contradictionPair1 && contradictionPair1[0] === clueId) {
+            newClueId = contradictionPair1[1];
         }
-      } else {
-         playSound('sfx_fail');
-         alert("Hai manh mối này không mâu thuẫn.");
-      }
-      setSelectedClueId(null);
+
+        // Check direction 2: clueId -> selectedClueId (only if not found in direction 1)
+        if (!newClueId) {
+            const contradictionPair2 = missionData.contradictions[clueId];
+            if (contradictionPair2 && contradictionPair2[0] === selectedClueId) {
+                newClueId = contradictionPair2[1];
+            }
+        }
+
+        if (newClueId) {
+            const newClue = missionData.deductionClues[newClueId];
+            if (newClue && !collectedClues[newClueId]) {
+                playSound('sfx_unlock');
+                alert(`Mâu thuẫn! Bạn đã phát hiện ra một manh mối mới: ${newClue.text}`);
+                setCollectedClues(prev => ({ ...prev, [newClueId]: newClue }));
+                spendTurn();
+            } else if (collectedClues[newClueId]) {
+                // The contradiction was already found, just inform the user.
+                playSound('sfx_click');
+                alert("Bạn đã sử dụng cặp manh mối này để suy luận rồi.");
+            }
+        } else {
+            playSound('sfx_fail');
+            alert("Hai manh mối này không mâu thuẫn.");
+        }
+
+        setSelectedClueId(null); // Reset selection after checking
     } else {
-      setSelectedClueId(clueId);
+        // No clue was selected, so select the current one.
+        setSelectedClueId(clueId);
     }
   };
 
@@ -368,7 +389,10 @@ const DetectiveScreen: React.FC<DetectiveScreenProps> = ({ missionData, onReturn
           </div>
           
            {/* ---- MOBILE VIEW ---- */}
-          <div className="block md:hidden detective-mobile-view">
+          <div
+            className="block md:hidden detective-mobile-view"
+            style={{ backgroundImage: `url(${missionData.backgroundUrl})` }}
+          >
              <h3 className="text-xl font-bold text-center text-amber-200 mb-4">Các nhân vật trong thành</h3>
              <div className="detective-mobile-list">
                 {missionData.npcs.map(npc => (

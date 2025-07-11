@@ -1,4 +1,5 @@
-import { GoogleGenAI, Chat, Content } from "@google/genai";
+
+import { GoogleGenAI, Chat, Content, Type } from "@google/genai";
 import type { Handler, HandlerEvent } from "@netlify/functions";
 
 // This is a server-side function, so process.env is available here.
@@ -24,7 +25,7 @@ const handler: Handler = async (event: HandlerEvent) => {
         }
         
         const chat: Chat = ai.chats.create({
-            model: 'gemini-2.5-flash-preview-04-17',
+            model: 'gemini-2.5-flash',
             config: { systemInstruction },
             history: history as Content[] || [],
         });
@@ -40,7 +41,7 @@ const handler: Handler = async (event: HandlerEvent) => {
             return { statusCode: 400, body: JSON.stringify({ error: "Yêu cầu generate thiếu 'prompt'."}) };
         }
         const response = await ai.models.generateContent({
-          model: "gemini-2.5-flash-preview-04-17",
+          model: "gemini-2.5-flash",
           contents: prompt,
         });
         return {
@@ -62,7 +63,7 @@ Yêu cầu:
 Format JSON: { "modifiedText": string, "answers": string[], "definitions": Record<string, string> }`;
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-preview-04-17",
+            model: "gemini-2.5-flash",
             contents: puzzlePrompt,
             config: {
               responseMimeType: "application/json",
@@ -81,6 +82,46 @@ Format JSON: { "modifiedText": string, "answers": string[], "definitions": Recor
             headers: { "Content-Type": "application/json" },
             body: jsonStr, // Return the clean JSON string
         };
+    } else if (type === 'generate_hue_quiz') {
+      const quizPrompt = `Generate a single multiple-choice quiz question about the Nguyễn Dynasty of Vietnam. The question should be interesting and suitable for a history game. Provide 4 unique options, one of which is the correct answer.`;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: quizPrompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: {
+                type: Type.OBJECT,
+                properties: {
+                    question: { type: Type.STRING, description: "The quiz question in Vietnamese." },
+                    options: {
+                        type: Type.ARRAY,
+                        items: { type: Type.STRING },
+                        description: "An array of 4 possible answers in Vietnamese."
+                    },
+                    correctAnswer: { type: Type.STRING, description: "The correct answer, which must be one of the strings from the options array." }
+                },
+                required: ["question", "options", "correctAnswer"]
+            }
+        },
+      });
+      
+      let jsonStr = response.text.trim();
+      
+      try {
+        const parsed = JSON.parse(jsonStr);
+        if (!parsed.question || !Array.isArray(parsed.options) || parsed.options.length !== 4 || !parsed.correctAnswer || !parsed.options.includes(parsed.correctAnswer)) {
+            throw new Error('Invalid quiz format from AI');
+        }
+      } catch (e) {
+        return { statusCode: 500, body: JSON.stringify({ error: "Failed to generate a valid quiz question." }) };
+      }
+
+      return {
+          statusCode: 200,
+          headers: { "Content-Type": "application/json" },
+          body: jsonStr,
+      };
     } else {
         return { statusCode: 400, body: JSON.stringify({ error: 'Loại yêu cầu không hợp lệ.' }) };
     }

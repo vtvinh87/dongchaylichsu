@@ -184,7 +184,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
     id: 'thang_long_spy',
     title: 'Mật Thám Chốn Thị Thành',
     reward: { id: Items.LY_DYNASTY_COIN_ARTIFACT_ID, type: 'artifact' },
-    backgroundUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-phien-cho-thoi-Ly.png',
+    backgroundUrl: 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-phien-cho-thoi-ly.png',
     turnLimit: 12,
     npcs: [
       {

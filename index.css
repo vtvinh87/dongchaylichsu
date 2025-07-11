@@ -2912,7 +2912,6 @@ body {
     display: flex;
     flex-direction: column;
     background-color: #3d3d3d; /* Fallback */
-    background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
 }
 
 #detective-screen {
@@ -2955,7 +2954,6 @@ body {
     height: 100%;
     padding: 1rem;
     overflow-y: auto;
-    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-phien-cho-thoi-Ly.png');
     background-size: cover;
     background-position: center;
     position: relative;
