@@ -1,0 +1,198 @@
+/* components/StrategicPathScreen.css */
+
+#player-hud {
+    width: 100%;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    color: white;
+}
+
+#skill-bar {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#skill-bar button {
+    background-color: #78350f; /* amber-800 */
+    color: #fefce8; /* amber-50 */
+    border: 2px solid #fcd34d; /* amber-300 */
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+#skill-bar button:not(:disabled):hover {
+    background-color: #a16207; /* amber-700 */
+}
+
+#skill-bar button.skill-active {
+    background-color: #f59e0b; /* amber-500 */
+    color: #44403c; /* stone-700 */
+    box-shadow: 0 0 10px #fcd34d;
+    transform: scale(1.05);
+}
+
+#skill-bar button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #4b5563; /* gray-600 */
+    border-color: #9ca3af; /* gray-400 */
+}
+
+#strategic-path-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(15, 1fr);
+    gap: 1px;
+    background-color: #1c1917; /* stone-900 */
+    padding: 2px;
+    border: 3px solid #78350f; /* amber-800 */
+    border-radius: 0.5rem;
+}
+
+.strategic-path-cell {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    transition: all 0.2s;
+}
+
+/* Base Terrains */
+.cell-jungle { background-color: #14532d; }
+.cell-mountain { background-color: #44403c; }
+.cell-unstable-mountain { animation: unstable-pulse 2s infinite; }
+.cell-river { background-color: #0c4a6e; }
+.cell-open-path { background-color: #a16207; cursor: pointer; }
+.cell-sebanghieng-river { background-color: #0e7490; }
+
+/* Special Cell Icons */
+.cell-crater { background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-ho-bom.png'); }
+.cell-broken-bridge { background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-cau-sap.png'); }
+.cell-resource-wood { background-image: url('https://i.ibb.co/k5JqTz5/icon-go.png'); }
+.cell-sensor { background-image: url('https://i.ibb.co/3cqFHRd/icon-cam-bien.png'); }
+.cell-sensor-disabled { background-image: url('https://i.ibb.co/JqjT2W9/icon-cam-bien-disabled.png'); }
+.cell-timed-bomb { background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-bom-no-cham.png'); }
+.cell-rockslide { background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-sat-lo-da.png'); }
+.cell-supply-cache { background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-kho-vat-tu.png'); }
+.cell-lao-village { background-image: url('https://i.ibb.co/y4Y2Qwq/icon-lang-lao.png'); cursor: pointer; }
+.cell-lao-village.visited { filter: grayscale(1); }
+.cell-pontoon-bridge { background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-cau-phao.png'); }
+.cell-friendly-camp { background-image: url('https://i.ibb.co/x78hC1Q/icon-trai-ban.png'); cursor: pointer; }
+.cell-herb { background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-cay-thao-duoc.png'); cursor: pointer; }
+.cell-quest-location::after {
+    content: '!';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #facc15;
+    text-shadow: 0 0 5px black, 0 0 10px #f59e0b;
+    animation: pulse-yellow-glow 1.5s infinite;
+}
+
+@keyframes unstable-pulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(0.8); }
+}
+
+/* Path Markers */
+.cell-player-path { background-color: rgba(251, 191, 36, 0.4); }
+.cell-start { background-color: #fcd34d; font-weight: bold; display: flex; align-items: center; justify-content: center; color: #78350f;}
+.cell-end { background-color: #ef4444; font-weight: bold; display: flex; align-items: center; justify-content: center; color: white;}
+
+.convoy-icon {
+    position: absolute;
+    width: 10%;
+    height: calc(100% / 15);
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-xe-khong-kinh-ngang.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 10;
+    transition: all 0.5s ease-in-out;
+}
+
+.bomb-timer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    background-color: rgba(239, 68, 68, 0.8);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    z-index: 5;
+    border: 1px solid white;
+}
+
+/* Overlays */
+#night-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: #1e3a8a; /* indigo-900 */
+    opacity: 0;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    transition: opacity 1s ease-in-out;
+}
+#night-overlay.active {
+    opacity: 0.6;
+}
+#flash-flood-overlay {
+    position: absolute;
+    inset: 0;
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Effects/Effect-mua-rung.png');
+    pointer-events: none;
+    z-index: 20;
+    opacity: 0;
+    animation: flash-flood-anim 1.5s ease-out;
+}
+#flash-flood-overlay.active {
+    opacity: 0.7;
+}
+@keyframes flash-flood-anim {
+    0% { opacity: 0; }
+    50% { opacity: 0.7; }
+    100% { opacity: 0; }
+}
+
+/* Notification */
+#page-unlock-notification {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fcd34d; /* amber-300 */
+    color: #78350f; /* amber-800 */
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    z-index: 300;
+    animation: fadeUpAndOut 3s forwards;
+}
+
+@keyframes fadeUpAndOut {
+    0% { transform: translate(-50%, 50px); opacity: 0; }
+    20% { transform: translate(-50%, 0); opacity: 1; }
+    80% { transform: translate(-50%, 0); opacity: 1; }
+    100% { transform: translate(-50%, -50px); opacity: 0; }
+}
