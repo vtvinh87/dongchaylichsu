@@ -86,6 +86,10 @@ export const INSTRUCTION_DATA: Record<string, { title: string; text: string }> =
       title: 'Thuận Thiên Ý - Kiến Tạo Kinh Thành',
       text: "Tâu Bệ hạ! Nhiệm vụ của ngài là quy hoạch và xây dựng các công trình trọng điểm của Kinh thành. Hãy chú ý đến tài nguyên 'Vật tư' và điểm 'Uy Nghi'. Kéo các công trình từ bảng bên phải vào đúng vị trí trên bản đồ. Đặt đúng vị trí sẽ nhận được nhiều điểm thưởng Phong Thủy và Thần Đạo. Hãy lắng nghe lời của Triều thần Cố vấn để hoàn thành kinh thành vĩ đại qua từng giai đoạn!",
   },
+  newspaperPublisher: {
+    title: 'Chủ Bút Báo Quốc Ngữ',
+    text: "Chào mừng Chủ bút! Nhiệm vụ của bạn là lèo lái tờ báo qua giai đoạn khó khăn. Mỗi tuần, hãy chọn một bài viết để đăng. Mỗi lựa chọn sẽ ảnh hưởng đến Uy Tín (với độc giả), Ngân Sách (tài chính), và Nguy Cơ (với chính quyền). Sau khi chọn, bạn phải sắp chữ (gõ lại tiêu đề) thật chính xác để phát hành. Hãy cân bằng các chỉ số để tồn tại và hoàn thành sứ mệnh lịch sử này!",
+  },
   typesetting: {
       title: 'In báo Chữ Quốc Ngữ',
       text: "Kéo và thả các con chữ từ khay vào đúng vị trí trên khuôn in để tạo thành tít báo mẫu. Sắp xếp chính xác để hoàn thành bản in đầu tiên!",

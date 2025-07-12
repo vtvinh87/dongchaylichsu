@@ -1,0 +1,31 @@
+/* --- Puzzle Mission Update --- */
+#mission-timer {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #1f2937;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+.dark #mission-timer {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #f3f4f6;
+}
+#mission-timer.low-time {
+    color: #ef4444; /* red-500 */
+    transform: scale(1.1);
+    animation: pulse-red-timer 1s infinite;
+}
+
+#puzzle-container {
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/PuzzlePics/trong-dong.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}

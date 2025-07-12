@@ -1,0 +1,9 @@
+#construction-site {
+  border: 4px solid #854d0e; /* amber-800 */
+  box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+}
+
+#control-panel {
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}

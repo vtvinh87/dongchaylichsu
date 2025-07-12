@@ -1,0 +1,77 @@
+/* Naval Battle Screen */
+.naval-battle-area {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #4a2c13; /* Dark brown border */
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.trap-zone-indicator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(239, 68, 68, 0.2);
+  border-left: 2px dashed rgba(239, 68, 68, 0.8);
+  border-right: 2px dashed rgba(239, 68, 68, 0.8);
+  z-index: 1;
+}
+.enemy-ship-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 160px; /* Adjust size */
+  height: auto;
+  z-index: 2;
+  animation: ship-bob 3s ease-in-out infinite; /* Add bobbing animation */
+}
+
+@keyframes ship-bob {
+  0%, 100% { transform: translateY(-52%); }
+  50% { transform: translateY(-48%); }
+}
+
+.tide-bar-container {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  bottom: 10px;
+  width: 30px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 1px solid white;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column-reverse; /* Fill from bottom */
+  z-index: 3;
+}
+.tide-bar-fill {
+  width: 100%;
+  background: linear-gradient(to top, #0ea5e9, #67e8f9); /* sky-500 to cyan-200 */
+  border-radius: 9px;
+  transition: height 0.5s ease-in-out;
+}
+.naval-battle-controls {
+  margin-top: 1rem;
+}
+.attack-button {
+  padding: 1rem 2.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(145deg, #ef4444, #b91c1c); /* red-500 to red-800 */
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 5px 20px rgba(239, 68, 68, 0.4);
+  transition: all 0.3s ease-out;
+}
+.attack-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+}
+.attack-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

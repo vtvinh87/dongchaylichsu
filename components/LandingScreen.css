@@ -1,0 +1,178 @@
+/* --- CSS cho Landing Screen - The Curator's Desk --- */
+.landing-screen {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Simulates a dim, focused light on the desk */
+.landing-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.8) 80%);
+}
+
+.curators-desk {
+  position: relative;
+  width: 1000px;
+  height: 700px;
+  transform-style: preserve-3d;
+  perspective: 1500px;
+  animation: fadeInDesk 1.5s ease-out forwards;
+}
+
+@keyframes fadeInDesk {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.open-book {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  height: 600px;
+}
+
+.book-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(5px 10px 15px rgba(0,0,0,0.5));
+}
+
+/* Remove flex layout to allow absolute positioning of children */
+.book-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Center the logo and place it below the text layer */
+.logo-in-book {
+    position: absolute;
+    width: 230px;
+    height: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    opacity: 0; /* Starts hidden */
+    animation: fadeInLogo 1s ease-out 0.5s forwards;
+}
+
+@keyframes fadeInLogo {
+    from { opacity: 0; transform: translate(-50%, -40%); }
+    to { opacity: 0.9; transform: translate(-50%, -50%); }
+}
+
+/* Position text above the logo */
+.game-title {
+  position: absolute;
+  width: 100%;
+  top: 5%; /* Moved up from 30% */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  font-family: 'Dancing Script', cursive;
+  font-size: 4.5rem;
+  color: #ffffff;
+  text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+  margin: 0;
+  text-align: center;
+}
+
+.game-subtitle {
+  position: absolute;
+  width: 100%;
+  top: 20%; /* Moved up from 45% */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.25rem;
+  color: #ffffff;
+  margin: 0;
+  text-align: center;
+}
+
+/* Position button on the right page, above other elements */
+.start-button-container {
+  position: absolute;
+  bottom: 80px;
+  left: calc(50% + 65px);
+  width: 200px;
+  height: 150px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.start-magnifier {
+  width: 120px;
+  height: 120px;
+  filter: drop-shadow(3px 3px 5px rgba(0,0,0,0.4));
+  transition: transform 0.3s ease-out;
+  animation: pulse-magnifier 3s infinite ease-in-out;
+}
+
+/* Move text down slightly to avoid overlap */
+.start-text {
+  font-family: 'Special Elite', cursive;
+  font-size: 1.5rem;
+  color: #a16207;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+  margin-top: 0px; /* Reduced negative margin */
+  pointer-events: none;
+  transition: all 0.3s ease-out;
+}
+
+.start-button-container:hover .start-magnifier {
+  transform: scale(1.1) rotate(5deg);
+  animation-play-state: paused;
+}
+.start-button-container:hover .start-text {
+  color: #78350f;
+  text-shadow: 0 0 5px #fcd34d;
+}
+
+@keyframes pulse-magnifier {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .curators-desk {
+    transform: scale(0.8);
+  }
+}
+@media (max-width: 800px) {
+  .curators-desk {
+    transform: scale(0.65);
+  }
+}
+@media (max-width: 640px) {
+  .curators-desk {
+    transform: scale(0.5);
+  }
+  .game-title {
+      font-size: 4rem;
+  }
+}

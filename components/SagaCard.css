@@ -1,0 +1,25 @@
+/* --- CSS for Premium Locked Mission --- */
+.premium-locked-visuals {
+  border-color: #fbbf24; /* amber-400 */
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.6), 0 0 25px rgba(251, 191, 36, 0.4);
+  -webkit-animation: premium-glow 2.5s infinite alternate;
+  animation: premium-glow 2.5s infinite alternate;
+}
+.dark .premium-locked-visuals {
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.7), 0 0 25px rgba(251, 191, 36, 0.5);
+}
+
+@keyframes premium-glow {
+  from { box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+  to { box-shadow: 0 0 20px rgba(251, 191, 36, 0.8); }
+}
+
+.premium-locked-visuals .premium-crown {
+  content: '👑';
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  font-size: 28px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+  transform: rotate(15deg);
+}

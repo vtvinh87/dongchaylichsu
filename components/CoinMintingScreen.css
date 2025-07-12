@@ -1,0 +1,204 @@
+/* --- CSS cho Coin Minting Mini-game --- */
+.minting-stage-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 0.75rem;
+    position: relative;
+    color: white;
+}
+
+.minting-instructions {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    max-width: 600px;
+    text-shadow: 1px 1px 2px black;
+    text-align: center;
+}
+
+.minting-start-button {
+    background: linear-gradient(145deg, #fcd34d, #fbbf24);
+    color: #78350f;
+    font-size: 1.5rem;
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    font-weight: bold;
+    border: 2px solid #fefce8;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+}
+
+.char-mold {
+    width: 100px;
+    height: 100px;
+    background-color: #292524; /* stone-800 */
+    position: relative;
+    border: 2px solid #1c1917;
+}
+.char-mold.completed {
+    background-color: #166534; /* green-800 */
+    box-shadow: 0 0 15px #4ade80; /* green-400 */
+}
+.engraving-dot {
+    fill: #a1a1aa; /* stone-400 */
+    cursor: pointer;
+    transition: fill 0.2s;
+}
+.engraving-dot.clicked {
+    fill: #facc15; /* amber-400 */
+}
+.engraving-dot.next-dot {
+    fill: #fde047; /* yellow-200 */
+    animation: pulse-yellow-glow 1.5s infinite;
+}
+.engraving-line {
+    stroke: #facc15; /* amber-400 */
+    stroke-width: 4;
+    stroke-linecap: round;
+}
+
+#furnace-visual {
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/main/pictures/icon/icon-lo-luyen-kim.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: relative;
+}
+#furnace-visual.heating::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 50%;
+    background: radial-gradient(ellipse at bottom, #f97316, transparent 70%);
+    animation: flicker 0.2s infinite;
+}
+@keyframes flicker {
+    0% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+    50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+    100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+}
+#temp-gauge {
+    background-color: #1f2937; /* gray-800 */
+    border: 2px solid #4b5563;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+}
+#temp-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, #f87171, #facc15, #4ade80, #facc15, #f87171);
+    transition: height 0.1s linear;
+}
+#temp-green-zone {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background-color: rgba(34, 197, 94, 0.3);
+    border-top: 2px dashed #22c55e;
+    border-bottom: 2px dashed #22c55e;
+}
+#smelting-progress-bar {
+    width: 100%;
+    max-width: 500px;
+    height: 20px;
+    background-color: #4b5563;
+    border-radius: 10px;
+    margin-top: 1rem;
+}
+#smelting-progress-fill {
+    height: 100%;
+    background-color: #f59e0b;
+    border-radius: 10px;
+    transition: width 0.2s linear;
+}
+
+#bellows-container {
+    position: relative;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 0.5rem;
+    border: 2px dashed #a16207; /* amber-700 */
+    flex-shrink: 0;
+}
+
+.bellows-button {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #f97316, #ef4444); /* orange-500 to red-500 */
+    color: white;
+    line-height: 1;
+    font-weight: bold;
+    border: 3px solid #fefce8; /* amber-50 */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4), inset 0 -4px 8px rgba(0,0,0,0.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    transform: translate(-50%, -50%);
+    transition: all 0.2s ease-out;
+}
+
+.bellows-button:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 -4px 8px rgba(0,0,0,0.3), 0 0 15px #f97316;
+    background: linear-gradient(145deg, #fb923c, #f87171);
+}
+
+.bellows-button:active {
+    transform: translate(-50%, -50%) scale(1.05);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5), inset 0 -2px 5px rgba(0,0,0,0.3);
+}
+
+/* Casting Stage */
+#casting-bar {
+    width: 100%;
+    max-width: 600px;
+    height: 50px;
+    background-color: #4b5563; /* gray-600 */
+    border-radius: 10px;
+    position: relative;
+    border: 2px solid #1f2937;
+    overflow: hidden;
+    cursor: pointer;
+}
+#casting-sweet-spot {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(34, 197, 94, 0.5);
+}
+#casting-indicator {
+    position: absolute;
+    top: -5px;
+    bottom: -5px;
+    width: 8px;
+    background-color: #fefce8;
+    box-shadow: 0 0 8px white;
+    animation-name: move-casting-marker;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+@keyframes move-casting-marker {
+  from { left: 0%; }
+  to { left: calc(100% - 8px); }
+}
+
+.minting-hud {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px black;
+}

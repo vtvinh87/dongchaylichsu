@@ -1,0 +1,589 @@
+/* === DETECTIVE SCREEN STYLES (UPDATES & ADDITIONS) === */
+.detective-screen-container {
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    background-color: #3d3d3d; /* Fallback */
+}
+
+#detective-screen {
+    flex-grow: 1;
+    position: relative;
+    border-bottom: 4px solid #4a2c13; /* Dark brown border */
+    overflow: hidden;
+    display: flex;
+}
+
+#detective-screen .hidden.md\:block {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+}
+
+.npc-on-screen {
+    position: absolute;
+    cursor: pointer;
+    transition: transform 0.2s, filter 0.2s;
+}
+.npc-on-screen:not(.questioned) {
+    animation: pulse-yellow-glow 2.5s infinite alternate ease-in-out;
+}
+.npc-on-screen:hover:not(.questioned) {
+    transform: scale(1.1);
+}
+.npc-on-screen.questioned {
+    filter: grayscale(80%) opacity(0.7);
+    cursor: not-allowed;
+}
+.npc-on-screen img {
+    width: 200px;
+    height: auto;
+}
+
+.detective-mobile-view {
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+    overflow-y: auto;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+.detective-mobile-view::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+.detective-mobile-view > * {
+    position: relative; /* Make content appear above overlay */
+    z-index: 1;
+}
+
+.detective-mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.detective-mobile-npc-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: rgba(253, 246, 235, 0.8); /* beige color with transparency */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 2px solid #d6bda2;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.detective-mobile-npc-card:hover {
+    border-color: #c0ab8f;
+    transform: scale(1.02);
+}
+
+.detective-mobile-npc-card.questioned {
+    filter: grayscale(1);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.detective-mobile-npc-card .ask-button {
+    flex-shrink: 0;
+    background-color: #78350f; /* amber-800 */
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-weight: bold;
+}
+
+#detective-hud {
+    flex-shrink: 0;
+    padding: 0.75rem 1.5rem;
+    background-color: #3a2e20; /* Dark wood color */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.hud-info {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #fefce8; /* amber-50 */
+    background-color: rgba(0,0,0,0.3);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+}
+.hud-buttons {
+    display: flex;
+    gap: 0.75rem;
+}
+.hud-buttons button {
+    padding: 0.5rem 1rem;
+    background-color: #d6bda2;
+    color: #3a2e20;
+    border: 2px solid #5d4a36;
+    border-radius: 0.25rem;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+.hud-buttons button:hover:not(:disabled) {
+    background-color: #c0ab8f;
+    border-color: #3a2e20;
+}
+.hud-buttons button#hint-button {
+    background-color: #0c4a6e;
+    color: white;
+    border-color: #075985;
+}
+.hud-buttons button#hint-button:disabled {
+    background-color: #4b5563; /* gray-600 */
+    color: #d1d5db;
+    cursor: not-allowed;
+}
+
+
+.npc-dialogue-box {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 500px;
+    background-color: #fdf6e3;
+    border: 2px solid #5d4a36;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    z-index: 10;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: fadeInScaleUp 0.3s forwards;
+}
+.dialogue-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px dashed #5d4a36;
+    padding-bottom: 0.5rem;
+}
+.dialogue-header h4 {
+    font-family: 'Special Elite', cursive;
+    font-size: 1.25rem;
+    color: #5d4a36;
+}
+.dialogue-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #5d4a36;
+    object-fit: cover;
+}
+
+.dialogue-text {
+    font-family: 'Nunito', sans-serif;
+    color: #333;
+    margin-bottom: 1rem;
+}
+.dialogue-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+.dialogue-actions button {
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: bold;
+    background-color: #d6bda2;
+    color: #3a2e20;
+    border: 2px solid #5d4a36;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.dialogue-actions button:hover {
+    background-color: #c0ab8f;
+    border-color: #3a2e20;
+}
+
+.detective-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0,0,0,0.7);
+    backdrop-filter: blur(5px);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.detective-modal-content {
+    background-color: #fdf6e3;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    border: 4px solid #3a2e20;
+    position: relative;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+#notebook-modal {
+    width: 90%;
+    max-width: 600px;
+    position: absolute; /* Changed to absolute for centering */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+#deduction-board-modal {
+    width: 95%;
+    max-width: 1200px;
+    justify-content: center; /* Center horizontally */
+    margin: 0 auto; /* Center in the overlay */
+}
+#notebook-title, #deduction-board-title {
+    font-family: 'Special Elite', cursive;
+    font-size: 2rem;
+    text-align: center;
+    color: #5d4a36;
+    margin-bottom: 1rem;
+}
+.modal-close-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #5d4a36;
+}
+.modal-close-button:hover {
+    color: #3a2e20;
+}
+
+/* Notebook Styles */
+#clues-list {
+    overflow-y: auto;
+    max-height: 60vh;
+    padding: 0.5rem;
+    background-color: rgba(0,0,0,0.05);
+    border-radius: 0.25rem;
+}
+.clue-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: #fff9ed;
+    border: 1px solid #e2d8c7;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.clue-item.selected-clue {
+    background-color: #fcd34d;
+    border-color: #78350f;
+}
+.clue-item.contradiction-source {
+    animation: pulse-yellow-glow 1.5s infinite;
+}
+.clue-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+.clue-item p, .clue-item span {
+    font-family: 'Nunito', sans-serif;
+    color: #333;
+}
+
+/* Deduction Board Styles */
+#suspects-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.suspect-area {
+    background-color: #e2d8c7;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    text-align: center;
+}
+.suspect-portrait {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #5d4a36;
+    margin: 0 auto 0.5rem;
+}
+.suspect-area h4 {
+    font-family: 'Special Elite', cursive;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+.evidence-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.evidence-slot {
+    min-height: 50px;
+    background-color: rgba(0,0,0,0.1);
+    border: 2px dashed #856a4e;
+    border-radius: 0.25rem;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+.evidence-slot:hover {
+    background-color: rgba(0,0,0,0.15);
+}
+.evidence-slot.drag-over {
+    background-color: rgba(59, 130, 246, 0.3);
+    border-color: #3b82f6;
+}
+.evidence-slot .clue-item {
+    cursor: grab;
+}
+
+#evidence-pool-container {
+    background-color: #d6bda2;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+}
+#evidence-pool-container h4 {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+#evidence-pool {
+    min-height: 100px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    gap: 0.5rem;
+    background-color: rgba(0,0,0,0.1);
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+}
+.clue-icon-in-pool {
+    width: 50px;
+    height: 50px;
+    padding: 4px;
+    background-color: #fff9ed;
+    border: 1px solid #e2d8c7;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.clue-icon-in-pool:hover {
+    transform: scale(1.1);
+    background-color: #fefce8;
+}
+.clue-icon-in-pool.selected-for-placement {
+    outline: 3px solid #3b82f6;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px #3b82f6;
+}
+
+#deduction-controls {
+    text-align: center;
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+}
+#deduction-controls button {
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+#deduction-controls .accuse-button {
+     background-color: #dc2626;
+}
+#deduction-controls .hint-button {
+    background-color: #2563eb;
+}
+#deduction-controls .hint-button:disabled {
+    background-color: #6b7280;
+    cursor: not-allowed;
+}
+
+.detective-result-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 15;
+    color: white;
+    text-align: center;
+    animation: fadeInScaleUp 0.5s forwards;
+}
+.result-win {
+    background-color: rgba(22, 163, 74, 0.8);
+}
+.result-loss {
+    background-color: rgba(185, 28, 28, 0.8);
+}
+.detective-result-overlay h2 {
+    font-size: 3rem;
+    font-weight: bold;
+    text-shadow: 0 2px 4px black;
+}
+#final-score {
+    font-size: 4rem;
+    font-weight: bold;
+    color: #fcd34d;
+}
+
+.clue-inspector-modal {
+    background-color: #fefce8;
+    color: #3a2e20;
+    border: 3px solid #78350f;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    animation: fadeInScaleUp 0.3s forwards;
+    width: 90%;
+    max-width: 350px;
+}
+.clue-inspector-modal p {
+    color: #5d4a36;
+}
+.clue-inspector-modal .clue-item {
+    cursor: grab;
+    background: transparent;
+    border: none;
+    margin-bottom: 0.5rem;
+}
+.clue-inspector-modal .actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+.clue-inspector-modal button {
+    flex-grow: 1;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.clue-inspector-modal .btn-close {
+    background-color: #d6bda2;
+    color: #3a2e20;
+    border: 2px solid #5d4a36;
+}
+.clue-inspector-modal .btn-close:hover {
+    background-color: #c0ab8f;
+    border-color: #3a2e20;
+}
+.clue-inspector-modal .btn-select {
+    background-color: #3b82f6; /* blue-600 */
+    color: white;
+    border: 2px solid #2563eb; /* blue-700 */
+}
+.clue-inspector-modal .btn-select:hover {
+    background-color: #2563eb;
+}
+
+.clue-collection-modal {
+    width: 90%;
+    max-width: 500px;
+}
+.clue-collection-modal hr {
+    border: none;
+    border-top: 1px dashed #c0ab8f;
+    margin: 1rem 0;
+}
+.clue-collection-modal h4 {
+    font-family: 'Special Elite', cursive;
+    color: #78350f;
+    margin-bottom: 0.5rem;
+}
+.clue-collection-modal .flavor-text {
+    font-style: italic;
+    color: #5d4a36;
+}
+.clue-collection-modal .clue-item {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+.clue-collection-modal .dialogue-actions {
+    margin-top: 1rem;
+}
+
+.profession-info-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #e2d8c7;
+    color: #5d4a36;
+    border: 1px solid #5d4a36;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-weight: bold;
+    font-style: italic;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: all 0.2s;
+    animation: pulse-yellow-glow 2.5s infinite alternate ease-in-out;
+}
+.profession-info-button:hover {
+    background: #c0ab8f;
+    transform: scale(1.1);
+}
+
+.profession-info-modal {
+    background-color: #fdf6e3;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border: 4px solid #3a2e20;
+    max-width: 500px;
+}
+.profession-info-modal h3 {
+    font-family: 'Special Elite', cursive;
+    color: #5d4a36;
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+.profession-info-modal p {
+    font-family: 'Nunito', sans-serif;
+    color: #333;
+    text-align: left;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+.profession-info-modal button {
+    display: block;
+    margin: 1rem auto 0;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: bold;
+    background-color: #d6bda2;
+    color: #3a2e20;
+    border: 2px solid #5d4a36;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.profession-info-modal button:hover {
+    background-color: #c0ab8f;
+    border-color: #3a2e20;
+}

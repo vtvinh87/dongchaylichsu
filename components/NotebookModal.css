@@ -1,0 +1,83 @@
+/* --- CSS cho Notebook Modal --- */
+#notebook-modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 1rem;
+}
+
+#notebook-container {
+    width: 100%;
+    max-width: 900px;
+    aspect-ratio: 16/10;
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-so-tay.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    position: relative;
+    padding: 5% 7%;
+}
+
+.notebook-page {
+    flex-basis: 50%;
+    padding: 1.5rem 2rem;
+    overflow-y: auto;
+    font-family: 'Dancing Script', cursive;
+    color: #3a2e20;
+    font-size: 1.5rem;
+    line-height: 2.0;
+    white-space: pre-wrap;
+}
+
+#left-page {
+    border-right: 1px dashed rgba(0,0,0,0.1);
+}
+
+.notebook-controls {
+    position: absolute;
+    bottom: 2%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.notebook-controls button, #close-notebook-button {
+    background-color: #854d0e; /* amber-800 */
+    color: white;
+    border: 2px solid #eab308; /* yellow-500 */
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+.notebook-controls button:hover:not(:disabled) {
+    background-color: #a16207; /* amber-700 */
+}
+.notebook-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#close-notebook-button {
+    position: absolute;
+    top: 2%;
+    right: 2%;
+    padding: 0.25rem 1rem;
+}
+
+#notebook-page-indicator {
+  font-family: 'Nunito', sans-serif;
+  font-weight: bold;
+  color: #3a2e20;
+}

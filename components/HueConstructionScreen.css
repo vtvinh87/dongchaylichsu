@@ -1,4 +1,4 @@
-/* hue-construction-game.css */
+/* hue-construction-game.css -> HueConstructionScreen.css */
 
 .text-shadow-glow {
     text-shadow: 0 0 5px #fef08a, 0 0 10px #fde047;
@@ -534,15 +534,6 @@
 
 .secret-letter:hover {
     transform: scale(1.15);
-}
-
-@keyframes pulse-glow {
-    from {
-        filter: drop-shadow(0 0 5px #fde047);
-    }
-    to {
-        filter: drop-shadow(0 0 15px #fef08a);
-    }
 }
 
 @keyframes fadeInLetter {

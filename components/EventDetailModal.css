@@ -1,0 +1,35 @@
+#event-detail-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 1rem;
+  animation: fadeInScreen 0.3s forwards;
+}
+#event-detail-modal-content {
+  background-color: #fef3c7; /* amber-100 */
+  color: #78350f; /* amber-800 */
+  padding: 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  border: 3px solid #fcd34d; /* amber-300 */
+  max-width: 500px;
+  text-align: center;
+  position: relative;
+}
+.dark #event-detail-modal-content {
+    background-color: #44403c; /* stone-700 */
+    color: #fef3c7; /* amber-100 */
+    border-color: #f59e0b; /* amber-500 */
+}
+#event-detail-modal-content img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    aspect-ratio: 1 / 1;
+}

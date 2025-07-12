@@ -1,0 +1,52 @@
+/* --- CSS cho Timeline Mission Mới --- */
+#timeline-timer {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #1f2937;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+.dark #timeline-timer {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #f3f4f6;
+}
+
+#timeline-timer.low-time {
+    color: #ef4444; /* red-500 */
+    transform: scale(1.1);
+    animation: pulse-red-timer 1s infinite;
+}
+
+.event-card-with-image {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
+}
+
+.event-card-with-image img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 0.25rem;
+    border: 1px solid rgba(0,0,0,0.1);
+    pointer-events: none; /* Make image non-draggable */
+}
+
+.timeline-slot-with-image {
+    padding: 0.5rem;
+}
+.timeline-slot-with-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.375rem;
+}

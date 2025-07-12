@@ -1,0 +1,86 @@
+/* Admin Dashboard Styles */
+.tab-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    color: #6b7280;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+.dark .tab-button {
+    color: #9ca3af;
+}
+.tab-button:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+.dark .tab-button:hover {
+    background-color: rgba(255,255,255,0.05);
+}
+.tab-button.active {
+    color: #1d4ed8;
+    border-bottom-color: #2563eb;
+}
+.dark .tab-button.active {
+    color: #60a5fa;
+    border-bottom-color: #60a5fa;
+}
+
+.summary-card {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+.dark .summary-card {
+    background-color: #1f2937; /* gray-800 */
+}
+.summary-card h4 {
+    color: #4b5563; /* gray-600 */
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+.dark .summary-card h4 {
+    color: #9ca3af; /* gray-400 */
+}
+.summary-card p {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #111827; /* gray-900 */
+}
+.dark .summary-card p {
+    color: #f9fafb; /* gray-50 */
+}
+.chart-container {
+    position: relative;
+    height: 400px;
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+.dark .chart-container {
+    background-color: #1f2937; /* gray-800 */
+}
+.th-cell {
+    padding: 0.75rem 1.5rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4b5563;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.dark .th-cell {
+    color: #9ca3af;
+}
+.td-cell {
+    padding: 1rem 1.5rem;
+    white-space: nowrap;
+    color: #374151;
+}
+.dark .td-cell {
+    color: #d1d5db;
+}

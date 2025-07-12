@@ -1,5 +1,5 @@
 // constants/missions.ts
-import { MissionData, DetectiveMissionData, RallyCallMissionData, TacticalBattleMissionData } from '../types';
+import { MissionData, DetectiveMissionData, RallyCallMissionData, TacticalBattleMissionData, NewspaperPublisherMissionData } from '../types';
 import * as Items from './items';
 import * as ImageUrls from '../imageUrls';
 
@@ -573,14 +573,80 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
         3: { title: "Giai Đoạn 3: Tưởng Vọng Tiên Tổ", text: "Muôn tâu, đại sự sắp thành! Giờ là lúc xây dựng Thế Tổ Miếu để thờ các vị vua triều Nguyễn, cùng với Hiển Lâm Các và Cửu Đỉnh để ghi nhớ công đức, thể hiện sự trường tồn của vương triều." },
     }
   },
-  'quoc-ngu-typesetting': {
-    type: 'typesetting',
-    id: 'quoc-ngu-typesetting',
-    title: 'In báo Chữ Quốc Ngữ',
-    targetText: 'ĐỘC LẬP TỰ DO',
-    availableLetters: ['Đ', 'Ộ', 'C', 'L', 'Ậ', 'P', 'T', 'Ự', 'D', 'O', 'A', 'N', 'H', 'G', 'Ê', 'M'],
+  'chu-but-bao-quoc-ngu': {
+    type: 'newspaperPublisher',
+    id: 'chu-but-bao-quoc-ngu',
+    title: 'Chủ Bút Báo Quốc Ngữ',
     reward: { id: Items.GIA_DINH_BAO_ARTIFACT_ID, type: 'artifact' },
-  },
+    durationInWeeks: 12,
+    initialStats: { uyTin: 50, nganSach: 200, nguyCo: 10 },
+    maxStats: { uyTin: 100, nganSach: 500, nguyCo: 100 },
+    typesettingTimeLimit: 30, // seconds
+    upgrades: [
+        { id: 'phong_vien_dieu_tra', name: 'Thuê Phóng viên Điều tra', description: 'Mở khóa các lựa chọn bài viết "Phóng sự Điều tra" độc quyền, mang lại nhiều Uy Tín hơn.', cost: 100 },
+        { id: 'hoa_si_biem_hoa', name: 'Thuê Họa sĩ Biếm họa', description: 'Thêm các bức tranh biếm họa vào tờ báo, giúp tăng mạnh Uy Tín nhưng cũng tăng Nguy Cơ.', cost: 80 },
+        { id: 'may_in_tot_hon', name: 'Nâng cấp Máy in', description: 'Giảm độ khó của mini-game Sắp chữ, tăng thời gian cho phép lên 45 giây.', cost: 150 },
+    ],
+    specialArticleChoices: [
+        { headline: 'Phóng sự: Tệ nạn thuốc phiện trong giới lao động', description: 'Phơi bày góc khuất xã hội, tăng uy tín mạnh nhưng có thể bị kiểm duyệt.', effects: { uyTin: 30, nganSach: 20, nguyCo: 25 }, isSpecial: true, requiredUpgrade: 'phong_vien_dieu_tra'},
+        { headline: 'Biếm họa: "Quan lớn và Chiếc ô"', description: 'Bức tranh châm biếm sâu cay về một viên quan Pháp. Rất nguy hiểm!', effects: { uyTin: 35, nganSach: 10, nguyCo: 50 }, isSpecial: true, requiredUpgrade: 'hoa_si_biem_hoa'},
+    ],
+    weeklyArticleChoices: [
+        // Week 1
+        [
+            { headline: 'Thông báo lịch tàu bè đến Cảng Sài Gòn', description: 'Tin tức an toàn, hữu ích cho giới thương nhân.', effects: { uyTin: 5, nganSach: 10, nguyCo: -10 } },
+            { headline: 'Kêu gọi giữ gìn vệ sinh đường phố', description: 'Bài viết có ích cho xã hội, được lòng dân chúng.', effects: { uyTin: 15, nganSach: 20, nguyCo: 5 } },
+            { headline: 'Ca ngợi vẻ đẹp và sự trong sáng của Tiếng Việt', description: 'Một bài viết khơi gợi lòng tự tôn dân tộc một cách nhẹ nhàng.', effects: { uyTin: 25, nganSach: 15, nguyCo: 20 } }
+        ],
+        // ... add more weeks up to week 11
+        [
+            { headline: 'Giá cả các mặt hàng tại chợ Bến Thành', description: 'Thông tin thiết thực, giúp bình ổn giá.', effects: { uyTin: 10, nganSach: 15, nguyCo: -5 } },
+            { headline: 'Phóng sự về một vụ cháy, kêu gọi quyên góp', description: 'Thể hiện vai trò xã hội của tờ báo, tăng uy tín mạnh.', effects: { uyTin: 25, nganSach: 25, nguyCo: 10 } },
+            { headline: 'In một bài thơ của Nguyễn Đình Chiểu', description: 'Văn chương yêu nước có thể khiến chính quyền để ý.', effects: { uyTin: 35, nganSach: 20, nguyCo: 30 } }
+        ],
+        [
+            { headline: 'Tin tức từ Pháp quốc và Âu châu', description: 'Dịch lại các tin tức an toàn từ báo Pháp.', effects: { uyTin: 5, nganSach: 10, nguyCo: -15 } },
+            { headline: 'Phê phán tệ nạn cờ bạc trong dân chúng', description: 'Bài viết gai góc, có thể động chạm nhưng được lòng người có học.', effects: { uyTin: 20, nganSach: 15, nguyCo: 15 } },
+            { headline: 'Bàn về Tinh thần bất khuất của Hai Bà Trưng', description: 'Chủ đề nhạy cảm, có thể bị xem là kích động.', effects: { uyTin: 40, nganSach: 20, nguyCo: 45 } }
+        ],
+        [
+            { headline: 'Quảng cáo cho một hiệu buôn mới mở', description: 'Một nguồn thu nhập an toàn cho tờ báo.', effects: { uyTin: -5, nganSach: 50, nguyCo: -5 } },
+            { headline: 'Giới thiệu một phương thuốc dân gian chữa bệnh thông thường', description: 'Bài viết hữu ích, giúp tăng lượng độc giả trong dân chúng.', effects: { uyTin: 20, nganSach: 20, nguyCo: 5 } },
+            { headline: 'Trích đăng "Bình Ngô Đại Cáo"', description: 'Một tác phẩm kinh điển, nhưng có thể bị diễn giải là chống đối.', effects: { uyTin: 45, nganSach: 25, nguyCo: 60 } }
+        ]
+    ],
+    specialEvents: [
+        {
+            id: 'lu-lut-sai-gon',
+            triggerAfterWeek: 3,
+            title: 'Sự kiện Đặc biệt: Lũ lụt Sài Gòn',
+            stages: [
+                {
+                    prompt: 'Một trận lụt lớn chưa từng thấy đã tàn phá các vùng lân cận Sài Gòn! Quý báo có muốn thực hiện một tuyến bài điều tra dài 2 kỳ về vấn đề này không?',
+                    choices: [
+                        { text: 'Thực hiện tuyến bài', effects: {} },
+                        { text: 'Bỏ qua, tập trung vào tin tức khác', effects: {} }
+                    ]
+                },
+                {
+                    prompt: 'Kỳ 1: Bạn muốn tập trung vào khía cạnh nào của thảm họa?',
+                    choices: [
+                        { text: 'Phóng sự về những thiệt hại tang thương', effects: { uyTin: 25, nguyCo: 5 }, historicalNote: 'Báo chí thời kỳ này bắt đầu có vai trò quan trọng trong việc phản ánh đời sống xã hội.' },
+                        { text: 'Chất vấn về công tác phòng chống lụt bão của chính quyền', effects: { uyTin: 20, nguyCo: 30 }, historicalNote: 'Việc chất vấn chính quyền là một hành động dũng cảm nhưng đầy rủi ro cho các nhà báo.' }
+                    ]
+                },
+                {
+                    prompt: 'Kỳ 2: Sau bài báo đầu tiên, bạn sẽ làm gì tiếp theo?',
+                    choices: [
+                        { text: 'Kêu gọi người dân quyên góp cho nạn nhân', effects: { uyTin: 30, nganSach: 40 }, historicalNote: 'Báo chí trở thành cầu nối, huy động sự tương trợ trong cộng đồng.' },
+                        { text: 'Vạch trần sự chậm trễ của bộ máy công quyền', effects: { uyTin: 10, nguyCo: 50 }, historicalNote: 'Những bài báo chỉ trích trực diện có thể dẫn đến việc tờ báo bị đóng cửa.' }
+                    ],
+                    isTerminal: true,
+                }
+            ]
+        }
+    ]
+  } as NewspaperPublisherMissionData,
   'dong-du-adventure-puzzle': {
     type: 'adventurePuzzle',
     id: 'dong-du-adventure-puzzle',
@@ -717,7 +783,7 @@ export const ALL_MISSIONS: Record<string, MissionData> = {
   'bach-dang-naval-battle': {
       type: 'navalBattle',
       id: 'bach-dang-naval-battle',
-      title: 'Đại Phá Quân Nam Hán',
+      title: 'Đại phá quân Nam Hán',
       backgroundUrl: ImageUrls.BG_LANE_BATTLE_URL,
       enemyShipIconUrl: ImageUrls.ENEMY_SHIP_ICON_URL,
       trapZone: { start: 40, end: 70 }, // 40% to 70% of the screen width

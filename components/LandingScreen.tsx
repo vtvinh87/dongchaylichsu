@@ -1,31 +1,43 @@
-import React, { useEffect } from 'react';
-import { LANDING_PAGE_BACKGROUND_URL, LOGO_FULL_URL } from '../imageUrls';
+import React from 'react';
+
+// New image URLs for the enhanced landing page
+const DESK_BG_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-ban-go.png';
+const OPEN_BOOK_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-sach-mo.png';
+const MAGNIFYING_GLASS_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-kinh-lup.png';
+const LOGO_FULL_URL = 'https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Logo/Logo-full.png';
+
 
 interface LandingScreenProps {
   onStartAdventure: () => void;
 }
 
 const LandingScreen: React.FC<LandingScreenProps> = ({ onStartAdventure }) => {
-  useEffect(() => {
-    // This effect can be used for any logic specific to when the landing screen is mounted.
-    // For now, it's a good place to ensure the theme is correctly applied if needed, though
-    // App.tsx handles the global theme.
-  }, []);
-
   return (
     <div
       className="landing-screen"
-      style={{ backgroundImage: `url('${LANDING_PAGE_BACKGROUND_URL}')` }}
+      style={{ backgroundImage: `url('${DESK_BG_URL}')` }}
     >
-      <div className="landing-content">
-        <img src={LOGO_FULL_URL} alt="Dòng Chảy Lịch Sử Logo" className="app-logo" />
-        <h2 className="text-amber-200">Cuộc Phiêu Lưu Khám Phá Lịch Sử Việt Nam!</h2>
-        <button
-          id="start-adventure-button"
-          onClick={onStartAdventure}
-        >
-          Bắt đầu Khám phá
-        </button>
+      <div className="curators-desk">
+        
+        {/* The central open book */}
+        <div className="open-book">
+          <img src={OPEN_BOOK_URL} alt="Open Book" className="book-image" />
+          <div className="book-content">
+            <img src={LOGO_FULL_URL} alt="Dòng Chảy Lịch Sử Logo" className="logo-in-book" />
+            <h1 className="game-title">Dòng Chảy Lịch Sử</h1>
+            <p className="game-subtitle">Khám phá những câu chuyện ẩn giấu</p>
+            
+            <button
+              className="start-button-container"
+              onClick={onStartAdventure}
+              aria-label="Bắt đầu Khám phá"
+            >
+              <img src={MAGNIFYING_GLASS_URL} alt="Khám phá" className="start-magnifier" />
+              <span className="start-text">Bắt đầu Khám phá</span>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   );

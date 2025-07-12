@@ -29,7 +29,7 @@ export enum Screen {
   STRATEGY_MAP_MISSION_SCREEN, // New screen for the strategy map game
   COIN_MINTING_MISSION_SCREEN, // New screen for the coin minting game
   HUE_CONSTRUCTION_MISSION_SCREEN, // New screen for the Hue city construction game
-  TYPESETTING_MISSION_SCREEN, // New screen for the typesetting game
+  NEWSPAPER_PUBLISHER_SCREEN, // New screen for the new newspaper game
   ADVENTURE_PUZZLE_SCREEN,
   STRATEGIC_PATH_MISSION_SCREEN,
   CONSTRUCTION_PUZZLE_SCREEN, // New screen for the block puzzle game
@@ -38,6 +38,7 @@ export enum Screen {
   ADMIN_DASHBOARD, // New screen for the admin panel
   STRATEGIC_MARCH_MISSION_SCREEN, // New screen for the march game
   TACTICAL_BATTLE_SCREEN, // New screen for the final battle of Tay Son campaign
+  TYPESETTING_SCREEN,
 }
 
 export interface Point {
@@ -455,11 +456,66 @@ export interface HueConstructionMissionData extends BaseMissionData {
   advisorTips: Record<number, { title: string; text: string }>;
 }
 
+export interface ArticleChoice {
+    headline: string;
+    description: string;
+    effects: {
+        uyTin: number;
+        nganSach: number;
+        nguyCo: number;
+    };
+    isSpecial?: boolean;
+    requiredUpgrade?: string; // ID of upgrade
+}
 
-export interface TypesettingMissionData extends BaseMissionData {
-  type: 'typesetting';
-  targetText: string;
-  availableLetters: string[];
+export interface UpgradeDefinition {
+    id: string;
+    name: string;
+    description: string;
+    cost: number;
+}
+
+export interface SpecialEventChoice {
+    text: string;
+    effects: {
+        uyTin?: number;
+        nganSach?: number;
+        nguyCo?: number;
+    };
+    historicalNote?: string;
+}
+
+export interface SpecialEventStage {
+    prompt: string;
+    choices: SpecialEventChoice[];
+    isTerminal?: boolean;
+}
+
+export interface SpecialEvent {
+    id: string;
+    triggerAfterWeek: number;
+    title: string;
+    stages: SpecialEventStage[];
+}
+
+export interface NewspaperPublisherMissionData extends BaseMissionData {
+    type: 'newspaperPublisher';
+    durationInWeeks: number;
+    initialStats: {
+        uyTin: number;
+        nganSach: number;
+        nguyCo: number;
+    };
+    maxStats: {
+        uyTin: number;
+        nganSach: number;
+        nguyCo: number;
+    };
+    typesettingTimeLimit: number;
+    weeklyArticleChoices: ArticleChoice[][]; // Array of weeks, each week is an array of choices
+    upgrades: UpgradeDefinition[];
+    specialArticleChoices: ArticleChoice[];
+    specialEvents: SpecialEvent[];
 }
 
 export interface AdventurePuzzleRiddle {
@@ -510,6 +566,12 @@ export interface LaneBattleMissionData extends BaseMissionData {
   type: 'laneBattle';
   duration: number;
   defensePoints: number;
+}
+
+export interface TypesettingMissionData extends BaseMissionData {
+    type: 'typesetting';
+    targetText: string;
+    availableLetters: string[];
 }
 
 // --- New Strategic March Types ---
@@ -603,14 +665,15 @@ export type MissionData =
   | StrategyMapMissionData
   | CoinMintingMissionData
   | HueConstructionMissionData
-  | TypesettingMissionData
+  | NewspaperPublisherMissionData
   | AdventurePuzzleMissionData
   | StrategicPathMissionData
   | ConstructionPuzzleMissionData
   | NavalBattleMissionData
   | LaneBattleMissionData
   | StrategicMarchMissionData
-  | TacticalBattleMissionData;
+  | TacticalBattleMissionData
+  | TypesettingMissionData;
 
 // --- Player & Game State Types ---
 

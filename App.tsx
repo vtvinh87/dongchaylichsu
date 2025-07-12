@@ -1,3 +1,5 @@
+
+
 import React, { useState, useCallback, useEffect, useMemo, useLayoutEffect, useRef } from 'react';
 import LoginScreen from './components/LoginScreen';
 import MainInterface from './components/MainInterface';
@@ -36,7 +38,7 @@ import StrategyMapScreen from './components/StrategyMapScreen'; // Import Strate
 import StrategicMarchScreen from './components/StrategicMarchScreen'; // Import Strategic March Screen
 import CoinMintingScreen from './components/CoinMintingScreen'; // Import CoinMinting Screen
 import HueConstructionScreen from './components/HueConstructionScreen'; // Import Hue Construction Screen
-import TypesettingScreen from './components/TypesettingScreen'; // Import Typesetting Screen
+import NewspaperPublisherScreen from './components/NewspaperPublisherScreen'; // Import new screen
 import AdventurePuzzleScreen from './components/AdventurePuzzleScreen';
 import StrategicPathScreen from './components/StrategicPathScreen';
 import ConstructionPuzzleScreen from './components/ConstructionPuzzleScreen';
@@ -45,7 +47,7 @@ import LaneBattleScreen from './components/LaneBattleScreen';
 import DialogueModal from './components/DialogueModal';
 import AdminDashboard from './components/AdminDashboard'; // Import Admin Dashboard
 import { GoogleGenAI } from "@google/genai";
-import { Screen, Artifact, MissionInfo, HeroCard, MissionData, PuzzleMissionData, NarrativeMissionData, TimelineMissionData, ARMissionData, HiddenObjectMissionData, LeaderboardEntry, AiCharacter, Decoration, QuizMissionData, ConstructionMissionData, Tutorial, SavedGameState, AvatarCustomization, CustomizationItem, DiplomacyMissionData, Reward, MemoryFragment, DetectiveMissionData, ColoringMissionData, RhythmMissionData, SandboxState, SandboxBackground, Achievement, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingMissionData, HueConstructionMissionData, TypesettingMissionData, AdventurePuzzleMissionData, StrategicPathMissionData, DialogueEntry, ActiveSideQuestState, DialogueOption, NotebookUnlockEvent, ConstructionPuzzleMissionData, NavalBattleMissionData, HichPuzzleData, LaneBattleMissionData, NotebookPage, QuizQuestion, BachDangCampaignState, PlayEvent, ConfigOverrides, StrategicMarchMissionData, TacticalBattleMissionData, TaySonCampaignState } from './types';
+import { Screen, Artifact, MissionInfo, HeroCard, MissionData, PuzzleMissionData, NarrativeMissionData, TimelineMissionData, ARMissionData, HiddenObjectMissionData, LeaderboardEntry, AiCharacter, Decoration, QuizMissionData, ConstructionMissionData, Tutorial, SavedGameState, AvatarCustomization, CustomizationItem, DiplomacyMissionData, Reward, MemoryFragment, DetectiveMissionData, ColoringMissionData, RhythmMissionData, SandboxState, SandboxBackground, Achievement, RallyCallMissionData, ForgingMissionData, QuestChain, TacticalMapMissionData, DefenseMissionData, StrategyMapMissionData, CoinMintingMissionData, HueConstructionMissionData, NewspaperPublisherMissionData, AdventurePuzzleMissionData, StrategicPathMissionData, DialogueEntry, ActiveSideQuestState, DialogueOption, NotebookUnlockEvent, ConstructionPuzzleMissionData, NavalBattleMissionData, HichPuzzleData, LaneBattleMissionData, NotebookPage, QuizQuestion, BachDangCampaignState, PlayEvent, ConfigOverrides, StrategicMarchMissionData, TacticalBattleMissionData, TaySonCampaignState } from './types';
 import { 
   HOI_DATA, ALL_MISSIONS, APP_NAME, ALL_HERO_CARDS,
   LEADERBOARD_LOCAL_STORAGE_KEY,
@@ -53,6 +55,46 @@ import {
 } from './constants';
 import { BACKGROUND_IMAGE_URL } from './imageUrls';
 import { initializeAudio, playSound, playMusic, stopMusic, toggleAudio, getIsSoundEnabled } from './utils/audio';
+
+// --- CSS Imports ---
+import './index.css';
+import './components/LandingScreen.css';
+import './components/MainInterface.css';
+import './components/AdminDashboard.css';
+import './components/ArScreenComponent.css';
+import './components/SagaCard.css';
+import './components/TutorialOverlay.css';
+import './components/AdventurePuzzleScreen.css';
+import './components/StrategicPathScreen.css';
+import './components/NotebookModal.css';
+import './components/DialogueModal.css';
+import './components/MissionScreen.css';
+import './components/TimelineMissionScreen.css';
+import './components/EventDetailModal.css';
+import './components/RallyCallScreen.css';
+import './components/NavalBattleScreen.css';
+import './components/DefenseScreen.css';
+import './components/Chatbot.css';
+import './components/ForgingScreen.css';
+import './components/QuestChainScreen.css';
+import './components/TacticalBattleScreen.css';
+import './components/NewspaperPublisherScreen.css'; // Import new CSS
+import './components/QuizScreen.css';
+import './components/DiplomacyScreen.css';
+import './components/DetectiveScreen.css';
+import './components/AchievementToast.css';
+import './components/CoinMintingScreen.css';
+import './components/HueConstructionScreen.css';
+import './components/TradingScreen.css'; // Assume this will be created
+import './components/RhythmScreen.css'; // Assume this will be created
+import './components/LaneBattleScreen.css'; // Assume this will be created
+import './components/StrategyMapScreen.css'; // Assume this will be created
+import './components/ColoringScreen.css'; // Assume this will be created
+import './components/ConstructionPuzzleScreen.css'; // Assume this will be created
+import './components/ConstructionScreen.css'; // Assume this will be created
+import './components/HiddenObjectScreen.css'; // Assume this will be created
+import './components/TacticalMapScreen.css'; // Assume this will be created
+import './components/StrategicMarchScreen.css'; // Assume this will be created
 
 const LOCAL_STORAGE_KEY = 'dongChayLichSu_gameState_v1';
 const THEME_STORAGE_KEY = 'dongChayLichSu_theme_v1';
@@ -218,20 +260,16 @@ export const App: React.FC = () => {
     }
     
     switch (currentScreen) {
-        case Screen.MAIN_INTERFACE:
-        case Screen.LEADERBOARD:
-        case Screen.CUSTOMIZATION:
-        case Screen.ACHIEVEMENTS:
-        case Screen.CRAFTING_SCREEN:
-        case Screen.SANDBOX:
-        case Screen.ADMIN_DASHBOARD:
-            playMusic('bgm_museum');
-            break;
         case Screen.STRATEGIC_PATH_MISSION_SCREEN:
             playMusic('bgm_truong_son');
             break;
+        case Screen.LANDING_PAGE:
+        case Screen.LOGIN:
+            stopMusic();
+            break;
         default:
-            stopMusic(); // Stop music for most other mission screens
+            playMusic('bgm_museum'); // Default music for main interface and most mini-games
+            break;
     }
   }, [currentScreen, isSoundEnabled]);
 
@@ -277,7 +315,7 @@ export const App: React.FC = () => {
         }
     }
 
-    const nonStandardNavScreens = [Screen.AR_MISSION_SCREEN, Screen.PREMIUM_SCREEN, Screen.SANDBOX, Screen.HIDDEN_OBJECT_SCREEN, Screen.QUIZ_MISSION_SCREEN, Screen.CONSTRUCTION_MISSION_SCREEN, Screen.DIPLOMACY_MISSION_SCREEN, Screen.CUSTOMIZATION, Screen.CRAFTING_SCREEN, Screen.DETECTIVE_SCREEN, Screen.COLORING_MISSION_SCREEN, Screen.RHYTHM_MISSION_SCREEN, Screen.ACHIEVEMENTS, Screen.RALLY_CALL_MISSION_SCREEN, Screen.FORGING_MISSION_SCREEN, Screen.QUEST_CHAIN_SCREEN, Screen.TACTICAL_MAP_MISSION_SCREEN, Screen.DEFENSE_MISSION_SCREEN, Screen.STRATEGY_MAP_MISSION_SCREEN, Screen.COIN_MINTING_MISSION_SCREEN, Screen.HUE_CONSTRUCTION_MISSION_SCREEN, Screen.TYPESETTING_MISSION_SCREEN, Screen.ADVENTURE_PUZZLE_SCREEN, Screen.STRATEGIC_PATH_MISSION_SCREEN, Screen.CONSTRUCTION_PUZZLE_SCREEN, Screen.NAVAL_BATTLE_TIMING_SCREEN, Screen.LANE_BATTLE_MISSION_SCREEN, Screen.ADMIN_DASHBOARD, Screen.STRATEGIC_MARCH_MISSION_SCREEN, Screen.TACTICAL_BATTLE_SCREEN];
+    const nonStandardNavScreens = [Screen.AR_MISSION_SCREEN, Screen.PREMIUM_SCREEN, Screen.SANDBOX, Screen.HIDDEN_OBJECT_SCREEN, Screen.QUIZ_MISSION_SCREEN, Screen.CONSTRUCTION_MISSION_SCREEN, Screen.DIPLOMACY_MISSION_SCREEN, Screen.CUSTOMIZATION, Screen.CRAFTING_SCREEN, Screen.DETECTIVE_SCREEN, Screen.COLORING_MISSION_SCREEN, Screen.RHYTHM_MISSION_SCREEN, Screen.ACHIEVEMENTS, Screen.RALLY_CALL_MISSION_SCREEN, Screen.FORGING_MISSION_SCREEN, Screen.QUEST_CHAIN_SCREEN, Screen.TACTICAL_MAP_MISSION_SCREEN, Screen.DEFENSE_MISSION_SCREEN, Screen.STRATEGY_MAP_MISSION_SCREEN, Screen.COIN_MINTING_MISSION_SCREEN, Screen.HUE_CONSTRUCTION_MISSION_SCREEN, Screen.NEWSPAPER_PUBLISHER_SCREEN, Screen.ADVENTURE_PUZZLE_SCREEN, Screen.STRATEGIC_PATH_MISSION_SCREEN, Screen.CONSTRUCTION_PUZZLE_SCREEN, Screen.NAVAL_BATTLE_TIMING_SCREEN, Screen.LANE_BATTLE_MISSION_SCREEN, Screen.ADMIN_DASHBOARD, Screen.STRATEGIC_MARCH_MISSION_SCREEN, Screen.TACTICAL_BATTLE_SCREEN];
     if (currentScreen !== screen || activeMission?.id !== mission?.id || nonStandardNavScreens.includes(screen)) {
       setTransitionClass('screen-fade-out');
       setTimeout(() => {
@@ -569,7 +607,7 @@ Yêu cầu:
 Format JSON: { "modifiedText": string, "answers": string[], "definitions": Record<string, string> }`;
 
     const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash-preview-04-17",
+        model: "gemini-2.5-flash",
         contents: puzzlePrompt,
         config: { responseMimeType: "application/json" },
     });
@@ -626,7 +664,7 @@ Format JSON: { "modifiedText": string, "answers": string[], "definitions": Recor
           'strategyMap': Screen.STRATEGY_MAP_MISSION_SCREEN,
           'coinMinting': Screen.COIN_MINTING_MISSION_SCREEN,
           'hueConstruction': Screen.HUE_CONSTRUCTION_MISSION_SCREEN,
-          'typesetting': Screen.TYPESETTING_MISSION_SCREEN,
+          'newspaperPublisher': Screen.NEWSPAPER_PUBLISHER_SCREEN,
           'adventurePuzzle': Screen.ADVENTURE_PUZZLE_SCREEN,
           'strategicPath': Screen.STRATEGIC_PATH_MISSION_SCREEN,
           'constructionPuzzle': Screen.CONSTRUCTION_PUZZLE_SCREEN,
@@ -1066,9 +1104,9 @@ Format JSON: { "modifiedText": string, "answers": string[], "definitions": Recor
             />;
         }
         break;
-      case Screen.TYPESETTING_MISSION_SCREEN:
-        if (activeMission && activeMission.type === 'typesetting') {
-            return <TypesettingScreen missionData={activeMission as TypesettingMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} onFail={handleMissionFail} />;
+      case Screen.NEWSPAPER_PUBLISHER_SCREEN:
+        if (activeMission && activeMission.type === 'newspaperPublisher') {
+            return <NewspaperPublisherScreen missionData={activeMission as NewspaperPublisherMissionData} onReturnToMuseum={handleReturnToMuseum} onComplete={completeMissionLogic} onFail={handleMissionFail} />;
         }
         break;
       case Screen.ADVENTURE_PUZZLE_SCREEN:

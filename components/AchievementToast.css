@@ -1,0 +1,16 @@
+#achievement-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  animation: slide-in-out 4s forwards;
+  pointer-events: none;
+}
+
+@keyframes slide-in-out {
+  0% { transform: translate(-50%, -150%); opacity: 0; }
+  10% { transform: translate(-50%, 0); opacity: 1; }
+  90% { transform: translate(-50%, 0); opacity: 1; }
+  100% { transform: translate(-50%, -150%); opacity: 0; }
+}

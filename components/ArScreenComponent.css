@@ -1,0 +1,39 @@
+/* --- CSS cho AR Back Button --- */
+#ar-back-button {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10002; /* Ensure it's above the AR scene and modals */
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #f59e0b; /* Amber 500 */
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+#ar-back-button:hover {
+  background-color: #d97706; /* Amber 600 */
+}
+
+.dark #ar-back-button { /* Applied when <html> has 'dark' class */
+  background-color: #78350f; /* Amber 800 */
+  color: #fef3c7; /* Amber 100 */
+  box-shadow: 0 4px 6px rgba(255,255,255,0.1);
+}
+.dark #ar-back-button:hover {
+  background-color: #92400e; /* Amber 700 */
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translate(-50%, -20px); }
+    10% { opacity: 1; transform: translate(-50%, 0); }
+    90% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+#ar-reward-notification {
+    animation: fadeInOut 3s forwards;
+}

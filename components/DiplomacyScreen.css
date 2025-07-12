@@ -1,0 +1,62 @@
+/* --- Diplomacy Screen Specific Styles --- */
+#goodwill-bar-container {
+    width: 100%;
+    height: 24px;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 4px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+}
+#goodwill-bar {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.5s ease-in-out, background-color 0.5s ease-in-out;
+    box-shadow: 0 0 5px rgba(255,255,255,0.5);
+}
+#npc-dialogue-box {
+    width: 100%;
+    background-color: rgba(255,255,255,0.4);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border-left: 5px solid #d97706;
+}
+.dark #npc-dialogue-box {
+    background-color: rgba(75, 85, 99, 0.4);
+    border-left-color: #f59e0b;
+}
+
+.diplomacy-choice-button {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease-in-out;
+    background-color: rgba(255,255,255,0.7);
+    color: #44403c;
+    border: 1px solid rgba(255,255,255,1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.dark .diplomacy-choice-button {
+    background-color: rgba(55, 65, 81, 0.7);
+    color: #e7e5e4;
+    border-color: rgba(255,255,255,0.2);
+}
+.diplomacy-choice-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.diplomacy-choice-button.selected-correct {
+    background-color: #16a34a; /* green-700 */
+    color: white;
+    transform: scale(1.02);
+}
+.diplomacy-choice-button.selected-wrong {
+    background-color: #b91c1c; /* red-800 */
+    color: white;
+    transform: scale(0.98);
+}
+.diplomacy-choice-button:disabled {
+    cursor: not-allowed;
+}

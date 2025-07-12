@@ -2,21 +2,21 @@
 
 const audioAssets = {
   // Nhạc nền (BGM) - Stable URLs
-  bgm_main: 'https://cdn.pixabay.com/audio/2022/11/17/audio_87460b6163.mp3',
-  bgm_museum: 'https://cdn.pixabay.com/audio/2023/02/13/audio_434825509a.mp3',
+  bgm_main: 'https://github.com/vtvinh87/dongchaylichsu/raw/refs/heads/main/sound/bgm/bgm-main.mp3',
+  bgm_museum: 'https://github.com/vtvinh87/dongchaylichsu/raw/refs/heads/main/sound/bgm/bgm-museum.mp3',
   bgm_truong_son: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1cba96d45f.mp3',
 
   // Hiệu ứng âm thanh (SFX) - Stable URLs
-  sfx_click: 'https://cdn.pixabay.com/audio/2022/03/15/audio_71a729c788.mp3',
-  sfx_success: 'https://cdn.pixabay.com/audio/2022/03/10/audio_c3b092e347.mp3',
-  sfx_fail: 'https://cdn.pixabay.com/audio/2021/08/04/audio_c6ccf3964a.mp3',
-  sfx_collect: 'https://cdn.pixabay.com/audio/2022/11/19/audio_24a23743ab.mp3',
-  sfx_dig: 'https://cdn.pixabay.com/audio/2022/03/25/audio_a66c4e0984.mp3',
-  sfx_explosion: 'https://cdn.pixabay.com/audio/2022/01/18/audio_25501b7a56.mp3',
-  sfx_build: 'https://cdn.pixabay.com/audio/2021/09/24/audio_13a391dc13.mp3',
-  sfx_unlock: 'https://cdn.pixabay.com/audio/2022/03/22/audio_2d813a3098.mp3',
-  sfx_page_turn: 'https://cdn.pixabay.com/audio/2022/10/28/audio_c363de6344.mp3',
-  sfx_flood: 'https://cdn.pixabay.com/audio/2022/03/13/audio_034b02c326.mp3',
+  sfx_click: 'https://github.com/vtvinh87/dongchaylichsu/raw/refs/heads/main/sound/sfx/sfx-click.mp3',
+  sfx_success: 'https://github.com/vtvinh87/dongchaylichsu/raw/refs/heads/main/sound/sfx/sfx-success.mp3',
+  sfx_fail: 'https://github.com/vtvinh87/dongchaylichsu/raw/refs/heads/main/sound/sfx/sfx-fail.mp3',
+  sfx_collect: 'https://github.com/vtvinh87/dongchaylichsu/raw/refs/heads/main/sound/sfx/sfx-collect.mp3',
+  sfx_dig: 'https://github.com/vtvinh87/dongchaylichsu/raw/refs/heads/main/sound/sfx/sfx-dig.mp3',
+  sfx_explosion: 'https://github.com/vtvinh87/dongchaylichsu/raw/refs/heads/main/sound/sfx/sfx-explosion.mp3',
+  sfx_build: 'https://github.com/vtvinh87/dongchaylichsu/raw/refs/heads/main/sound/sfx/sfx-build.mp3',
+  sfx_unlock: 'https://github.com/vtvinh87/dongchaylichsu/raw/refs/heads/main/sound/sfx/sfx-unlock.mp3',
+  sfx_page_turn: 'https://github.com/vtvinh87/dongchaylichsu/raw/refs/heads/main/sound/sfx/sfx-page-turn.mp3',
+  sfx_flood: 'https://github.com/vtvinh87/dongchaylichsu/raw/refs/heads/main/sound/sfx/sfx-flood.mp3',
 };
 
 

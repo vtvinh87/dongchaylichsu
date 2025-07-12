@@ -1,0 +1,108 @@
+/* --- CSS cho Adventure Puzzle Screen --- */
+#adventure-puzzle-screen {
+  background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-ban-do-vuot-bien.png');
+  background-size: cover;
+  background-position: center;
+  width: 100%;
+  max-width: 900px;
+  height: 90vh;
+  max-height: 700px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  position: relative;
+}
+
+#adventure-puzzle-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0,0,0,0.3);
+  border-radius: 0.75rem; /* Match parent's rounding */
+}
+
+.adventure-puzzle-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  color: #3a2e20; /* Dark brown text */
+}
+
+.adventure-puzzle-content h2 {
+  color: #fefce8; /* amber-50 */
+  text-shadow: 0 0 4px #fefce8, 0 0 8px #fde047, 0 0 12px #facc15;
+  animation: pulse-yellow-glow 2.5s infinite alternate ease-in-out;
+}
+
+#riddle-display {
+  /* Replaced parchment with frosted glass for better readability */
+  background-color: rgba(255, 255, 255, 0.4);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  padding: 2.5rem 3rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  font-family: 'Special Elite', cursive;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: #3a2e20;
+}
+
+.dark #riddle-display {
+  background-color: rgba(30, 27, 27, 0.5);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #fefce8;
+}
+
+#answer-input-area {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+#answer-input-area input {
+  flex-grow: 1;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 2px solid #a16207; /* amber-700 */
+  background-color: #fef3c7; /* amber-100 */
+  color: #3a2e20;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+#answer-input-area input:focus {
+  background-color: #fefce8; /* amber-50 */
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.4); /* ring-amber-600 with opacity */
+}
+
+#answer-input-area button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  background-color: #a16207; /* amber-700 */
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#answer-input-area button:hover {
+  background-color: #78350f; /* amber-800 */
+}
+
+.feedback-display {
+    background-color: rgba(255, 237, 213, 0.9); /* orange-100 with alpha */
+    border: 1px solid #fdba74; /* orange-300 */
+    color: #c2410c; /* orange-700 */
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    animation: fadeInScaleUp 0.3s forwards;
+}

@@ -1,0 +1,131 @@
+/* --- CSS for Dialogue Modal --- */
+.dialogue-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 250; /* Above most things, below system-level modals if any */
+  -webkit-animation: fadeInScreen 0.3s forwards;
+  animation: fadeInScreen 0.3s forwards;
+}
+
+.dialogue-box {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 800px;
+  background-color: #fdfbf6; /* A slightly creamy white */
+  border: 4px solid #a16207; /* amber-700 */
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  animation: slideUpIn 0.5s ease-out forwards;
+}
+.dark .dialogue-box {
+  background-color: #292524; /* stone-800 */
+  border-color: #d97706; /* amber-600 */
+}
+
+@keyframes slideUpIn {
+  from {
+    transform: translate(-50%, 50px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+.character-portrait {
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid #fcd34d; /* amber-300 */
+  object-fit: cover;
+  background-color: #fefce8; /* amber-50 */
+}
+.dark .character-portrait {
+  border-color: #f59e0b; /* amber-500 */
+  background-color: #44403c; /* stone-700 */
+}
+
+.dialogue-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100px; /* Ensure a minimum height */
+}
+
+.speaker-name {
+  font-family: 'Special Elite', cursive;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #78350f; /* amber-800 */
+  margin-bottom: 0.5rem;
+}
+.dark .speaker-name {
+  color: #fcd34d; /* amber-300 */
+}
+
+#dialogue-text {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.125rem; /* 18px */
+  color: #3f3f46; /* stone-700 */
+  flex-grow: 1;
+  min-height: 50px;
+}
+.dark #dialogue-text {
+  color: #e7e5e4; /* stone-200 */
+}
+
+.dialogue-controls {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+#dialogue-continue-button {
+  background-color: #a16207; /* amber-700 */
+  color: white;
+  padding: 0.5rem 2rem;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+#dialogue-continue-button:hover {
+  background-color: #78350f; /* amber-800 */
+  transform: scale(1.05);
+}
+.dark #dialogue-continue-button {
+  background-color: #f59e0b; /* amber-500 */
+  color: #44403c;
+}
+.dark #dialogue-continue-button:hover {
+  background-color: #d97706; /* amber-600 */
+}
+
+/* --- CSS for Side Quest System --- */
+.dialogue-option-button {
+  background-color: #16a34a; /* green-600 */
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.dialogue-option-button:hover {
+  background-color: #15803d; /* green-700 */
+  transform: scale(1.05);
+}

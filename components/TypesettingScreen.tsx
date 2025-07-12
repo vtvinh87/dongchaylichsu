@@ -58,7 +58,7 @@ const TypesettingScreen: React.FC<{
     // Initialize state when the mission changes
     useEffect(() => {
         const initialPieces = shuffleArray(
-            missionData.availableLetters.map((letter, index) => ({ id: `${letter}-${index}`, letter }))
+            missionData.availableLetters.map((letter, index): LetterPiece => ({ id: `${letter}-${index}`, letter }))
         );
         setTrayPieces(initialPieces);
         setSlottedPieces(Array(totalSlots).fill(null));

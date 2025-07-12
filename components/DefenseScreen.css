@@ -1,0 +1,180 @@
+/* --- CSS cho Defense Mission --- */
+#defense-map-grid {
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Background/B-chien-dich-thang-long.png');
+    background-size: cover;
+    background-position: center;
+    border: 4px solid #4a2c13;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+}
+.map-cell {
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.cell-village { background-color: rgba(161, 98, 7, 0.5); }
+.cell-road { background-color: rgba(120, 53, 15, 0.5); }
+.cell-empty { background-color: transparent; }
+.cell-forest { /* This is the safe zone */
+    background-color: rgba(22, 101, 52, 0.5);
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-khu-vuc-an-toan.png');
+    background-size: 50%;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.8;
+}
+.unit-icon {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: grab;
+    transition: transform 0.2s, box-shadow 0.2s, outline 0.2s;
+}
+.unit-icon:active {
+    cursor: grabbing;
+    transform: scale(1.1);
+    z-index: 10;
+}
+.unit-civilian { background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-dan-thuong.png'); }
+.unit-supplies { background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-quan-nhu.png'); }
+.unit-wounded { background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-thuong-binh.png'); }
+
+.unit-icon.selected {
+  outline: 3px solid #facc15; /* A bright yellow outline */
+  outline-offset: 2px;
+  border-radius: 50%; /* Make the outline circular */
+  box-shadow: 0 0 15px #facc15;
+  animation: pulse-yellow-glow 1.5s infinite alternate;
+}
+
+#rain-overlay {
+    position: absolute;
+    inset: 0;
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/Effects/Effect-mua-rung.png');
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0.5;
+    animation: rain-fall 0.5s linear infinite;
+}
+@keyframes rain-fall {
+    from { background-position: 0px 0px; }
+    to { background-position: 100px 100px; }
+}
+
+#enemy-threat-meter {
+    display: flex;
+    width: 100%;
+    height: 20px;
+    background: linear-gradient(to right, #4b5563 50%, #7f1d1d);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #1f2937;
+    position: relative;
+}
+#enemy-threat-meter-progress {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(to right, #facc15, #f97316, #ef4444);
+    transition: width 0.5s ease-in-out;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+}
+#defense-hud-panel {
+  display: grid;
+  width: 100%;
+  gap: 1rem;
+}
+.hud-section {
+  flex: 1;
+  background: rgba(0,0,0,0.4);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+#event-log {
+  grid-column: span 1 / span 1;
+}
+@media (min-width: 768px) {
+  #event-log {
+    grid-column: span 2 / span 2;
+  }
+  #defense-hud-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+   #defense-hud-panel {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+   #event-log {
+    grid-column: span 1 / span 1;
+  }
+}
+
+#event-log ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  height: 100px; /* fixed height */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.log-entry {
+    font-size: 0.875rem;
+    padding: 0.25rem;
+    margin-top: 0.25rem;
+    border-bottom: 1px dashed rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: fadeInDown 0.5s forwards;
+}
+.log-entry img {
+    width: 16px;
+    height: 16px;
+}
+
+#defense-screen-timer {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 0.5rem;
+  color: #fbbf24; /* amber-400 */
+}
+#defense-screen-timer.low-time {
+  color: #ef4444; /* red-500 */
+  animation: pulse-red-timer 1s infinite;
+}
+
+.log-enemy_surge {
+  color: #fca5a5; /* red-300 */
+  font-weight: bold;
+  background-color: rgba(153, 27, 27, 0.3);
+  border-radius: 4px;
+  animation: flash-red-log 1.5s ease-in-out;
+}
+@keyframes flash-red-log {
+  from, to { background-color: rgba(153, 27, 27, 0.3); }
+  50% { background-color: rgba(153, 27, 27, 0.6); }
+}
+
+.intel-item {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url('https://raw.githubusercontent.com/vtvinh87/dongchaylichsu/refs/heads/main/pictures/icon/icon-tinh-bao.png');
+    background-size: 70%;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    z-index: 5;
+    animation: pulse-intel 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse-intel {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}

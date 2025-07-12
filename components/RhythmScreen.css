@@ -1,0 +1,65 @@
+.rhythm-play-area {
+    width: 100%;
+    max-width: 400px;
+    height: 600px;
+    background: linear-gradient(to top, #1f2937, #374151, #4b5563);
+    border: 2px solid #9ca3af;
+    border-radius: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+}
+.rhythm-lane {
+    flex: 1;
+    border-left: 1px dashed rgba(255,255,255,0.3);
+    border-right: 1px dashed rgba(255,255,255,0.3);
+    position: relative;
+}
+.hit-line {
+    position: absolute;
+    bottom: 50px;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background-color: #fbbf24;
+    box-shadow: 0 0 10px #fcd34d, 0 0 20px #f59e0b;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.hit-key {
+    color: white;
+    font-weight: bold;
+    font-size: 1.5rem;
+    text-shadow: 0 0 5px black;
+}
+.rhythm-note {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 20px;
+    background: linear-gradient(145deg, #a78bfa, #8b5cf6);
+    border-radius: 5px;
+    animation-name: fall;
+    animation-timing-function: linear;
+}
+@keyframes fall {
+    from { top: -20px; }
+    to { top: calc(100% - 60px); }
+}
+.hit-feedback {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-shadow: 0 0 5px black;
+    opacity: 0;
+    animation: fade-up 0.5s forwards;
+}
+@keyframes fade-up {
+    from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    to { opacity: 0; transform: translate(-50%, -100%) scale(1.2); }
+}
