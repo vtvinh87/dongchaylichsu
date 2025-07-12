@@ -1,0 +1,37 @@
+/* --- CSS for Tutorial Overlay --- */
+
+#tutorial-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000; /* High z-index to cover everything */
+  pointer-events: all; /* Blocks interaction with underlying UI */
+}
+
+.tutorial-highlight {
+  position: absolute; /* Position is set by React style prop */
+  border-radius: 8px;
+  /* This is the key trick: a massive, clipped box-shadow creates the "hole punch" effect */
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none; /* Allows clicks inside the hole if needed, though backdrop covers most */
+}
+
+#tutorial-box {
+  position: absolute; /* Position is set by React style prop */
+  background-color: #fefce8; /* amber-50 */
+  color: #3f3f46; /* stone-700 */
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  max-width: 350px;
+  min-width: 300px;
+  border: 2px solid #fcd34d; /* amber-300 */
+  z-index: 1001; /* Must be higher than the highlight's box-shadow z-index (implicitly 0) */
+  animation: fadeInScaleUp 0.4s ease-out forwards;
+}
+
+.dark #tutorial-box {
+  background-color: #374151; /* gray-700 */
+  color: #f3f4f6; /* gray-100 */
+  border-color: #f59e0b; /* amber-500 */
+}

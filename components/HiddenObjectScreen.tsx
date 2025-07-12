@@ -73,13 +73,13 @@ const HiddenObjectScreen: React.FC<HiddenObjectScreenProps> = ({
 
       <h2 className="text-3xl font-bold text-amber-700 dark:text-amber-400 mb-4 font-serif">{missionData.title}</h2>
       
-      <div className="relative w-full aspect-[16/9] bg-stone-200 dark:bg-stone-900 rounded-md overflow-hidden shadow-lg border-4 border-amber-300 dark:border-stone-600">
-        <img src={missionData.backgroundImageUrl} alt="Bối cảnh phiên chợ" className="w-full h-full object-cover" />
+      <div className="hidden-object-container">
+        <img src={missionData.backgroundImageUrl} alt="Bối cảnh phiên chợ" className="hidden-object-image" />
 
         {missionData.objectsToFind.map(item => (
           <div
             key={item.id}
-            className={`absolute cursor-pointer rounded-sm transition-all duration-300 ${foundItems.includes(item.id) ? 'bg-green-500/50 border-2 border-white pointer-events-none' : 'hover:bg-yellow-300/40'}`}
+            className={`hotspot ${foundItems.includes(item.id) ? 'found' : ''}`}
             style={{
               left: `${item.coords.x}%`,
               top: `${item.coords.y}%`,
@@ -100,14 +100,14 @@ const HiddenObjectScreen: React.FC<HiddenObjectScreenProps> = ({
         )}
       </div>
 
-      <div id="item-list" className="w-full mt-4 p-3 bg-white/70 dark:bg-stone-700/70 rounded-lg shadow-inner flex justify-center items-center gap-4 flex-wrap">
+      <div className="item-list-container">
         {missionData.objectsToFind.map(item => (
           <div
             key={`list-${item.id}`}
-            className={`flex items-center gap-2 p-2 rounded-md transition-all duration-300 ${foundItems.includes(item.id) ? 'opacity-40 line-through' : 'bg-amber-50 dark:bg-stone-600'}`}
+            className={`item-in-list ${foundItems.includes(item.id) ? 'found' : ''}`}
           >
-            <img src={item.iconUrl} alt={item.name} className="w-8 h-8 object-contain" />
-            <span className="font-semibold text-stone-700 dark:text-stone-200">{item.name}</span>
+            <img src={item.iconUrl} alt={item.name} className="item-icon" />
+            <span className="item-name">{item.name}</span>
           </div>
         ))}
       </div>
